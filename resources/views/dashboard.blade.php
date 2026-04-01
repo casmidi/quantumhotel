@@ -1,45 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Quantum Hotel Dashboard</title>
-</head>
-<body>
+@extends('layouts.app')
 
-<h2>Quantum Hotel System</h2>
+@section('title', 'Dashboard')
 
-<p>
-    Login sebagai: <b>{{ session('user') }}</b> 
-    ({{ session('role') }})
-</p>
+@section('content')
 
-<hr>
+<div class="row">
 
-<h3>TABLE</h3>
-<ul>
-    <li><a href="/room-class">Room Class</a></li>
-    <li><a href="/room">Room</a></li>
-</ul>
+    <div class="col-md-4">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h4>Room Class</h4>
+                <p>Manage room class data</p>
+            </div>
+            <a href="/kelas" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
 
-<h3>TRANSAKSI</h3>
-<ul>
-    <li><a href="/checkin">Checkin</a></li>
-    <li><a href="/checkout">Checkout</a></li>
-</ul>
+</div>
 
-<h3>REPORT</h3>
-<ul>
-    <li><a href="/guest-in-house">Guest In House</a></li>
-    <li><a href="/expected-departure">Expected Departure</a></li>
-</ul>
-
-<h3>TOOLS</h3>
-<ul>
-    <li><a href="/user">Maintenance User</a></li>
-    <li><a href="/change-password">Change Password</a></li>
-</ul>
-
-<br>
-<a href="/logout">Logout</a>
-
-</body>
-</html>
+@endsection

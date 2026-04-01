@@ -1,22 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Quantum Hotel Login</title>
+    <meta charset="utf-8">
+    <title>Login - Quantum Hotel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
 </head>
-<body>
 
-<h2>Login Quantum Hotel</h2>
+<body class="hold-transition login-page">
 
-@if(session('error'))
-    <p style="color:red">{{ session('error') }}</p>
-@endif
+<div class="login-box">
+    <div class="login-logo">
+        <b>Quantum Hotel</b>
+    </div>
 
-<form method="POST" action="/login">
-    @csrf
-    <input type="text" name="username" placeholder="User"><br><br>
-    <input type="password" name="password" placeholder="Password"><br><br>
-    <button type="submit">Login</button>
-</form>
+    <div class="card">
+        <div class="card-body login-card-body">
+
+            <p class="login-box-msg">Sign in to start your session</p>
+
+            <form method="POST" action="/login">
+                @csrf
+
+                <div class="input-group mb-3">
+                    <input type="text" name="username" class="form-control" placeholder="User">
+                </div>
+
+                <div class="input-group mb-3">
+                    <input type="password" name="password" class="form-control" placeholder="Password">
+                </div>
+
+                <button class="btn btn-primary btn-block">Login</button>
+            </form>
+
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
