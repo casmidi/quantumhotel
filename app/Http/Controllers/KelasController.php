@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 class KelasController extends Controller
 {
-    // =========================
-    // TAMPIL DATA
-    // =========================
+    /*
+    =========================================
+    INDEX
+    =========================================
+    */
     public function index(Request $request)
     {
         $query = DB::table('KELAS');
@@ -24,48 +26,82 @@ class KelasController extends Controller
         return view('kelas.index', compact('kelas'));
     }
 
-    // =========================
-    // SIMPAN DATA
-    // =========================
+
+    /*
+    =========================================
+    STORE (SUPER SAFE)
+    =========================================
+    */
     public function store(Request $request)
     {
+        // 🔥 SANITIZE TOTAL (ANTI ERROR)
+        $rate = $this->safeNumber($request->Rate1);
+        $depo = $this->safeNumber($request->Depo1);
+
         DB::table('KELAS')->insert([
-            'Kode' => $request->Kode,
-            'Nama' => $request->Nama,
-            'Rate1' => $request->Rate1 ?? 0,
-            'Depo1' => $request->Depo1 ?? 0,
+            'Kode'  => trim($request->Kode),
+            'Nama'  => trim($request->Nama),
+            'Rate1' => $rate,
+            'Depo1' => $depo,
         ]);
 
-        return redirect('/kelas')->with('success', 'Data berhasil disimpan');
+        return redirect('/kelas')->with('success', 'Data saved successfully');
     }
 
-    // =========================
-    // HAPUS DATA
-    // =========================
+
+    /*
+    =========================================
+    UPDATE (SUPER SAFE)
+    =========================================
+    */
+    public function update(Request $request, $kode)
+    {
+        $rate = $this->safeNumber($request->Rate1);
+        $depo = $this->safeNumber($request->Depo1);
+
+        DB::table('KELAS')
+            ->where('Kode', $kode)
+            ->update([
+                'Nama'  => trim($request->Nama),
+                'Rate1' => $rate,
+                'Depo1' => $depo,
+            ]);
+
+        return redirect('/kelas')->with('success', 'Data updated successfully');
+    }
+
+
+    /*
+    =========================================
+    DELETE
+    =========================================
+    */
     public function destroy($kode)
     {
         DB::table('KELAS')->where('Kode', $kode)->delete();
 
-        return redirect('/kelas')->with('success', 'Data berhasil dihapus');
+        return redirect('/kelas')->with('success', 'Data deleted successfully');
     }
 
-    public function edit($kode)
-{
-    $kelas = DB::table('KELAS')->where('Kode', $kode)->first();
 
-    return view('kelas.edit', compact('kelas'));
-}
-
-    public function update(Request $request, $kode)
+    /*
+    =========================================
+    FUNCTION ANTI ERROR (KUNCI UTAMA)
+    =========================================
+    */
+    private function safeNumber($value)
     {
-        DB::table('KELAS')
-            ->where('Kode', $kode)
-            ->update([
-                'Nama' => $request->Nama,
-                'Rate1' => $request->Rate1,
-                'Depo1' => $request->Depo1,
-            ]);
+        // kalau kosong → 0
+        if (!$value) return 0;
 
-        return redirect('/kelas')->with('success', 'Data updated');
+        // ambil hanya angka
+        $clean = preg_replace('/[^0-9]/', '', $value);
+
+        // kalau hasil kosong → 0
+        if ($clean === '' || !is_numeric($clean)) {
+            return 0;
+        }
+
+        return (int) $clean;
     }
 }
