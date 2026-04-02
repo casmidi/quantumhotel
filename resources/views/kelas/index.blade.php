@@ -6,7 +6,7 @@
 
 <div class="container-fluid">
     @if(session('success'))
-    <div class="alert alert-success">
+    <div class="alert alert-success" id="successAlert">
         {{ session('success') }}
     </div>
     @endif
@@ -189,6 +189,19 @@ formKelas.addEventListener('submit', function () {
     rateField.value = unformat(rateField.value);
     depoField.value = unformat(depoField.value);
 });
+
+const successAlert = document.getElementById('successAlert');
+
+if (successAlert) {
+    setTimeout(() => {
+        successAlert.style.transition = 'opacity 0.3s ease';
+        successAlert.style.opacity = '0';
+
+        setTimeout(() => {
+            successAlert.remove();
+        }, 300);
+    }, 3000);
+}
 
 kodeField.focus();
 </script>
