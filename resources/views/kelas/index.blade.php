@@ -330,7 +330,7 @@
             <span>Master Data</span>
         </div>
         <h1>Room Class Management</h1>
-        <p>Kelola kelas kamar dengan tampilan yang lebih elegan, cepat dioperasikan, dan siap menjadi template CRUD utama untuk modul hotel system berikutnya.</p>
+        <p>Manage room classes with a more elegant interface, faster operator flow, and a polished CRUD foundation for the next hotel system modules.</p>
 
         <div class="row kelas-summary">
             <div class="col-md-4 mb-3 mb-md-0">
@@ -358,7 +358,7 @@
         <div class="kelas-shell-header">
             <div>
                 <h2 class="kelas-shell-title">Input Room Class</h2>
-                <p class="kelas-shell-subtitle">Enter akan berpindah field secara otomatis, dan field terakhir langsung menyimpan data.</p>
+                <p class="kelas-shell-subtitle">Press Enter to move through each field, and the last field submits the form automatically.</p>
             </div>
             <span class="kelas-shell-badge">Ready for Fast Entry</span>
         </div>
@@ -401,7 +401,7 @@
         <div class="kelas-shell-header">
             <div>
                 <h2 class="kelas-shell-title">Class Directory</h2>
-                <p class="kelas-shell-subtitle">Klik salah satu baris untuk memuat data ke form dan langsung masuk mode edit.</p>
+                <p class="kelas-shell-subtitle">Click any row to load its data into the form and switch directly into edit mode.</p>
             </div>
             <span class="kelas-shell-badge">{{ number_format($totalKelas, 0, ',', '.') }} Records</span>
         </div>
@@ -434,7 +434,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="kelas-empty">Belum ada data room class. Input data pertama untuk memulai.</td>
+                            <td colspan="5" class="kelas-empty">No room class records yet. Create the first one to get started.</td>
                         </tr>
                         @endforelse
                     </tbody>

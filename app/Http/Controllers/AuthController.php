@@ -34,7 +34,7 @@ class AuthController extends Controller
             }
         }
 
-        return back()->with('error', 'Login gagal');
+        return back()->with('error', 'Login failed');
     }
 
     public function logout()
