@@ -4,220 +4,196 @@
 
 @section('content')
 
-<style>
-/* Zebra */
-#tableKelas tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
+<div class="container-fluid">
 
-/* Hover */
-#tableKelas tbody tr:hover {
-    background-color: #d6e9ff !important;
-    cursor: pointer;
-}
-</style>
+    <h3 class="mb-3">Room Class</h3>
 
-<div class="row">
-
-    <!-- ERROR -->
-    @if ($errors->any())
-    <div class="col-md-12">
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    </div>
-    @endif
-
-    <!-- SUCCESS -->
     @if(session('success'))
-    <div class="col-md-12">
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
+    <div class="alert alert-success">
+        {{ session('success') }}
     </div>
     @endif
 
-    <!-- FORM -->
-    <div class="col-md-12">
-        <div class="card card-primary">
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            Input Room Class
+        </div>
 
-            <div class="card-header">
-                <h3 class="card-title">Room Class Form</h3>
-            </div>
-
+        <div class="card-body">
             <form method="POST" action="/kelas" id="formKelas">
                 @csrf
 
-                <div class="card-body">
-                    <div class="row">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Kode</label>
+                        <input type="text" name="Kode" id="Kode" class="form-control" required>
+                    </div>
 
-                        <div class="col-md-3">
-                            <label>Kode</label>
-                            <input type="text" name="Kode" id="Kode" class="form-control" required>
-                        </div>
+                    <div class="col-md-6">
+                        <label>Nama</label>
+                        <input type="text" name="Nama" id="Nama" class="form-control" required>
+                    </div>
 
-                        <div class="col-md-5">
-                            <label>Nama</label>
-                            <input type="text" name="Nama" id="Nama" class="form-control">
-                        </div>
+                    <div class="col-md-2">
+                        <label>Rate</label>
+                        <input type="text" name="Rate1" id="Rate1" class="form-control text-end" inputmode="numeric">
+                    </div>
 
-                        <div class="col-md-2">
-                            <label>Rate</label>
-                            <input type="text" name="Rate1" id="Rate1" class="form-control">
-                        </div>
-
-                        <div class="col-md-2">
-                            <label>Deposit</label>
-                            <input type="text" name="Depo1" id="Depo1" class="form-control">
-                        </div>
-
+                    <div class="col-md-2">
+                        <label>Deposit</label>
+                        <input type="text" name="Depo1" id="Depo1" class="form-control text-end" inputmode="numeric">
                     </div>
                 </div>
 
-                <div class="card-footer">
+                <div class="mt-3">
                     <button class="btn btn-primary">Save</button>
-                    <button type="reset" class="btn btn-secondary" id="btnReset">Reset</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
                 </div>
-
             </form>
-
         </div>
     </div>
 
-    <!-- TABLE -->
-    <div class="col-md-12">
-        <div class="card mt-3">
+    <div class="card">
+        <div class="card-header">
+            Data Room Class
+        </div>
 
-            <div class="card-header d-flex justify-content-between">
-                <h3 class="card-title">Room Class List</h3>
-
-                <form method="GET">
-                    <input type="text" name="q" placeholder="Search..."
-                        class="form-control form-control-sm"
-                        value="{{ request('q') }}">
-                </form>
-            </div>
-
-            <div class="card-body table-responsive">
-
-                <table class="table table-bordered" id="tableKelas">
-                    <thead>
-                        <tr>
-                            <th>Kode</th>
-                            <th>Nama</th>
-                            <th>Rate</th>
-                            <th>Deposit</th>
-                            <th width="80">Action</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @foreach($kelas as $k)
-                        <tr>
-                            <td>{{ $k->Kode }}</td>
-                            <td>{{ $k->Nama }}</td>
-                            <td>{{ number_format($k->Rate1,0,',','.') }}</td>
-                            <td>{{ number_format($k->Depo1,0,',','.') }}</td>
-                            <td>
-                                <a href="/kelas/{{ $k->Kode }}/delete"
-                                   class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Delete this data?')">
-                                   🗑
-                                </a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-
-                </table>
-
-            </div>
-
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0" id="tableKelas">
+                <thead class="table-light">
+                    <tr>
+                        <th>Kode</th>
+                        <th>Nama</th>
+                        <th class="text-end">Rate</th>
+                        <th class="text-end">Deposit</th>
+                        <th width="80">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($kelas as $k)
+                    <tr data-kode="{{ $k->Kode }}"
+                        data-nama="{{ $k->Nama }}"
+                        data-rate="{{ $k->Rate1 }}"
+                        data-depo="{{ $k->Depo1 }}">
+                        <td><strong>{{ $k->Kode }}</strong></td>
+                        <td>{{ $k->Nama }}</td>
+                        <td class="text-end">{{ number_format($k->Rate1 ?? 0, 0, ',', '.') }}</td>
+                        <td class="text-end">{{ number_format($k->Depo1 ?? 0, 0, ',', '.') }}</td>
+                        <td>
+                            <a href="/kelas/{{ $k->Kode }}/delete" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    // =========================
-    // FORMAT RIBUAN (VB6 STYLE)
-    // =========================
-    function formatRibuan(angka) {
-        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+function normalizeNumber(angka) {
+    if (angka === null || angka === undefined) {
+        return '';
     }
 
-    function handleInput(el) {
-        let cursorPos = el.selectionStart;
-        let oldLength = el.value.length;
+    const raw = angka.toString().trim();
 
-        let angka = el.value.replace(/[^0-9]/g, '');
-        let formatted = formatRibuan(angka);
-
-        el.value = formatted;
-
-        let newLength = formatted.length;
-        cursorPos = cursorPos + (newLength - oldLength);
-
-        el.setSelectionRange(cursorPos, cursorPos);
+    if (raw === '') {
+        return '';
     }
 
-    // APPLY FORMAT
-    document.querySelectorAll("#Rate1, #Depo1").forEach(function(input) {
-        input.addEventListener("input", function () {
-            handleInput(this);
-        });
+    if (raw.includes('.')) {
+        const [integerPart, decimalPart = ''] = raw.split('.');
+        const cleanInteger = integerPart.replace(/\D/g, '');
+
+        if (/^0+$/.test(decimalPart)) {
+            return cleanInteger;
+        }
+    }
+
+    return raw.replace(/\D/g, '');
+}
+
+function formatRibuan(angka) {
+    const normalized = normalizeNumber(angka);
+
+    if (!normalized) {
+        return '';
+    }
+
+    return normalized.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function unformat(angka) {
+    return (angka || '').toString().replace(/\./g, '');
+}
+
+const formKelas = document.getElementById('formKelas');
+const kodeField = document.getElementById('Kode');
+const namaField = document.getElementById('Nama');
+const rateField = document.getElementById('Rate1');
+const depoField = document.getElementById('Depo1');
+
+const fields = [kodeField, namaField, rateField, depoField];
+const numericFields = [rateField, depoField];
+
+numericFields.forEach((field) => {
+    field.addEventListener('input', function () {
+        const angka = this.value.replace(/\D/g, '');
+        this.value = formatRibuan(angka);
     });
-
-    // =========================
-    // CLICK ROW → FILL FORM
-    // =========================
-    document.querySelectorAll("#tableKelas tbody tr").forEach(function(row){
-
-        row.addEventListener("click", function(){
-
-            let tds = row.querySelectorAll("td");
-
-            let kode = tds[0].innerText.trim();
-            let nama = tds[1].innerText.trim();
-            let rate = tds[2].innerText.replace(/\./g,'');
-            let depo = tds[3].innerText.replace(/\./g,'');
-
-            document.getElementById("Kode").value = kode;
-            document.getElementById("Nama").value = nama;
-            document.getElementById("Rate1").value = rate;
-            document.getElementById("Depo1").value = depo;
-
-            // mode update
-            document.getElementById("formKelas").action = "/kelas/" + kode + "/update";
-        });
-
-    });
-
-    // =========================
-    // RESET
-    // =========================
-    document.getElementById("btnReset").addEventListener("click", function(){
-        document.getElementById("formKelas").action = "/kelas";
-    });
-
 });
-</script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+fields.forEach((field, index) => {
+    field.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
 
-    if (document.querySelector('.alert-success')) {
-        document.getElementById("formKelas").reset();
-        document.getElementById("Kode").focus();
+        event.preventDefault();
+
+        if (index < fields.length - 1) {
+            fields[index + 1].focus();
+            fields[index + 1].select();
+            return;
+        }
+
+        formKelas.requestSubmit();
+    });
+});
+
+document.querySelector('#tableKelas tbody').addEventListener('click', function (event) {
+    if (event.target.closest('a')) {
+        return;
     }
 
+    const row = event.target.closest('tr');
+
+    kodeField.value = row.dataset.kode;
+    namaField.value = row.dataset.nama;
+    rateField.value = formatRibuan(row.dataset.rate || '');
+    depoField.value = formatRibuan(row.dataset.depo || '');
+
+    kodeField.readOnly = true;
+    formKelas.action = '/kelas/' + row.dataset.kode + '/update';
+    namaField.focus();
+    namaField.select();
 });
+
+function resetForm() {
+    formKelas.reset();
+    kodeField.readOnly = false;
+    formKelas.action = '/kelas';
+    kodeField.focus();
+}
+
+formKelas.addEventListener('submit', function () {
+    rateField.value = unformat(rateField.value);
+    depoField.value = unformat(depoField.value);
+});
+
+kodeField.focus();
 </script>
 
 @endsection
