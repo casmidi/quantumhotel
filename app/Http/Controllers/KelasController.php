@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Events\KelasUpdated;
 
 class KelasController extends Controller
 {
     /*
-    =========================================
-    INDEX
-    =========================================
+    |--------------------------------------------------------------------------
+    | INDEX (LIST + SEARCH)
+    |--------------------------------------------------------------------------
     */
     public function index(Request $request)
     {
@@ -26,82 +27,91 @@ class KelasController extends Controller
         return view('kelas.index', compact('kelas'));
     }
 
-
     /*
-    =========================================
-    STORE (SUPER SAFE)
-    =========================================
+    |--------------------------------------------------------------------------
+    | STORE (INSERT)
+    |--------------------------------------------------------------------------
     */
     public function store(Request $request)
     {
-        // 🔥 SANITIZE TOTAL (ANTI ERROR)
-        $rate = $this->safeNumber($request->Rate1);
-        $depo = $this->safeNumber($request->Depo1);
+        $kode = trim((string) $request->Kode);
+
+        $existing = DB::table('KELAS')
+            ->whereRaw('RTRIM(Kode) = ?', [$kode])
+            ->first();
+
+        if ($existing) {
+            DB::table('KELAS')
+                ->whereRaw('RTRIM(Kode) = ?', [$kode])
+                ->update([
+                    'Nama' => $request->Nama,
+                    'Rate1' => is_numeric($request->Rate1) ? $request->Rate1 : 0,
+                    'Depo1' => is_numeric($request->Depo1) ? $request->Depo1 : 0,
+                ]);
+
+            event(new KelasUpdated());
+
+            return redirect('/kelas')->with('success', 'Existing room class updated successfully');
+        }
 
         DB::table('KELAS')->insert([
-            'Kode'  => trim($request->Kode),
-            'Nama'  => trim($request->Nama),
-            'Rate1' => $rate,
-            'Depo1' => $depo,
+            'Kode' => $kode,
+            'Nama' => $request->Nama,
+            'Rate1' => is_numeric($request->Rate1) ? $request->Rate1 : 0,
+            'Depo1' => is_numeric($request->Depo1) ? $request->Depo1 : 0,
         ]);
+
+        // 🔥 trigger realtime
+        event(new KelasUpdated());
 
         return redirect('/kelas')->with('success', 'Data saved successfully');
     }
 
-
     /*
-    =========================================
-    UPDATE (SUPER SAFE)
-    =========================================
+    |--------------------------------------------------------------------------
+    | UPDATE
+    |--------------------------------------------------------------------------
     */
     public function update(Request $request, $kode)
     {
-        $rate = $this->safeNumber($request->Rate1);
-        $depo = $this->safeNumber($request->Depo1);
-
         DB::table('KELAS')
             ->where('Kode', $kode)
             ->update([
-                'Nama'  => trim($request->Nama),
-                'Rate1' => $rate,
-                'Depo1' => $depo,
+                'Nama' => $request->Nama,
+                'Rate1' => is_numeric($request->Rate1) ? $request->Rate1 : 0,
+                'Depo1' => is_numeric($request->Depo1) ? $request->Depo1 : 0,
             ]);
+
+        // 🔥 trigger realtime
+        event(new KelasUpdated());
 
         return redirect('/kelas')->with('success', 'Data updated successfully');
     }
 
-
     /*
-    =========================================
-    DELETE
-    =========================================
+    |--------------------------------------------------------------------------
+    | DELETE
+    |--------------------------------------------------------------------------
     */
     public function destroy($kode)
     {
         DB::table('KELAS')->where('Kode', $kode)->delete();
 
+        // 🔥 trigger realtime
+        event(new KelasUpdated());
+
         return redirect('/kelas')->with('success', 'Data deleted successfully');
     }
 
-
     /*
-    =========================================
-    FUNCTION ANTI ERROR (KUNCI UTAMA)
-    =========================================
+    |--------------------------------------------------------------------------
+    | DATA API (UNTUK AJAX / REALTIME LOAD)
+    |--------------------------------------------------------------------------
     */
-    private function safeNumber($value)
+    public function data()
     {
-        // kalau kosong → 0
-        if (!$value) return 0;
-
-        // ambil hanya angka
-        $clean = preg_replace('/[^0-9]/', '', $value);
-
-        // kalau hasil kosong → 0
-        if ($clean === '' || !is_numeric($clean)) {
-            return 0;
-        }
-
-        return (int) $clean;
+        return response()->json(
+            DB::table('KELAS')->orderBy('Kode')->get()
+        );
     }
 }

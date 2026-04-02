@@ -379,6 +379,7 @@
                     <div class="form-group col-lg-2 col-md-3">
                         <label class="kelas-label" for="Kode">Kode</label>
                         <input type="text" name="Kode" id="Kode" class="form-control kelas-input" required>
+                        <small class="text-muted d-block mt-2">If the code already exists, pressing Enter will load that room class for editing.</small>
                     </div>
 
                     <div class="form-group col-lg-5 col-md-9">
@@ -490,6 +491,10 @@ function unformat(angka) {
     return (angka || '').toString().replace(/\./g, '');
 }
 
+function normalizeCode(kode) {
+    return (kode || '').toString().trim().toUpperCase();
+}
+
 const formKelas = document.getElementById('formKelas');
 const kodeField = document.getElementById('Kode');
 const namaField = document.getElementById('Nama');
@@ -497,9 +502,30 @@ const rateField = document.getElementById('Rate1');
 const depoField = document.getElementById('Depo1');
 const saveButton = document.getElementById('saveButton');
 const resetButton = document.getElementById('resetButton');
+const tableRows = Array.from(document.querySelectorAll('#tableKelas tbody tr[data-kode]'));
 
 const fields = [kodeField, namaField, rateField, depoField];
 const numericFields = [rateField, depoField];
+
+function findExistingRowByCode(kode) {
+    const normalizedCode = normalizeCode(kode);
+
+    return tableRows.find((row) => normalizeCode(row.dataset.kode) === normalizedCode) || null;
+}
+
+function loadRowIntoForm(row) {
+    kodeField.value = row.dataset.kode;
+    namaField.value = row.dataset.nama;
+    rateField.value = formatRibuan(row.dataset.rate || '');
+    depoField.value = formatRibuan(row.dataset.depo || '');
+
+    kodeField.readOnly = true;
+    formKelas.action = '/kelas/' + row.dataset.kode + '/update';
+    saveButton.textContent = 'Update Room Class';
+    resetButton.textContent = 'Cancel Edit';
+    namaField.focus();
+    namaField.select();
+}
 
 numericFields.forEach((field) => {
     field.addEventListener('input', function () {
@@ -515,6 +541,17 @@ fields.forEach((field, index) => {
         }
 
         event.preventDefault();
+
+        if (field === kodeField) {
+            const existingRow = findExistingRowByCode(kodeField.value);
+
+            if (existingRow) {
+                loadRowIntoForm(existingRow);
+                return;
+            }
+
+            kodeField.value = normalizeCode(kodeField.value);
+        }
 
         if (index < fields.length - 1) {
             fields[index + 1].focus();
@@ -537,17 +574,7 @@ document.querySelector('#tableKelas tbody').addEventListener('click', function (
         return;
     }
 
-    kodeField.value = row.dataset.kode;
-    namaField.value = row.dataset.nama;
-    rateField.value = formatRibuan(row.dataset.rate || '');
-    depoField.value = formatRibuan(row.dataset.depo || '');
-
-    kodeField.readOnly = true;
-    formKelas.action = '/kelas/' + row.dataset.kode + '/update';
-    saveButton.textContent = 'Update Room Class';
-    resetButton.textContent = 'Cancel Edit';
-    namaField.focus();
-    namaField.select();
+    loadRowIntoForm(row);
 });
 
 function resetForm() {
@@ -560,6 +587,7 @@ function resetForm() {
 }
 
 formKelas.addEventListener('submit', function () {
+    kodeField.value = normalizeCode(kodeField.value);
     rateField.value = unformat(rateField.value);
     depoField.value = unformat(depoField.value);
 });
