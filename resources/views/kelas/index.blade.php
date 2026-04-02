@@ -243,6 +243,14 @@
         cursor: pointer;
     }
 
+    .kelas-table tbody tr:nth-child(odd) {
+        background: rgba(16, 35, 59, 0.045);
+    }
+
+    .kelas-table tbody tr:nth-child(even) {
+        background: rgba(255, 255, 255, 0.96);
+    }
+
     .kelas-table tbody tr:hover {
         background: rgba(179, 138, 81, 0.06);
         transform: translateY(-1px);
