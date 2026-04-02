@@ -5,9 +5,6 @@
 @section('content')
 
 <div class="container-fluid">
-
-    <h3 class="mb-3">Room Class</h3>
-
     @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
@@ -23,30 +20,35 @@
             <form method="POST" action="/kelas" id="formKelas">
                 @csrf
 
-                <div class="row">
-                    <div class="col-md-2">
+                <div class="form-row">
+                    <div class="form-group col-md-2">
                         <label>Kode</label>
                         <input type="text" name="Kode" id="Kode" class="form-control" required>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="form-group col-md-5">
                         <label>Nama</label>
                         <input type="text" name="Nama" id="Nama" class="form-control" required>
                     </div>
 
-                    <div class="col-md-2">
+                    <div class="form-group col-md-2">
                         <label>Rate</label>
                         <input type="text" name="Rate1" id="Rate1" class="form-control text-end" inputmode="numeric">
                     </div>
 
-                    <div class="col-md-2">
+                    <div class="form-group col-md-2">
                         <label>Deposit</label>
                         <input type="text" name="Depo1" id="Depo1" class="form-control text-end" inputmode="numeric">
                     </div>
+
+                    <div class="form-group col-md-1 d-flex align-items-end">
+                        <div class="w-100">
+                            <button class="btn btn-primary btn-block">Save</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mt-3">
-                    <button class="btn btn-primary">Save</button>
+                <div>
                     <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
                 </div>
             </form>
@@ -80,7 +82,7 @@
                         <td class="text-end">{{ number_format($k->Rate1 ?? 0, 0, ',', '.') }}</td>
                         <td class="text-end">{{ number_format($k->Depo1 ?? 0, 0, ',', '.') }}</td>
                         <td>
-                            <a href="/kelas/{{ $k->Kode }}/delete" class="btn btn-danger btn-sm">Delete</a>
+                            <a href="/kelas/{{ $k->Kode }}/delete" class="btn btn-danger btn-sm" title="Delete" aria-label="Delete">&#128465;</a>
                         </td>
                     </tr>
                     @endforeach
