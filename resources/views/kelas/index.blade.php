@@ -40,15 +40,10 @@
                         <label>Deposit</label>
                         <input type="text" name="Depo1" id="Depo1" class="form-control text-end" inputmode="numeric">
                     </div>
-
-                    <div class="form-group col-md-1 d-flex align-items-end">
-                        <div class="w-100">
-                            <button class="btn btn-primary btn-block">Save</button>
-                        </div>
-                    </div>
                 </div>
 
                 <div>
+                    <button class="btn btn-primary">Save</button>
                     <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
                 </div>
             </form>
