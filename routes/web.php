@@ -1,17 +1,30 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
 
 /*
 |--------------------------------------------------------------------------
-| LOGIN
+| DEBUG
+|--------------------------------------------------------------------------
+*/
+Route::get('/test-db', function () {
+    return DB::select("SELECT TOP 5 * FROM KELAS");
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| AUTH
 |--------------------------------------------------------------------------
 */
 Route::get('/', [AuthController::class, 'loginForm']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout']);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -20,12 +33,13 @@ Route::get('/logout', [AuthController::class, 'logout']);
 */
 Route::get('/dashboard', function () {
     if (!session('user')) return redirect('/');
-    return view('dashboard');
+    return app(DashboardController::class)->index();
 });
+
 
 /*
 |--------------------------------------------------------------------------
-| MASTER KELAS
+| MASTER DATA - KELAS
 |--------------------------------------------------------------------------
 */
 Route::get('/kelas', function () {
@@ -38,12 +52,71 @@ Route::post('/kelas', function () {
     return app(KelasController::class)->store(request());
 });
 
-Route::get('/kelas/{kode}/edit', function ($kode) {
+Route::post('/kelas/{kode}/update', function ($kode) {
     if (!session('user')) return redirect('/');
-    return app(KelasController::class)->edit($kode);
+    return app(KelasController::class)->update(request(), $kode);
 });
 
 Route::get('/kelas/{kode}/delete', function ($kode) {
     if (!session('user')) return redirect('/');
     return app(KelasController::class)->destroy($kode);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| MASTER DATA - ROOM
+|--------------------------------------------------------------------------
+*/
+Route::get('/room', function () {
+    if (!session('user')) return redirect('/');
+    return "Room Page";
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| TRANSACTION
+|--------------------------------------------------------------------------
+*/
+Route::get('/checkin', function () {
+    if (!session('user')) return redirect('/');
+    return "Check-In Page";
+});
+
+Route::get('/checkout', function () {
+    if (!session('user')) return redirect('/');
+    return "Check-Out Page";
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| REPORT
+|--------------------------------------------------------------------------
+*/
+Route::get('/guest-in-house', function () {
+    if (!session('user')) return redirect('/');
+    return "Guest In House Report";
+});
+
+Route::get('/expected-departure', function () {
+    if (!session('user')) return redirect('/');
+    return "Expected Departure Report";
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| TOOLS
+|--------------------------------------------------------------------------
+*/
+Route::get('/user', function () {
+    if (!session('user')) return redirect('/');
+    return "User Management Page";
+});
+
+Route::get('/change-password', function () {
+    if (!session('user')) return redirect('/');
+    return "Change Password Page";
 });
