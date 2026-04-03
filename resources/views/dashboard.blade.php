@@ -119,16 +119,17 @@
     }
 
     .metric-card.occupied { background: linear-gradient(135deg, #6f1f24, #b93a42 58%, #e07177 140%); }
-    .metric-card.dirty { background: linear-gradient(135deg, #6d2b2b, #b14d4d); }
-    .metric-card.clean { background: linear-gradient(135deg, #17634f, #2aa078); }
-    .metric-card.renovated { background: linear-gradient(135deg, #6b4b18, #b88431); }
-    .metric-card.out-of-order { background: linear-gradient(135deg, #4a3c6e, #785eb0); }
+    .metric-card.dirty { background: linear-gradient(135deg, #9b6a1a, #d8a23f 58%, #f4d47b 145%); }
+    .metric-card.clean { background: linear-gradient(135deg, #17634f, #2aa078 58%, #65cfaa 140%); }
+    .metric-card.renovated { background: linear-gradient(135deg, #5c3a7d, #8f63ba 58%, #c3a4ef 145%); }
+    .metric-card.out-of-order { background: linear-gradient(135deg, #3f3072, #654db5 58%, #9d89ee 145%); }
 
     .metric-label {
         position: relative;
         z-index: 1;
         display: inline-flex;
         align-items: center;
+        gap: 0.5rem;
         padding: 0.45rem 0.8rem;
         border-radius: 999px;
         background: rgba(255,255,255,0.14);
@@ -138,7 +139,19 @@
         text-transform: uppercase;
     }
 
-    .metric-icon {`r`n        font-size: 1rem;`r`n        line-height: 1;`r`n        display: inline-flex;`r`n        align-items: center;`r`n    }`r`n`r`n    .metric-value {
+    .metric-icon {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.18);
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .metric-value {
         position: relative;
         z-index: 1;
         margin-top: 1.1rem;
@@ -187,9 +200,19 @@
 
     @media (max-width: 991.98px) {
         .dashboard-hero h1 { font-size: 1.9rem; }
-        .metric-icon {`r`n        font-size: 1rem;`r`n        line-height: 1;`r`n        display: inline-flex;`r`n        align-items: center;`r`n    }`r`n`r`n    .metric-value { font-size: 2.7rem; }
+        .metric-value { font-size: 2.7rem; }
     }
 </style>
+
+@php
+    $metricIcons = [
+        'occupied' => '&#128719;',
+        'vacant_dirty' => '&#129532;',
+        'vacant_clean' => '&#9989;',
+        'renovated' => '&#128736;',
+        'out_of_order' => '&#9888;',
+    ];
+@endphp
 
 <div class="container-fluid dashboard-page">
     <section class="dashboard-hero">
@@ -206,7 +229,10 @@
         @foreach($metrics as $metric)
         <div class="col-xl col-md-6 mb-4">
             <div class="metric-card {{ $metric['tone'] }}">
-                <span class="metric-label">@if($metric['key'] === 'occupied')<span class="metric-icon">&#128719;</span>@endif {{ $metric['label'] }}</span>
+                <span class="metric-label">
+                    <span class="metric-icon">{!! $metricIcons[$metric['key']] ?? '&#9632;' !!}</span>
+                    <span>{{ $metric['label'] }}</span>
+                </span>
                 <div class="metric-value">{{ number_format($metric['count'], 0, ',', '.') }}</div>
                 <div class="metric-percent">{{ number_format($metric['percentage'], 2) }}%</div>
                 <div class="metric-progress">
@@ -221,5 +247,3 @@
     </section>
 </div>
 @endsection
-
-
