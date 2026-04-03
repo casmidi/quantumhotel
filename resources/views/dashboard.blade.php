@@ -127,6 +127,7 @@
 
     .metric-card.occupied { background: linear-gradient(135deg, #6f1f24, #b93a42 58%, #e07177 140%); }
     .metric-card.dirty { background: linear-gradient(135deg, #9b6a1a, #d8a23f 58%, #f4d47b 145%); }
+    .metric-card.ready { background: linear-gradient(135deg, #0d6f4b, #25b37f 58%, #79e3ba 145%); }
     .metric-card.clean { background: linear-gradient(135deg, #17634f, #2aa078 58%, #65cfaa 140%); }
     .metric-card.renovated { background: linear-gradient(135deg, #5c3a7d, #8f63ba 58%, #c3a4ef 145%); }
     .metric-card.out-of-order { background: linear-gradient(135deg, #3f3072, #654db5 58%, #9d89ee 145%); }
@@ -318,6 +319,7 @@
     $metricIcons = [
         'occupied' => '&#128719;',
         'vacant_dirty' => '&#129532;',
+        'vacant_ready' => '&#10004;',
         'vacant_clean' => '&#9989;',
         'renovated' => '&#128736;',
         'out_of_order' => '&#9888;',
@@ -393,4 +395,5 @@
     </section>
 </div>
 @endsection
+
 

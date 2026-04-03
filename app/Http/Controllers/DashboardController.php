@@ -62,6 +62,7 @@ class DashboardController extends Controller
             'occupied' => 0,
             'vacant_dirty' => 0,
             'vacant_clean' => 0,
+            'vacant_ready' => 0,
             'renovated' => 0,
             'out_of_order' => 0,
             'complimentary' => 0,
@@ -126,8 +127,13 @@ class DashboardController extends Controller
                 continue;
             }
 
-            if ($status === 'Vacant Clean' || $status === 'Vacant Ready') {
+            if ($status === 'Vacant Clean') {
                 $counts['vacant_clean']++;
+                continue;
+            }
+
+            if ($status === 'Vacant Ready') {
+                $counts['vacant_ready']++;
                 continue;
             }
 
@@ -167,11 +173,11 @@ class DashboardController extends Controller
                 'tone' => 'occupied',
             ],
             [
-                'key' => 'vacant_dirty',
-                'label' => 'Vacant Dirty',
-                'count' => $counts['vacant_dirty'],
-                'percentage' => round(($counts['vacant_dirty'] / $operationalBase) * 100, 2),
-                'tone' => 'dirty',
+                'key' => 'vacant_ready',
+                'label' => 'Vacant Ready',
+                'count' => $counts['vacant_ready'],
+                'percentage' => round(($counts['vacant_ready'] / $operationalBase) * 100, 2),
+                'tone' => 'ready',
             ],
             [
                 'key' => 'vacant_clean',
@@ -179,6 +185,13 @@ class DashboardController extends Controller
                 'count' => $counts['vacant_clean'],
                 'percentage' => round(($counts['vacant_clean'] / $operationalBase) * 100, 2),
                 'tone' => 'clean',
+            ],
+            [
+                'key' => 'vacant_dirty',
+                'label' => 'Vacant Dirty',
+                'count' => $counts['vacant_dirty'],
+                'percentage' => round(($counts['vacant_dirty'] / $operationalBase) * 100, 2),
+                'tone' => 'dirty',
             ],
             [
                 'key' => 'owner_unit',
