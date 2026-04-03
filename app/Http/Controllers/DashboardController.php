@@ -51,51 +51,60 @@ class DashboardController extends Controller
             ->leftJoinSub($guestSubquery, 'MasDATA2', function ($join) {
                 $join->on('MasROOM.Kode', '=', 'MasDATA2.Kode');
             })
-            ->selectRaw("MasROOM.Kode, MasROOM.Kelas, MasDATA2.Person, MasDATA2.Payment, MasDATA2.Package, MasDATA2.TglIn, MasROOM.Layar, MasROOM.Urut, MasROOM.Status2, {$statusExpression} as Status, MasROOM.StatusB, MasROOM.StatusC, MasROOM.StatusMove")
+            ->selectRaw("MasROOM.Kode, {$statusExpression} as Status")
             ->orderBy('MasROOM.Urut')
             ->get();
 
-        $dashboardCounts = [
-            'occupied' => $roomStatuses->where('Status', 'Occupied')->count(),
-            'vacant_dirty' => $roomStatuses->where('Status', 'Vacant Dirty')->count(),
-            'vacant_clean' => $roomStatuses->filter(function ($room) {
-                return in_array($room->Status, ['Vacant Clean', 'Vacant Ready'], true);
-            })->count(),
-            'renovated' => $roomStatuses->where('Status', 'Renovated')->count(),
-            'out_of_order' => $roomStatuses->where('Status', 'Out Of Order')->count(),
+        $totalRooms = $roomStatuses->count();
+
+        $metrics = [
+            [
+                'key' => 'occupied',
+                'label' => 'Occupied',
+                'count' => $roomStatuses->where('Status', 'Occupied')->count(),
+                'tone' => 'occupied',
+            ],
+            [
+                'key' => 'vacant_dirty',
+                'label' => 'Vacant Dirty',
+                'count' => $roomStatuses->where('Status', 'Vacant Dirty')->count(),
+                'tone' => 'dirty',
+            ],
+            [
+                'key' => 'vacant_clean',
+                'label' => 'Vacant Clean',
+                'count' => $roomStatuses->filter(function ($room) {
+                    return in_array($room->Status, ['Vacant Clean', 'Vacant Ready'], true);
+                })->count(),
+                'tone' => 'clean',
+            ],
+            [
+                'key' => 'renovated',
+                'label' => 'Renovated',
+                'count' => $roomStatuses->where('Status', 'Renovated')->count(),
+                'tone' => 'renovated',
+            ],
+            [
+                'key' => 'out_of_order',
+                'label' => 'Out Of Order',
+                'count' => $roomStatuses->where('Status', 'Out Of Order')->count(),
+                'tone' => 'out-of-order',
+            ],
         ];
 
-        $statusGroups = [
-            'Occupied',
-            'Vacant Dirty',
-            'Vacant Clean',
-            'Vacant Ready',
-            'Renovated',
-            'Out Of Order',
-            'Owner Unit',
-            'Complimentary',
-        ];
+        $metrics = collect($metrics)
+            ->map(function ($metric) use ($totalRooms) {
+                $metric['percentage'] = $totalRooms > 0
+                    ? round(($metric['count'] / $totalRooms) * 100, 2)
+                    : 0;
 
-        $statusBreakdown = collect($statusGroups)
-            ->map(function ($status) use ($roomStatuses) {
-                return [
-                    'label' => $status,
-                    'count' => $roomStatuses->where('Status', $status)->count(),
-                ];
+                return $metric;
             })
-            ->filter(fn ($item) => $item['count'] > 0)
-            ->values();
-
-        $roomHighlights = $roomStatuses
-            ->filter(fn ($room) => in_array($room->Status, ['Occupied', 'Vacant Dirty', 'Out Of Order', 'Renovated'], true))
-            ->take(8)
             ->values();
 
         return view('dashboard', [
-            'dashboardCounts' => $dashboardCounts,
-            'statusBreakdown' => $statusBreakdown,
-            'roomHighlights' => $roomHighlights,
-            'totalRooms' => $roomStatuses->count(),
+            'metrics' => $metrics,
+            'totalRooms' => $totalRooms,
         ]);
     }
 }
