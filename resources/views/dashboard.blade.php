@@ -118,7 +118,7 @@
         background: rgba(255,255,255,0.12);
     }
 
-    .metric-card.occupied { background: linear-gradient(135deg, #0f2742, #1c4f80); }
+    .metric-card.occupied { background: linear-gradient(135deg, #6f1f24, #b93a42 58%, #e07177 140%); }
     .metric-card.dirty { background: linear-gradient(135deg, #6d2b2b, #b14d4d); }
     .metric-card.clean { background: linear-gradient(135deg, #17634f, #2aa078); }
     .metric-card.renovated { background: linear-gradient(135deg, #6b4b18, #b88431); }
@@ -138,7 +138,7 @@
         text-transform: uppercase;
     }
 
-    .metric-value {
+    .metric-icon {`r`n        font-size: 1rem;`r`n        line-height: 1;`r`n        display: inline-flex;`r`n        align-items: center;`r`n    }`r`n`r`n    .metric-value {
         position: relative;
         z-index: 1;
         margin-top: 1.1rem;
@@ -187,7 +187,7 @@
 
     @media (max-width: 991.98px) {
         .dashboard-hero h1 { font-size: 1.9rem; }
-        .metric-value { font-size: 2.7rem; }
+        .metric-icon {`r`n        font-size: 1rem;`r`n        line-height: 1;`r`n        display: inline-flex;`r`n        align-items: center;`r`n    }`r`n`r`n    .metric-value { font-size: 2.7rem; }
     }
 </style>
 
@@ -206,7 +206,7 @@
         @foreach($metrics as $metric)
         <div class="col-xl col-md-6 mb-4">
             <div class="metric-card {{ $metric['tone'] }}">
-                <span class="metric-label">{{ $metric['label'] }}</span>
+                <span class="metric-label">@if($metric['key'] === 'occupied')<span class="metric-icon">&#128719;</span>@endif {{ $metric['label'] }}</span>
                 <div class="metric-value">{{ number_format($metric['count'], 0, ',', '.') }}</div>
                 <div class="metric-percent">{{ number_format($metric['percentage'], 2) }}%</div>
                 <div class="metric-progress">
@@ -221,3 +221,5 @@
     </section>
 </div>
 @endsection
+
+
