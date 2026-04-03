@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
+use App\Http\Controllers\RoomController;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,7 +71,22 @@ Route::get('/kelas/{kode}/delete', function ($kode) {
 */
 Route::get('/room', function () {
     if (!session('user')) return redirect('/');
-    return "Room Page";
+    return app(RoomController::class)->index();
+});
+
+Route::post('/room', function () {
+    if (!session('user')) return redirect('/');
+    return app(RoomController::class)->store(request());
+});
+
+Route::post('/room/{kode}/update', function ($kode) {
+    if (!session('user')) return redirect('/');
+    return app(RoomController::class)->update(request(), $kode);
+});
+
+Route::get('/room/{kode}/delete', function ($kode) {
+    if (!session('user')) return redirect('/');
+    return app(RoomController::class)->destroy($kode);
 });
 
 
