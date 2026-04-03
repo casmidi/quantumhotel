@@ -6,7 +6,7 @@ Terakhir diperbarui: 2026-04-03
 
 1. TUJUAN MODUL
 Modul Package sekarang dibagi menjadi dua alur:
-- Manual: Menu Package - Transaction
+- Manual: Package Transactions
 - Fast process: Automatic Package
 
 Kedua alur ini sama-sama menghasilkan data di tabel Package dan PackageD.
@@ -74,7 +74,7 @@ Kolom yang diisi:
 - Jumlah
 - NoUrut
 
-6. MENU PACKAGE - TRANSACTION
+6. PACKAGE TRANSACTIONS
 Tujuan:
 - Memberi jalur manual untuk user yang ingin membentuk package dari item global yang sudah ada di StockPackage.
 
@@ -118,7 +118,7 @@ Automatic Package membuat:
 9. HUBUNGAN ANTAR MODUL
 Alur manual:
 1. user membuat item global di StockPackage
-2. user masuk ke Menu Package - Transaction
+2. user masuk ke Package Transactions
 3. user memilih item global dan menyimpan package manual
 
 Alur cepat:

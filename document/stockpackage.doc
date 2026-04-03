@@ -4,7 +4,7 @@ Table utama: StockPackage
 Terakhir diperbarui: 2026-04-03
 
 1. TUJUAN MODUL
-Modul Item Package - Global dipakai sebagai CRUD master untuk tabel StockPackage. Fungsinya adalah menyimpan item-item global yang nantinya dapat dipakai kembali pada Menu Package - Transaction dan pada Automatic Package.
+Modul Package Items dipakai sebagai CRUD master untuk tabel StockPackage. Fungsinya adalah menyimpan item-item global yang nantinya dapat dipakai kembali pada Package Transactions dan pada Automatic Package.
 
 2. FILE YANG TERLIBAT
 Route:
@@ -90,5 +90,5 @@ Flow utama:
 Master ini adalah sumber item package reusable. User bisa membuat item secara manual di sini lebih dulu, lalu item tersebut dipakai kembali dalam transaksi package manual.
 
 9. HUBUNGAN DENGAN MODUL LAIN
-- Dipakai oleh Menu Package - Transaction sebagai daftar item yang bisa dipilih.
+- Dipakai oleh Package Transactions sebagai daftar item yang bisa dipilih.
 - Dipakai oleh Automatic Package saat sistem otomatis membuat item room dan restaurant baru.

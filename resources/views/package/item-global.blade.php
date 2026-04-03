@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Item Package - Global')
+@section('title', 'Package Items')
 
 @section('content')
 
@@ -59,8 +59,8 @@
     @if(session('error'))<div class="alert package-error mb-4">{{ session('error') }}</div>@endif
 
     <section class="package-hero">
-        <div class="package-kicker"><span>Quantum Hotel</span><span>Item Package - Global</span></div>
-        <h1>Item Package Global</h1>
+        <div class="package-kicker"><span>Quantum Hotel</span><span>Package Items</span></div>
+        <h1>Package Items</h1>
         <p>Manage the global package items stored in the StockPackage table. This is the master source used by manual package transactions and the automatic package builder.</p>
         <div class="row package-summary">
             <div class="col-md-4 mb-3 mb-md-0"><div class="package-stat"><span class="package-stat-label">Total Items</span><span class="package-stat-value">{{ number_format($summary['total'], 0, ',', '.') }}</span></div></div>

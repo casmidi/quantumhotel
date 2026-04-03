@@ -94,19 +94,19 @@
                         <li class="nav-item {{ request()->is('item-package-global') || request()->is('item-package-global/*') || request()->is('menu-package-transaction') || request()->is('menu-package-transaction/*') || request()->is('automatic-package') || request()->is('automatic-package/*') || request()->is('stock-package') ? 'menu-open' : '' }}">
                             <a href="#" class="nav-link {{ request()->is('item-package-global') || request()->is('item-package-global/*') || request()->is('menu-package-transaction') || request()->is('menu-package-transaction/*') || request()->is('automatic-package') || request()->is('automatic-package/*') || request()->is('stock-package') ? 'active' : '' }}">
                                 <i class="nav-icon fa-solid fa-box-open"></i>
-                                <p>Package<span class="menu-caption">Manual and automatic package flow</span><i class="right fa-solid fa-angle-left"></i></p>
+                                <p>Package<span class="menu-caption">Item catalog, transactions, and automation</span><i class="right fa-solid fa-angle-left"></i></p>
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="/item-package-global" class="nav-link {{ request()->is('item-package-global') || request()->is('item-package-global/*') ? 'active' : '' }}">
                                         <i class="nav-icon fa-solid fa-boxes-stacked"></i>
-                                        <p>Item Package - Global</p>
+                                        <p>Package Items</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="/menu-package-transaction" class="nav-link {{ request()->is('menu-package-transaction') || request()->is('menu-package-transaction/*') ? 'active' : '' }}">
                                         <i class="nav-icon fa-solid fa-receipt"></i>
-                                        <p>Menu Package - Transaction</p>
+                                        <p>Package Transactions</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -123,14 +123,14 @@
                         <li class="nav-item">
                             <a href="/checkin" class="nav-link {{ request()->is('checkin') || request()->is('checkin/*') ? 'active' : '' }}">
                                 <i class="nav-icon fa-solid fa-door-open"></i>
-                                <p>Check-in<span class="menu-caption">Guest arrival and registration</span></p>
+                                <p>Check In<span class="menu-caption">Guest arrival and registration</span></p>
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a href="/checkout" class="nav-link {{ request()->is('checkout') || request()->is('checkout/*') ? 'active' : '' }}">
                                 <i class="nav-icon fa-solid fa-door-closed"></i>
-                                <p>Check-out<span class="menu-caption">Departure and settlement</span></p>
+                                <p>Check Out<span class="menu-caption">Departure and settlement</span></p>
                             </a>
                         </li>
 
@@ -139,14 +139,14 @@
                         <li class="nav-item">
                             <a href="/guest-in-house" class="nav-link {{ request()->is('guest-in-house') || request()->is('guest-in-house/*') ? 'active' : '' }}">
                                 <i class="nav-icon fa-solid fa-users"></i>
-                                <p>Guest In House<span class="menu-caption">Current staying guest list</span></p>
+                                <p>In-House Guests<span class="menu-caption">Current staying guest list</span></p>
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a href="/expected-departure" class="nav-link {{ request()->is('expected-departure') || request()->is('expected-departure/*') ? 'active' : '' }}">
                                 <i class="nav-icon fa-solid fa-calendar-check"></i>
-                                <p>Expected Departure<span class="menu-caption">Planned departures overview</span></p>
+                                <p>Expected Departures<span class="menu-caption">Planned departures overview</span></p>
                             </a>
                         </li>
 
