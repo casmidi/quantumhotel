@@ -41,7 +41,7 @@
         .quantum-navbar {
             display: flex;
             align-items: center;
-            gap: 0.9rem;
+            gap: 0;
             padding: 0.35rem 0;
         }
 
@@ -56,26 +56,6 @@
             color: #fff;
             box-shadow: 0 18px 34px rgba(16, 35, 59, 0.18);
             font-size: 1rem;
-        }
-
-        .quantum-navbar-copy {
-            display: flex;
-            flex-direction: column;
-            gap: 0.1rem;
-        }
-
-        .quantum-navbar-copy strong {
-            font-size: 1.05rem;
-            line-height: 1.1;
-            color: var(--quantum-text);
-        }
-
-        .quantum-navbar-copy span {
-            font-size: 0.78rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #8a6a3a;
-            font-weight: 700;
         }
 
         .main-sidebar {
@@ -313,10 +293,6 @@
             <span class="quantum-navbar-mark">
                 <i class="fa-solid fa-hotel"></i>
             </span>
-            <div class="quantum-navbar-copy">
-                <span>Premium Operations</span>
-                <strong>Quantum Hotel System</strong>
-            </div>
         </div>
     </nav>
 
