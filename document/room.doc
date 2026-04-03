@@ -1,0 +1,224 @@
+DOKUMENTASI MODUL: ROOM
+File document: D:\laravel\quantum\document\room.doc
+Table utama: ROOM
+Terakhir diperbarui: 2026-04-03
+
+1. TUJUAN MODUL
+Modul ROOM dipakai sebagai master data kamar. Tujuan utamanya adalah mencatat setiap nomor kamar hotel beserta class, fasilitas, rate, extension number, dan room key. Modul ini dibuat dengan tampilan dan pola operasi yang mirip dengan CRUD KELAS agar konsisten dan mudah dipakai operator.
+
+2. FILE YANG TERLIBAT
+Route:
+- D:\laravel\quantum\routes\web.php
+
+Controller:
+- D:\laravel\quantum\app\Http\Controllers\RoomController.php
+
+View:
+- D:\laravel\quantum\resources\views\room\index.blade.php
+
+Layout utama:
+- D:\laravel\quantum\resources\views\layouts\app.blade.php
+
+3. ROUTE YANG DIGUNAKAN
+- GET /room
+  Menampilkan form input room dan daftar room.
+- POST /room
+  Menyimpan data room baru. Bila kode room sudah ada, route ini juga dapat mengubah room existing.
+- POST /room/{kode}/update
+  Mengubah data room berdasarkan kode.
+- GET /room/{kode}/delete
+  Menghapus room berdasarkan kode.
+
+4. DATA YANG DIBACA DARI DATABASE
+A. Tabel utama: ROOM
+Kolom yang dibaca untuk tampilan halaman:
+- Kode
+- Nama
+- Fasilitas
+- ExtNo
+- KUNCI
+- Rate1
+- Rate2
+
+Catatan:
+- Data room dibaca dengan RTRIM agar trailing space dari SQL Server tidak ikut tampil.
+- Record dengan Kode = 999 tidak ditampilkan karena dianggap dummy code.
+
+B. Tabel referensi: KELAS
+Kolom yang dibaca:
+- Kode
+- Nama
+- Rate1
+
+Tujuan membaca KELAS:
+- Mengisi dropdown Class pada form Room.
+- Mengambil fasilitas default dari KELAS.Nama.
+- Mengambil rate default dari KELAS.Rate1.
+
+5. DATA YANG DITULIS KE DATABASE
+Saat insert dan update, modul ROOM menulis kolom berikut:
+- Kode
+- Nama
+- Fasilitas
+- ExtNo
+- Rate1
+- Rate2
+- Rate3
+- Rate4
+- KUNCI
+- Urut
+- UserName
+
+Saat insert baru, modul juga mengisi default:
+- Status = Vacant Ready
+- StatusB = null
+- StatusC = null
+- Statusmove = null
+- MEETING = 0
+- VILA = N
+- STATUS2 = null
+
+Alasan pengisian default:
+- Supaya record baru aman masuk ke tabel legacy ROOM.
+- Supaya kamar baru langsung dianggap kamar siap jual sampai ada transaksi yang mengubah statusnya.
+
+6. PENJELASAN CONTROLLER
+File: D:\laravel\quantum\app\Http\Controllers\RoomController.php
+
+Method index()
+Fungsi:
+- Membaca seluruh room dari tabel ROOM kecuali kode dummy 999.
+- Membaca seluruh room class dari tabel KELAS.
+- Mengirim dua data utama ke view:
+  - rooms
+  - classes
+
+Method store(Request $request)
+Fungsi:
+- Mengambil input form room.
+- Menormalkan kode ke uppercase.
+- Menormalkan nominal agar hanya angka.
+- Menyiapkan payload untuk insert/update.
+- Mengecek apakah Kode room sudah ada.
+- Jika room sudah ada, controller melakukan update, bukan insert.
+- Jika belum ada, controller melakukan insert baru dengan default status room.
+- Setelah itu controller mengirim flash message sukses.
+
+Logika penting store():
+- Nama pada tabel ROOM berisi kode class yang dipilih user.
+- Fasilitas diambil dari input form, yang umumnya terisi otomatis dari class terpilih.
+- Basic rate akan mengikuti rate utama bila field basic rate kosong.
+- KUNCI akan otomatis mengikuti kode room bila user tidak mengisi room key.
+
+Method update(Request $request, $kode)
+Fungsi:
+- Mengubah data room berdasarkan kode.
+- Mengubah class, fasilitas, rate, extension, room key, dan username pengubah.
+- Menjaga Urut tetap sama dengan kode room.
+
+Method destroy($kode)
+Fungsi:
+- Menghapus room berdasarkan kode.
+- Sesudah delete, user kembali ke halaman room dengan pesan sukses.
+
+Method normalizeMoney($value)
+Fungsi:
+- Menghapus semua karakter non-angka.
+- Mengubah input formatted seperti 1.500.000 menjadi angka yang aman untuk disimpan.
+
+7. PENJELASAN VIEW
+File: D:\laravel\quantum\resources\views\room\index.blade.php
+
+Bagian utama view:
+- Hero section premium
+  Menampilkan ringkasan modul room, total room, average sell rate, dan average basic rate.
+- Form input Room Master
+  Berisi field:
+  - Room / Kode
+  - Class
+  - Facility
+  - Rate + Tax & Serv
+  - Basic Rate
+  - Extension No
+  - Room Key
+- Grid / directory room
+  Menampilkan daftar kamar lengkap dengan nominal dan tombol delete.
+
+Tampilan dirancang mirip dengan CRUD KELAS agar:
+- konsisten secara visual,
+- operator tidak perlu belajar ulang,
+- modul mudah dijadikan pola untuk CRUD lain.
+
+8. LOGIKA JAVASCRIPT DI VIEW
+A. Enter untuk pindah field
+- Enter di setiap field akan memindahkan fokus ke field berikutnya.
+- Di field terakhir, Enter langsung submit form.
+
+B. Kode room sebagai primary flow
+- Jika user mengetik kode room yang sudah ada lalu menekan Enter, JavaScript mencari row yang sama di grid.
+- Jika ketemu, data room langsung dimuat ke form.
+- Form berubah ke mode edit.
+- Tombol Save berubah menjadi Update Room.
+- Tombol Reset berubah menjadi Cancel Edit.
+- Field kode menjadi readonly.
+
+C. Dropdown class terhubung ke KELAS
+- Dropdown Class membaca data dari tabel KELAS.
+- Setiap option class membawa data tambahan:
+  - fasilitas
+  - rate
+- Saat class dipilih, JavaScript otomatis mengisi:
+  - Facility
+  - Rate + Tax & Serv
+  - Basic Rate
+
+D. Format nominal ribuan
+- Field Rate1 dan Rate2 otomatis diformat ribuan di frontend.
+- Sebelum submit, titik pemisah ribuan dihapus supaya backend menerima angka murni.
+
+E. Klik row untuk edit
+- Klik pada row grid akan mengisi form dengan data room yang dipilih.
+- Tujuannya agar operator dapat mengubah data cepat tanpa mengetik ulang.
+
+F. Room Key default
+- Jika user belum mengisi Room Key saat memasukkan kode room baru, JavaScript mengisi otomatis dengan kode room.
+
+G. Auto hide notification
+- Pesan sukses hilang otomatis setelah 3 detik.
+
+H. Delete confirmation
+- Tombol delete memakai konfirmasi English.
+- Pesan konfirmasi: Are you sure you want to delete this room?
+
+9. PENJELASAN RELASI LOGIKA DENGAN KELAS
+Walaupun tabel utama modul ini adalah ROOM, modul ROOM sangat bergantung pada KELAS sebagai data referensi.
+
+Hubungan logika:
+- Kode class dari KELAS dipilih pada field Class.
+- Nama class di tabel ROOM disimpan pada kolom Nama.
+- Fasilitas default mengikuti data class.
+- Rate default juga mengikuti master class.
+
+Artinya:
+- KELAS adalah master kategori.
+- ROOM adalah master inventory fisik kamar.
+
+10. RINGKASAN LOGIKA BISNIS
+- Kode room adalah identitas utama kamar.
+- Kode 999 tidak dianggap room operasional.
+- Room baru default menjadi Vacant Ready.
+- Bila kode room yang sama diinput lagi, sistem tidak membuat record baru, tetapi memuat record existing untuk diedit.
+- Form dibuat untuk operator front office/admin agar proses master data cepat dan minim kesalahan input.
+
+11. HAL YANG PERLU DIINGAT SAAT MAINTENANCE
+- Jika struktur legacy ROOM berubah, field default insert harus dicek kembali.
+- Jika nanti ada validasi tambahan, tempat yang paling aman untuk menambahkannya adalah di RoomController.
+- Jika KELAS diubah strukturnya, autofill class di view ROOM harus disesuaikan.
+- Bila delete route nanti diubah ke POST/DELETE method, atribut konfirmasi tetap bisa dipertahankan.
+
+12. SARAN PENGEMBANGAN SELANJUTNYA
+- Tambah validasi server-side yang lebih ketat untuk field wajib.
+- Tambah pencarian room per kode atau class.
+- Tambah status badge di grid room.
+- Tambah filter berdasar class atau status.
+- Ubah delete ke method yang lebih aman selain GET bila struktur route sudah dirapikan.

@@ -1,0 +1,154 @@
+DOKUMENTASI MODUL: KELAS
+File document: D:\laravel\quantum\document\kelas.doc
+Table utama: KELAS
+Terakhir diperbarui: 2026-04-03
+
+1. TUJUAN MODUL
+Modul KELAS dipakai sebagai master data room class. Data ini menjadi acuan untuk jenis kamar yang dijual hotel, termasuk nama class, nominal rate, dan deposit. Modul ini juga dipakai sebagai template awal untuk pola CRUD modul lain karena sudah memiliki alur input cepat, tampilan premium, dan mode edit yang efisien.
+
+2. FILE YANG TERLIBAT
+Route:
+- D:\laravel\quantum\routes\web.php
+
+Controller:
+- D:\laravel\quantum\app\Http\Controllers\KelasController.php
+
+View:
+- D:\laravel\quantum\resources\views\kelas\index.blade.php
+
+Layout utama:
+- D:\laravel\quantum\resources\views\layouts\app.blade.php
+
+3. ROUTE YANG DIGUNAKAN
+- GET /kelas
+  Menampilkan daftar class dan form input.
+- POST /kelas
+  Menyimpan data baru. Jika kode sudah ada, route ini juga bisa mengubah data existing.
+- POST /kelas/{kode}/update
+  Mengubah data berdasarkan kode class.
+- GET /kelas/{kode}/delete
+  Menghapus data class berdasarkan kode.
+
+4. DATA YANG DIBACA DARI DATABASE
+Tabel: KELAS
+Kolom utama yang dipakai di modul ini:
+- Kode
+- Nama
+- Rate1
+- Depo1
+
+Fungsi pembacaan data:
+- index() membaca seluruh data KELAS lalu mengurutkannya berdasarkan Kode.
+- Jika ada query pencarian, data difilter berdasarkan Kode atau Nama.
+- View juga menghitung total class, average rate, dan average deposit untuk ditampilkan di hero summary.
+
+5. DATA YANG DITULIS KE DATABASE
+Saat insert atau update, controller menulis kolom berikut:
+- Kode
+- Nama
+- Rate1
+- Depo1
+
+Catatan penting:
+- Nominal yang dikirim dari form sudah dibersihkan dari tanda titik oleh JavaScript sebelum submit.
+- Jika nilai bukan angka, controller mengubahnya menjadi 0 agar aman untuk disimpan.
+
+6. PENJELASAN CONTROLLER
+File: D:\laravel\quantum\app\Http\Controllers\KelasController.php
+
+Method index(Request $request)
+Fungsi:
+- Membaca data dari KELAS.
+- Menjalankan pencarian sederhana bila parameter q diisi.
+- Mengirim hasil ke view kelas.index.
+
+Method store(Request $request)
+Fungsi:
+- Mengambil input Kode, Nama, Rate1, dan Depo1.
+- Mengecek apakah Kode sudah ada di tabel KELAS.
+- Jika Kode sudah ada, controller tidak menambah record baru, tetapi meng-update record existing.
+- Jika Kode belum ada, controller melakukan insert baru.
+- Setelah itu controller mengirim flash message sukses.
+
+Method update(Request $request, $kode)
+Fungsi:
+- Mengubah Nama, Rate1, dan Depo1 berdasarkan kode yang dipilih.
+- Dipakai saat user klik row grid atau saat form sudah masuk ke mode edit.
+
+Method destroy($kode)
+Fungsi:
+- Menghapus data class berdasarkan Kode.
+- Setelah delete, user diarahkan kembali ke halaman class dengan pesan sukses.
+
+Method data()
+Fungsi:
+- Menyediakan data JSON seluruh KELAS.
+- Method ini disiapkan untuk kebutuhan AJAX/realtime.
+- Saat ini fungsi utama halaman tidak bergantung penuh pada method ini, tetapi method tetap tersedia.
+
+7. PENJELASAN VIEW
+File: D:\laravel\quantum\resources\views\kelas\index.blade.php
+
+Bagian utama view:
+- Hero section premium
+  Menampilkan ringkasan modul dan statistik total class, average rate, dan average deposit.
+- Form input room class
+  Berisi field Kode, Nama, Rate, dan Deposit.
+- Grid / directory class
+  Menampilkan semua data class dalam tabel dengan zebra row dan tombol delete berbentuk icon.
+
+Styling penting:
+- Menggunakan card/glass style premium.
+- Warna utama navy, gold, dan white glass.
+- Hero dirancang untuk memberikan kesan enterprise hotel software.
+
+8. LOGIKA JAVASCRIPT DI VIEW
+Form ini memiliki logika operator flow yang cukup penting:
+
+A. Enter untuk pindah field
+- Saat user menekan Enter di field pertama, fokus pindah ke field berikutnya.
+- Pola ini berlanjut sampai field terakhir.
+- Di field terakhir, tombol Enter langsung melakukan submit form.
+
+B. Jika kode sudah ada
+- Saat user mengetik kode yang sudah ada lalu menekan Enter, JavaScript akan mencari row yang kodenya sama di grid.
+- Jika ditemukan, data row langsung dimuat ke form.
+- Form otomatis berubah ke mode edit.
+- Tombol Save berubah menjadi Update Room Class.
+- Tombol Reset berubah menjadi Cancel Edit.
+- Field Kode menjadi readonly agar primary key tidak berubah saat edit.
+
+C. Klik row grid untuk edit
+- Bila user klik row tabel, data row tersebut dimuat ke form input.
+- Tujuannya agar operator bisa edit data tanpa mengetik ulang.
+
+D. Format nominal ribuan
+- Field Rate dan Deposit otomatis menampilkan format ribuan, misalnya 1000000 menjadi 1.000.000.
+- Sebelum submit, tanda titik dihapus kembali supaya data yang masuk ke backend tetap numeric.
+
+E. Auto hide notification
+- Pesan sukses akan hilang otomatis setelah 3 detik.
+- Tujuannya agar halaman tetap bersih dan tidak terlalu ramai.
+
+F. Delete confirmation
+- Tombol delete sekarang memakai konfirmasi English sebelum data dihapus.
+- Pesan konfirmasi: Are you sure you want to delete this room class?
+
+9. TUJUAN DESAIN DAN FLOW MODUL
+Modul ini dirancang untuk:
+- mempercepat input operator front office atau admin,
+- menjadi template untuk CRUD lain,
+- meminimalkan duplikasi kode,
+- meminimalkan input ganda pada kode class,
+- menjaga tampilan agar premium dan profesional.
+
+10. RINGKASAN LOGIKA BISNIS
+- Kode class adalah identitas utama record.
+- Tidak boleh ada duplikasi kode class.
+- Jika kode yang sama dimasukkan lagi, sistem menganggap user ingin mengedit, bukan menambah record baru.
+- Rate dan deposit adalah nominal master yang akan dipakai lagi di modul lain.
+
+11. HAL YANG PERLU DIINGAT SAAT MAINTENANCE
+- Bila struktur tabel KELAS berubah, controller dan JavaScript formatting harus dicek ulang.
+- Bila route delete nanti diubah ke POST/DELETE method, atribut konfirmasi di view tetap bisa dipakai.
+- Bila ingin membuat modul lain, struktur view KELAS sangat cocok dijadikan template dasar.
