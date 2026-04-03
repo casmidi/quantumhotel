@@ -31,33 +31,6 @@
             min-height: 100vh;
         }
 
-        .main-header {
-            border-bottom: 1px solid rgba(15, 31, 54, 0.08);
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(16px);
-            box-shadow: 0 10px 35px rgba(15, 31, 54, 0.08);
-        }
-
-        .quantum-navbar {
-            display: flex;
-            align-items: center;
-            gap: 0;
-            padding: 0.35rem 0;
-        }
-
-        .quantum-navbar-mark {
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #10233b, #1f4677 62%, #c7a56a 150%);
-            color: #fff;
-            box-shadow: 0 18px 34px rgba(16, 35, 59, 0.18);
-            font-size: 1rem;
-        }
-
         .main-sidebar {
             background:
                 radial-gradient(circle at top right, rgba(199, 165, 106, 0.2), transparent 26%),
@@ -65,6 +38,7 @@
                 linear-gradient(180deg, #0c1930 0%, #10233b 48%, #173761 100%);
             border-right: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: 20px 0 40px rgba(15, 31, 54, 0.18);
+            top: 0;
         }
 
         .main-sidebar::after {
@@ -128,6 +102,7 @@
             position: relative;
             z-index: 1;
             padding: 1rem 0.8rem 1.2rem;
+            height: calc(100vh - 85px);
         }
 
         .sidebar-panel {
@@ -262,8 +237,9 @@
             background:
                 radial-gradient(circle at top right, rgba(199, 165, 106, 0.12), transparent 18%),
                 linear-gradient(180deg, #f4f7fb 0%, #edf2f8 100%);
-            min-height: calc(100vh - 57px);
+            min-height: 100vh;
             padding: 1.2rem;
+            margin-top: 0 !important;
         }
 
         .content-wrapper > h3 {
@@ -271,7 +247,7 @@
         }
 
         .content-shell {
-            min-height: calc(100vh - 90px);
+            min-height: calc(100vh - 2.4rem);
         }
 
         @media (max-width: 991.98px) {
@@ -282,20 +258,16 @@
             .sidebar-panel {
                 border-radius: 18px;
             }
+
+            .sidebar {
+                height: auto;
+            }
         }
     </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <div class="quantum-navbar">
-            <span class="quantum-navbar-mark">
-                <i class="fa-solid fa-hotel"></i>
-            </span>
-        </div>
-    </nav>
-
     <aside class="main-sidebar elevation-4">
         <a href="/dashboard" class="brand-link">
             <span class="brand-mark">
