@@ -194,18 +194,18 @@ class DashboardController extends Controller
                 'tone' => 'ready',
             ],
             [
-                'key' => 'vacant_dirty',
-                'label' => 'Vacant Dirty',
-                'count' => $counts['vacant_dirty'],
-                'percentage' => round(($counts['vacant_dirty'] / $operationalBase) * 100, 2),
-                'tone' => 'dirty',
-            ],
-            [
                 'key' => 'vacant_clean',
                 'label' => 'Vacant Clean',
                 'count' => $counts['vacant_clean'],
                 'percentage' => round(($counts['vacant_clean'] / $operationalBase) * 100, 2),
                 'tone' => 'clean',
+            ],
+            [
+                'key' => 'vacant_dirty',
+                'label' => 'Vacant Dirty',
+                'count' => $counts['vacant_dirty'],
+                'percentage' => round(($counts['vacant_dirty'] / $operationalBase) * 100, 2),
+                'tone' => 'dirty',
             ],
             [
                 'key' => 'renovated',
@@ -270,4 +270,5 @@ class DashboardController extends Controller
         ]);
     }
 }
+
 
