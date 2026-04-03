@@ -42,6 +42,12 @@ class AutomaticPackageController extends Controller
                 ->withInput();
         }
 
+        if ($this->hasDuplicatePackageCode($packageCode, $expired)) {
+            return redirect('/automatic-package')
+                ->with('error', 'The same package code and expired date already exist.')
+                ->withInput();
+        }
+
         $duplicate = DB::table('Package as p')
             ->join('PackageD as pd', 'p.Nofak', '=', 'pd.Nofak')
             ->where('p.JumlahRes', $nominal)
@@ -231,6 +237,14 @@ class AutomaticPackageController extends Controller
         }
 
         return $prefix . str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+    }
+
+    private function hasDuplicatePackageCode(string $packageCode, Carbon $expired): bool
+    {
+        return DB::table('Package')
+            ->whereRaw('RTRIM(Meja) = ?', [$packageCode])
+            ->whereDate('Expired', $expired->format('Y-m-d'))
+            ->exists();
     }
 
     private function defaultPackageCode(float $nominal): string

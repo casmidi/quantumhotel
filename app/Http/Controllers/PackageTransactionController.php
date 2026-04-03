@@ -93,8 +93,22 @@ class PackageTransactionController extends Controller
             return redirect('/menu-package-transaction')->with('error', 'Expired date is required.')->withInput();
         }
 
+        if ($expired->lt(Carbon::today())) {
+            return redirect('/menu-package-transaction')->with('error', 'Expired date must be greater than or equal to today.')->withInput();
+        }
+
         if (empty($details)) {
             return redirect('/menu-package-transaction')->with('error', 'At least one package item is required.')->withInput();
+        }
+
+        if ($existingNofak && !$this->packageExists($existingNofak)) {
+            return redirect('/menu-package-transaction')->with('error', 'Package transaction was not found.');
+        }
+
+        if ($this->hasDuplicatePackageCode($packageCode, $expired, $existingNofak)) {
+            return redirect('/menu-package-transaction')
+                ->with('error', 'The same package code and expired date already exist.')
+                ->withInput();
         }
 
         $nominal = collect($details)->sum('amount');
@@ -152,11 +166,20 @@ class PackageTransactionController extends Controller
         $qtys = $request->input('Qty', []);
         $prices = $request->input('Price', []);
         $details = [];
+        $existingItemCodes = DB::table('StockPackage')
+            ->selectRaw('RTRIM(KodeBrg) as KodeBrg')
+            ->pluck('KodeBrg')
+            ->map(fn ($code) => strtoupper(trim((string) $code)))
+            ->flip();
 
         foreach ($codes as $index => $code) {
             $normalizedCode = strtoupper(trim((string) $code));
 
             if ($normalizedCode === '') {
+                continue;
+            }
+
+            if (!$existingItemCodes->has($normalizedCode)) {
                 continue;
             }
 
@@ -177,6 +200,26 @@ class PackageTransactionController extends Controller
         }
 
         return $details;
+    }
+
+    private function packageExists(string $nofak): bool
+    {
+        return DB::table('Package')
+            ->whereRaw('RTRIM(Nofak) = ?', [trim($nofak)])
+            ->exists();
+    }
+
+    private function hasDuplicatePackageCode(string $packageCode, Carbon $expired, ?string $existingNofak = null): bool
+    {
+        $query = DB::table('Package')
+            ->whereRaw('RTRIM(Meja) = ?', [$packageCode])
+            ->whereDate('Expired', $expired->format('Y-m-d'));
+
+        if ($existingNofak) {
+            $query->whereRaw('RTRIM(Nofak) <> ?', [trim($existingNofak)]);
+        }
+
+        return $query->exists();
     }
 
     private function generatePackageNofak(): string

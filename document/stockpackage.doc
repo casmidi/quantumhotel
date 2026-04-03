@@ -64,14 +64,18 @@ Method store(Request)
 - Mengambil kode item, nama item, satuan, kategori, dan selling price.
 - Menormalkan code ke uppercase.
 - Menormalkan nominal agar menjadi angka murni.
+- Memvalidasi kategori agar hanya ROOM atau RESTAURANT.
 - Jika kode item sudah ada, sistem meng-update item existing.
 - Jika belum ada, sistem insert baru.
 
 Method update(Request, $kode)
 - Mengubah item global berdasarkan kode barang.
+- Validasi tetap memastikan kategori hanya ROOM atau RESTAURANT.
+- Jika kode item tidak ditemukan, sistem menolak update.
 
 Method destroy($kode)
 - Menghapus item dari StockPackage berdasarkan kode barang.
+- Delete akan ditolak bila item sudah dipakai di PackageD agar transaksi package lama tetap aman.
 
 7. PENJELASAN VIEW
 Halaman terdiri dari:

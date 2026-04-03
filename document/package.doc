@@ -46,6 +46,7 @@ A. Manual transaction membaca:
 
 B. Automatic process membaca:
 - Package dan PackageD untuk pengecekan duplicate nominal + expired
+- Package untuk pengecekan duplicate package code + expired
 - StockPackage untuk memastikan generated code baru tidak bentrok
 
 5. DATA YANG DITULIS KE DATABASE
@@ -87,7 +88,11 @@ Flow:
 - Save akan membuat header di Package dan detail di PackageD.
 
 Logika penting:
+- expired tidak boleh lebih kecil dari hari ini
+- kombinasi package code dan expired yang sama akan ditolak
+- item code yang tidak ada di StockPackage akan diabaikan agar detail selalu valid
 - Saat update, sistem hapus dulu detail lama di PackageD lalu insert ulang detail baru.
+- Update hanya boleh dilakukan bila header Package memang masih ada.
 - Klik row tabel memuat transaksi ke form edit.
 - Delete akan menghapus detail PackageD lebih dulu, lalu header Package.
 
@@ -107,6 +112,7 @@ Validasi penting:
 - nominal harus valid
 - expired wajib diisi
 - expired tidak boleh lebih kecil dari hari ini
+- kombinasi package code dan expired yang sama akan ditolak
 - kombinasi nominal dan expired yang sama akan ditolak
 
 8. GENERATE KODE DAN NOFAK

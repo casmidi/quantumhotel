@@ -34,13 +34,19 @@ class StockPackageController extends Controller
         $kodeBrg = $this->normalizeCode($request->KodeBrg);
         $namaBrg = strtoupper(trim((string) $request->NamaBrg));
         $satuan = strtoupper(trim((string) ($request->Satuan ?: 'PAX')));
-        $kind = strtoupper(trim((string) ($request->Kind ?: 'ROOM')));
+        $kind = $this->normalizeKind($request->Kind);
         $hj = $this->normalizeMoney($request->Hj);
         $username = strtoupper(trim((string) session('user', 'SYSTEM')));
 
         if ($kodeBrg === '' || $namaBrg === '' || $hj <= 0) {
             return redirect('/item-package-global')
                 ->with('error', 'Item code, item name, and selling price must be valid.')
+                ->withInput();
+        }
+
+        if (!$this->isAllowedKind($kind)) {
+            return redirect('/item-package-global')
+                ->with('error', 'Category must be ROOM or RESTAURANT.')
                 ->withInput();
         }
 
@@ -83,9 +89,29 @@ class StockPackageController extends Controller
         $kodeBrg = $this->normalizeCode($kode);
         $namaBrg = strtoupper(trim((string) $request->NamaBrg));
         $satuan = strtoupper(trim((string) ($request->Satuan ?: 'PAX')));
-        $kind = strtoupper(trim((string) ($request->Kind ?: 'ROOM')));
+        $kind = $this->normalizeKind($request->Kind);
         $hj = $this->normalizeMoney($request->Hj);
         $username = strtoupper(trim((string) session('user', 'SYSTEM')));
+
+        if ($kodeBrg === '' || $namaBrg === '' || $hj <= 0) {
+            return redirect('/item-package-global')
+                ->with('error', 'Item code, item name, and selling price must be valid.')
+                ->withInput();
+        }
+
+        if (!$this->isAllowedKind($kind)) {
+            return redirect('/item-package-global')
+                ->with('error', 'Category must be ROOM or RESTAURANT.')
+                ->withInput();
+        }
+
+        $exists = DB::table('StockPackage')
+            ->whereRaw('RTRIM(KodeBrg) = ?', [$kodeBrg])
+            ->exists();
+
+        if (!$exists) {
+            return redirect('/item-package-global')->with('error', 'Package item was not found.');
+        }
 
         DB::table('StockPackage')
             ->whereRaw('RTRIM(KodeBrg) = ?', [$kodeBrg])
@@ -103,8 +129,18 @@ class StockPackageController extends Controller
 
     public function destroy($kode)
     {
+        $normalizedCode = $this->normalizeCode($kode);
+        $isUsed = DB::table('PackageD')
+            ->whereRaw('RTRIM(KodeBrg) = ?', [$normalizedCode])
+            ->exists();
+
+        if ($isUsed) {
+            return redirect('/item-package-global')
+                ->with('error', 'This package item is already used in package transactions and cannot be deleted.');
+        }
+
         DB::table('StockPackage')
-            ->whereRaw('RTRIM(KodeBrg) = ?', [$this->normalizeCode($kode)])
+            ->whereRaw('RTRIM(KodeBrg) = ?', [$normalizedCode])
             ->delete();
 
         return redirect('/item-package-global')->with('success', 'Data deleted successfully');
@@ -120,5 +156,17 @@ class StockPackageController extends Controller
         $normalized = preg_replace('/[^\d]/', '', (string) $value);
 
         return is_numeric($normalized) ? (float) $normalized : 0;
+    }
+
+    private function normalizeKind($value): string
+    {
+        $kind = strtoupper(trim((string) ($value ?: 'ROOM')));
+
+        return $kind === '' ? 'ROOM' : $kind;
+    }
+
+    private function isAllowedKind(string $kind): bool
+    {
+        return in_array($kind, ['ROOM', 'RESTAURANT'], true);
     }
 }
