@@ -325,6 +325,16 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="/stock-package" class="nav-link {{ request()->is('stock-package') || request()->is('stock-package/*') ? 'active' : '' }}">
+                                <i class="nav-icon fa-solid fa-box-open"></i>
+                                <p>
+                                    Stock Package
+                                    <span class="menu-caption">Package items and auto builder</span>
+                                </p>
+                            </a>
+                        </li>
+
                         <li class="nav-header">Transactions</li>
 
                         <li class="nav-item">
@@ -397,4 +407,5 @@
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 </body>
 </html>
+
 

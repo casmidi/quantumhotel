@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\StockPackageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +93,37 @@ Route::get('/room/{kode}/delete', function ($kode) {
 
 /*
 |--------------------------------------------------------------------------
+| MASTER DATA - STOCK PACKAGE
+|--------------------------------------------------------------------------
+*/
+Route::get('/stock-package', function () {
+    if (!session('user')) return redirect('/');
+    return app(StockPackageController::class)->index();
+});
+
+Route::post('/stock-package', function () {
+    if (!session('user')) return redirect('/');
+    return app(StockPackageController::class)->store(request());
+});
+
+Route::post('/stock-package/process', function () {
+    if (!session('user')) return redirect('/');
+    return app(StockPackageController::class)->process(request());
+});
+
+Route::post('/stock-package/{kode}/update', function ($kode) {
+    if (!session('user')) return redirect('/');
+    return app(StockPackageController::class)->update(request(), $kode);
+});
+
+Route::get('/stock-package/{kode}/delete', function ($kode) {
+    if (!session('user')) return redirect('/');
+    return app(StockPackageController::class)->destroy($kode);
+});
+
+
+/*
+|--------------------------------------------------------------------------
 | TRANSACTION
 |--------------------------------------------------------------------------
 */
@@ -136,3 +168,4 @@ Route::get('/change-password', function () {
     if (!session('user')) return redirect('/');
     return "Change Password Page";
 });
+
