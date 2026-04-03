@@ -1,0 +1,94 @@
+DOKUMENTASI MODUL: STOCKPACKAGE
+File document: D:\laravel\quantum\document\stockpackage.doc
+Table utama: StockPackage
+Terakhir diperbarui: 2026-04-03
+
+1. TUJUAN MODUL
+Modul Item Package - Global dipakai sebagai CRUD master untuk tabel StockPackage. Fungsinya adalah menyimpan item-item global yang nantinya dapat dipakai kembali pada Menu Package - Transaction dan pada Automatic Package.
+
+2. FILE YANG TERLIBAT
+Route:
+- D:\laravel\quantum\routes\web.php
+
+Controller:
+- D:\laravel\quantum\app\Http\Controllers\StockPackageController.php
+
+View:
+- D:\laravel\quantum\resources\views\package\item-global.blade.php
+
+Layout utama:
+- D:\laravel\quantum\resources\views\layouts\app.blade.php
+
+3. ROUTE YANG DIGUNAKAN
+- GET /item-package-global
+- POST /item-package-global
+- POST /item-package-global/{kode}/update
+- GET /item-package-global/{kode}/delete
+- GET /stock-package
+  Route lama ini sekarang diarahkan ke /item-package-global agar link lama tidak putus.
+
+4. DATA YANG DIBACA DARI DATABASE
+Tabel: StockPackage
+Kolom yang dibaca:
+- KodeBrg
+- NamaBrg
+- Satuan
+- Kind
+- Hj
+
+Data dibaca dengan RTRIM agar trailing space dari SQL Server tidak ikut tampil di UI.
+
+5. DATA YANG DITULIS KE DATABASE
+Saat insert/update, modul menulis:
+- KodeBrg
+- NamaBrg
+- Satuan
+- Kind
+- Hj
+- Hb = 0
+- Hpr = 0
+- HprAwal = 0
+- StockMin = 0
+- StockMax = 0
+- Stock = 0
+- UserName = user login aktif
+- Tgl = waktu simpan
+
+6. PENJELASAN CONTROLLER
+Method index()
+- Membaca seluruh item dari StockPackage.
+- Menghitung summary total item, room item, dan restaurant item.
+- Mengirim data ke view package.item-global.
+
+Method store(Request)
+- Mengambil kode item, nama item, satuan, kategori, dan selling price.
+- Menormalkan code ke uppercase.
+- Menormalkan nominal agar menjadi angka murni.
+- Jika kode item sudah ada, sistem meng-update item existing.
+- Jika belum ada, sistem insert baru.
+
+Method update(Request, $kode)
+- Mengubah item global berdasarkan kode barang.
+
+Method destroy($kode)
+- Menghapus item dari StockPackage berdasarkan kode barang.
+
+7. PENJELASAN VIEW
+Halaman terdiri dari:
+- Hero summary
+- Form CRUD item global
+- Tabel daftar item global
+
+Flow utama:
+- Enter berpindah antar field
+- Kode item yang sudah ada akan memuat row existing ke mode edit
+- Klik row tabel memuat form edit
+- Nominal otomatis format ribuan
+- Delete memakai konfirmasi English
+
+8. TUJUAN BISNIS
+Master ini adalah sumber item package reusable. User bisa membuat item secara manual di sini lebih dulu, lalu item tersebut dipakai kembali dalam transaksi package manual.
+
+9. HUBUNGAN DENGAN MODUL LAIN
+- Dipakai oleh Menu Package - Transaction sebagai daftar item yang bisa dipilih.
+- Dipakai oleh Automatic Package saat sistem otomatis membuat item room dan restaurant baru.

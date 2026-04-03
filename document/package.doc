@@ -1,0 +1,132 @@
+DOKUMENTASI MODUL: PACKAGE
+File document: D:\laravel\quantum\document\package.doc
+Table utama: Package
+Table detail: PackageD
+Terakhir diperbarui: 2026-04-03
+
+1. TUJUAN MODUL
+Modul Package sekarang dibagi menjadi dua alur:
+- Manual: Menu Package - Transaction
+- Fast process: Automatic Package
+
+Kedua alur ini sama-sama menghasilkan data di tabel Package dan PackageD.
+
+2. FILE YANG TERLIBAT
+Route:
+- D:\laravel\quantum\routes\web.php
+
+Controller manual transaction:
+- D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php
+
+Controller automatic process:
+- D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php
+
+View manual transaction:
+- D:\laravel\quantum\resources\views\package\transaction.blade.php
+
+View automatic process:
+- D:\laravel\quantum\resources\views\package\automatic.blade.php
+
+3. ROUTE YANG DIGUNAKAN
+Manual transaction:
+- GET /menu-package-transaction
+- POST /menu-package-transaction
+- POST /menu-package-transaction/{nofak}/update
+- GET /menu-package-transaction/{nofak}/delete
+
+Automatic process:
+- GET /automatic-package
+- POST /automatic-package/process
+
+4. DATA YANG DIBACA DARI DATABASE
+A. Manual transaction membaca:
+- Package: Nofak, Meja, JumlahRes, Expired
+- PackageD: Nofak, KodeBrg, Qty, Harga, Jumlah, NoUrut
+- StockPackage: KodeBrg, NamaBrg, Kind, Hj
+
+B. Automatic process membaca:
+- Package dan PackageD untuk pengecekan duplicate nominal + expired
+- StockPackage untuk memastikan generated code baru tidak bentrok
+
+5. DATA YANG DITULIS KE DATABASE
+A. Tabel Package
+Kolom utama yang diisi:
+- Nofak
+- KArea = 02
+- strTgl
+- Tgl
+- Jam
+- Kode = kosong
+- Meja = package code
+- JumlahRes = total nominal package
+- UserName = user login aktif
+- PPn = 0
+- Pst = spasi
+- Expired
+
+B. Tabel PackageD
+Kolom yang diisi:
+- Nofak
+- KodeBrg
+- Qty
+- Harga
+- Disc = 0
+- Jumlah
+- NoUrut
+
+6. MENU PACKAGE - TRANSACTION
+Tujuan:
+- Memberi jalur manual untuk user yang ingin membentuk package dari item global yang sudah ada di StockPackage.
+
+Flow:
+- User isi package code.
+- User pilih expired.
+- User pilih item package dari dropdown item global.
+- User isi qty dan harga per item.
+- Sistem menghitung total nominal package.
+- Save akan membuat header di Package dan detail di PackageD.
+
+Logika penting:
+- Saat update, sistem hapus dulu detail lama di PackageD lalu insert ulang detail baru.
+- Klik row tabel memuat transaksi ke form edit.
+- Delete akan menghapus detail PackageD lebih dulu, lalu header Package.
+
+7. AUTOMATIC PACKAGE
+Tujuan:
+- Menyediakan jalan cepat sesuai logika VB6 lama.
+- User cukup isi formula, nominal, package code, dan expired.
+- Sistem otomatis membuat item room + restaurant bila diperlukan, lalu langsung membuat Package dan PackageD.
+
+Formula yang dipakai:
+- GROUP: room 60 persen, restaurant 40 persen
+- ROOM ONLY: room 100 persen, restaurant 0
+- OTA: room = nominal - 100000, restaurant = 100000
+- EXECUTIVE: room = nominal - 200000, restaurant = 200000
+
+Validasi penting:
+- nominal harus valid
+- expired wajib diisi
+- expired tidak boleh lebih kecil dari hari ini
+- kombinasi nominal dan expired yang sama akan ditolak
+
+8. GENERATE KODE DAN NOFAK
+Automatic Package membuat:
+- kode item room dengan prefix R
+- kode item restaurant dengan prefix M bila diperlukan
+- nofak baru dengan prefix berdasarkan tahun-bulan + 9002 + sequence 4 digit
+
+9. HUBUNGAN ANTAR MODUL
+Alur manual:
+1. user membuat item global di StockPackage
+2. user masuk ke Menu Package - Transaction
+3. user memilih item global dan menyimpan package manual
+
+Alur cepat:
+1. user masuk ke Automatic Package
+2. user isi formula, nominal, code, expired
+3. sistem langsung membuat item global yang dibutuhkan sekaligus Package dan PackageD
+
+10. CATATAN MAINTENANCE
+- Jika struktur Package atau PackageD berubah, periksa controller manual dan automatic sekaligus.
+- Jika format nofak ingin disesuaikan, ubah di helper generatePackageNofak pada controller terkait.
+- Jika user ingin detail item lebih banyak, jumlah row input di view transaction bisa diperluas.

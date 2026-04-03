@@ -7,6 +7,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StockPackageController;
+use App\Http\Controllers\PackageTransactionController;
+use App\Http\Controllers\AutomaticPackageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +19,6 @@ Route::get('/test-db', function () {
     return DB::select("SELECT TOP 5 * FROM KELAS");
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | AUTH
@@ -26,7 +27,6 @@ Route::get('/test-db', function () {
 Route::get('/', [AuthController::class, 'loginForm']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout']);
-
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +37,6 @@ Route::get('/dashboard', function () {
     if (!session('user')) return redirect('/');
     return app(DashboardController::class)->index();
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -64,7 +63,6 @@ Route::get('/kelas/{kode}/delete', function ($kode) {
     return app(KelasController::class)->destroy($kode);
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | MASTER DATA - ROOM
@@ -90,37 +88,65 @@ Route::get('/room/{kode}/delete', function ($kode) {
     return app(RoomController::class)->destroy($kode);
 });
 
-
 /*
 |--------------------------------------------------------------------------
-| MASTER DATA - STOCK PACKAGE
+| PACKAGE
 |--------------------------------------------------------------------------
 */
 Route::get('/stock-package', function () {
     if (!session('user')) return redirect('/');
+    return redirect('/item-package-global');
+});
+
+Route::get('/item-package-global', function () {
+    if (!session('user')) return redirect('/');
     return app(StockPackageController::class)->index();
 });
 
-Route::post('/stock-package', function () {
+Route::post('/item-package-global', function () {
     if (!session('user')) return redirect('/');
     return app(StockPackageController::class)->store(request());
 });
 
-Route::post('/stock-package/process', function () {
-    if (!session('user')) return redirect('/');
-    return app(StockPackageController::class)->process(request());
-});
-
-Route::post('/stock-package/{kode}/update', function ($kode) {
+Route::post('/item-package-global/{kode}/update', function ($kode) {
     if (!session('user')) return redirect('/');
     return app(StockPackageController::class)->update(request(), $kode);
 });
 
-Route::get('/stock-package/{kode}/delete', function ($kode) {
+Route::get('/item-package-global/{kode}/delete', function ($kode) {
     if (!session('user')) return redirect('/');
     return app(StockPackageController::class)->destroy($kode);
 });
 
+Route::get('/menu-package-transaction', function () {
+    if (!session('user')) return redirect('/');
+    return app(PackageTransactionController::class)->index();
+});
+
+Route::post('/menu-package-transaction', function () {
+    if (!session('user')) return redirect('/');
+    return app(PackageTransactionController::class)->store(request());
+});
+
+Route::post('/menu-package-transaction/{nofak}/update', function ($nofak) {
+    if (!session('user')) return redirect('/');
+    return app(PackageTransactionController::class)->update(request(), $nofak);
+});
+
+Route::get('/menu-package-transaction/{nofak}/delete', function ($nofak) {
+    if (!session('user')) return redirect('/');
+    return app(PackageTransactionController::class)->destroy($nofak);
+});
+
+Route::get('/automatic-package', function () {
+    if (!session('user')) return redirect('/');
+    return app(AutomaticPackageController::class)->index();
+});
+
+Route::post('/automatic-package/process', function () {
+    if (!session('user')) return redirect('/');
+    return app(AutomaticPackageController::class)->process(request());
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -137,7 +163,6 @@ Route::get('/checkout', function () {
     return "Check-Out Page";
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | REPORT
@@ -153,7 +178,6 @@ Route::get('/expected-departure', function () {
     return "Expected Departure Report";
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | TOOLS
@@ -168,4 +192,3 @@ Route::get('/change-password', function () {
     if (!session('user')) return redirect('/');
     return "Change Password Page";
 });
-
