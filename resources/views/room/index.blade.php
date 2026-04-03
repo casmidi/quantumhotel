@@ -474,7 +474,7 @@
                             <td>{{ $room->ExtNo }}</td>
                             <td>{{ $room->KUNCI }}</td>
                             <td class="text-center">
-                                <a href="/room/{{ $room->Kode }}/delete" class="room-delete" title="Delete" aria-label="Delete">&#128465;</a>
+                                <a href="/room/{{ $room->Kode }}/delete" class="room-delete" title="Delete" aria-label="Delete" data-confirm-delete="Are you sure you want to delete this room?">&#128465;</a>
                             </td>
                         </tr>
                         @empty
@@ -680,3 +680,4 @@ kodeField.focus();
 </script>
 
 @endsection
+

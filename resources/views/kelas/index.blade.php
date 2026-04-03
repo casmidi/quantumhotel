@@ -438,7 +438,7 @@
                             <td class="text-right kelas-money">{{ number_format($k->Rate1 ?? 0, 0, ',', '.') }}</td>
                             <td class="text-right kelas-money">{{ number_format($k->Depo1 ?? 0, 0, ',', '.') }}</td>
                             <td class="text-center">
-                                <a href="/kelas/{{ $k->Kode }}/delete" class="kelas-delete" title="Delete" aria-label="Delete">&#128465;</a>
+                                <a href="/kelas/{{ $k->Kode }}/delete" class="kelas-delete" title="Delete" aria-label="Delete" data-confirm-delete="Are you sure you want to delete this room class?">&#128465;</a>
                             </td>
                         </tr>
                         @empty
@@ -610,3 +610,4 @@ kodeField.focus();
 </script>
 
 @endsection
+
