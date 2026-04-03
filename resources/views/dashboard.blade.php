@@ -266,7 +266,7 @@
 
     .breakdown-left {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 0.85rem;
     }
 
@@ -279,6 +279,7 @@
         border-radius: 12px;
         font-size: 1.1rem;
         background: rgba(16, 35, 59, 0.08);
+        flex-shrink: 0;
     }
 
     .breakdown-text strong {
@@ -291,6 +292,36 @@
         color: #6b7b90;
         font-size: 0.88rem;
         margin-top: 0.18rem;
+    }
+
+    .breakdown-codes {
+        margin-top: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+    }
+
+    .breakdown-code {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 48px;
+        padding: 0.35rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(16, 35, 59, 0.08);
+        color: #173761;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .breakdown-more {
+        display: inline-flex;
+        align-items: center;
+        color: #6b7b90;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding-left: 0.1rem;
     }
 
     .breakdown-right {
@@ -383,6 +414,14 @@
                     <div class="breakdown-text">
                         <strong>{{ $item['label'] }}</strong>
                         <span>Legacy occupied-room branch</span>
+                        <div class="breakdown-codes">
+                            @foreach(array_slice($item['rooms'], 0, 8) as $roomCode)
+                            <span class="breakdown-code">{{ $roomCode }}</span>
+                            @endforeach
+                            @if(count($item['rooms']) > 8)
+                            <span class="breakdown-more">+{{ count($item['rooms']) - 8 }} more</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 <div class="breakdown-right">
@@ -395,6 +434,3 @@
     </section>
 </div>
 @endsection
-
-
-

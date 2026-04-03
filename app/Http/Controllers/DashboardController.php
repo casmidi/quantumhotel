@@ -76,12 +76,22 @@ class DashboardController extends Controller
             'occupied_dirty_long' => 0,
         ];
 
+        $roomLists = [
+            'occupied_clean' => [],
+            'occupied_dirty' => [],
+            'occupied_clean_short' => [],
+            'occupied_clean_long' => [],
+            'occupied_dirty_short' => [],
+            'occupied_dirty_long' => [],
+        ];
+
         foreach ($roomStatuses as $room) {
             $status = trim((string) $room->Status);
             $rawStatus = trim((string) $room->StatusKamar);
             $payment = strtoupper(trim((string) $room->Payment));
             $status2 = trim((string) $room->Status2);
             $daysStayed = 0;
+            $kode = trim((string) $room->Kode);
 
             if (!empty($room->TglIn) && $room->TglIn !== '2000-01-01') {
                 $daysStayed = Carbon::parse($room->TglIn)->startOfDay()->diffInDays($today);
@@ -97,19 +107,25 @@ class DashboardController extends Controller
 
                 if ($status2 === 'Occupied Clean') {
                     $counts['occupied_clean']++;
+                    $roomLists['occupied_clean'][] = $kode;
 
                     if ($daysStayed > 2) {
                         $counts['occupied_clean_long']++;
+                        $roomLists['occupied_clean_long'][] = $kode;
                     } else {
                         $counts['occupied_clean_short']++;
+                        $roomLists['occupied_clean_short'][] = $kode;
                     }
                 } else {
                     $counts['occupied_dirty']++;
+                    $roomLists['occupied_dirty'][] = $kode;
 
                     if ($daysStayed > 2) {
                         $counts['occupied_dirty_long']++;
+                        $roomLists['occupied_dirty_long'][] = $kode;
                     } else {
                         $counts['occupied_dirty_short']++;
+                        $roomLists['occupied_dirty_short'][] = $kode;
                     }
                 }
 
@@ -229,36 +245,42 @@ class DashboardController extends Controller
                 'count' => $counts['occupied_clean'],
                 'percentage' => round(($counts['occupied_clean'] / $totalBase) * 100, 2),
                 'icon' => '&#128719;',
+                'rooms' => $roomLists['occupied_clean'],
             ],
             [
                 'label' => 'Occupied Dirty',
                 'count' => $counts['occupied_dirty'],
                 'percentage' => round(($counts['occupied_dirty'] / $totalBase) * 100, 2),
                 'icon' => '&#129532;',
+                'rooms' => $roomLists['occupied_dirty'],
             ],
             [
                 'label' => 'Occ Clean <= 2',
                 'count' => $counts['occupied_clean_short'],
                 'percentage' => round(($counts['occupied_clean_short'] / $totalBase) * 100, 2),
                 'icon' => '&#9989;',
+                'rooms' => $roomLists['occupied_clean_short'],
             ],
             [
                 'label' => 'Occ Clean > 2',
                 'count' => $counts['occupied_clean_long'],
                 'percentage' => round(($counts['occupied_clean_long'] / $totalBase) * 100, 2),
                 'icon' => '&#9201;',
+                'rooms' => $roomLists['occupied_clean_long'],
             ],
             [
                 'label' => 'Occ Dirty <= 2',
                 'count' => $counts['occupied_dirty_short'],
                 'percentage' => round(($counts['occupied_dirty_short'] / $totalBase) * 100, 2),
                 'icon' => '&#129533;',
+                'rooms' => $roomLists['occupied_dirty_short'],
             ],
             [
                 'label' => 'Occ Dirty > 2',
                 'count' => $counts['occupied_dirty_long'],
                 'percentage' => round(($counts['occupied_dirty_long'] / $totalBase) * 100, 2),
                 'icon' => '&#8987;',
+                'rooms' => $roomLists['occupied_dirty_long'],
             ],
         ]);
 
@@ -270,5 +292,3 @@ class DashboardController extends Controller
         ]);
     }
 }
-
-
