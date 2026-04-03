@@ -142,8 +142,8 @@ class DashboardController extends Controller
             }
 
             if ($status === 'Owner Unit') {
-                $counts['complimentary']++;
                 $counts['owner_unit']++;
+                $counts['complimentary']++;
                 continue;
             }
 
@@ -156,6 +156,7 @@ class DashboardController extends Controller
         $operationalBase = $totalRooms - $counts['check_out'] - $counts['renovated'] - $counts['out_of_order'] - $counts['complimentary'];
         $operationalBase = $operationalBase > 0 ? $operationalBase : 1;
         $totalBase = $totalRooms > 0 ? $totalRooms : 1;
+        $complimentaryOnly = max($counts['complimentary'] - $counts['owner_unit'], 0);
 
         $metrics = collect([
             [
@@ -180,6 +181,20 @@ class DashboardController extends Controller
                 'tone' => 'clean',
             ],
             [
+                'key' => 'owner_unit',
+                'label' => 'Owner Unit',
+                'count' => $counts['owner_unit'],
+                'percentage' => round(($counts['owner_unit'] / $totalBase) * 100, 2),
+                'tone' => 'owner-unit',
+            ],
+            [
+                'key' => 'complimentary',
+                'label' => 'Complimentary',
+                'count' => $complimentaryOnly,
+                'percentage' => round(($complimentaryOnly / $totalBase) * 100, 2),
+                'tone' => 'complimentary',
+            ],
+            [
                 'key' => 'renovated',
                 'label' => 'Renovated',
                 'count' => $counts['renovated'],
@@ -201,42 +216,36 @@ class DashboardController extends Controller
                 'count' => $counts['occupied_clean'],
                 'percentage' => round(($counts['occupied_clean'] / $totalBase) * 100, 2),
                 'icon' => '&#128719;',
-                'tone' => 'occupied-clean',
             ],
             [
                 'label' => 'Occupied Dirty',
                 'count' => $counts['occupied_dirty'],
                 'percentage' => round(($counts['occupied_dirty'] / $totalBase) * 100, 2),
                 'icon' => '&#129532;',
-                'tone' => 'occupied-dirty',
             ],
             [
                 'label' => 'Occ Clean <= 2',
                 'count' => $counts['occupied_clean_short'],
                 'percentage' => round(($counts['occupied_clean_short'] / $totalBase) * 100, 2),
                 'icon' => '&#9989;',
-                'tone' => 'occupied-clean-short',
             ],
             [
                 'label' => 'Occ Clean > 2',
                 'count' => $counts['occupied_clean_long'],
                 'percentage' => round(($counts['occupied_clean_long'] / $totalBase) * 100, 2),
                 'icon' => '&#9201;',
-                'tone' => 'occupied-clean-long',
             ],
             [
                 'label' => 'Occ Dirty <= 2',
                 'count' => $counts['occupied_dirty_short'],
                 'percentage' => round(($counts['occupied_dirty_short'] / $totalBase) * 100, 2),
                 'icon' => '&#129533;',
-                'tone' => 'occupied-dirty-short',
             ],
             [
                 'label' => 'Occ Dirty > 2',
                 'count' => $counts['occupied_dirty_long'],
                 'percentage' => round(($counts['occupied_dirty_long'] / $totalBase) * 100, 2),
                 'icon' => '&#8987;',
-                'tone' => 'occupied-dirty-long',
             ],
         ]);
 
@@ -248,5 +257,3 @@ class DashboardController extends Controller
         ]);
     }
 }
-
-

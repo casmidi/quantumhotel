@@ -130,6 +130,8 @@
     .metric-card.clean { background: linear-gradient(135deg, #17634f, #2aa078 58%, #65cfaa 140%); }
     .metric-card.renovated { background: linear-gradient(135deg, #5c3a7d, #8f63ba 58%, #c3a4ef 145%); }
     .metric-card.out-of-order { background: linear-gradient(135deg, #3f3072, #654db5 58%, #9d89ee 145%); }
+    .metric-card.owner-unit { background: linear-gradient(135deg, #6f5318, #b88a2f 58%, #efd18b 145%); }
+    .metric-card.complimentary { background: linear-gradient(135deg, #5d2d73, #934eb3 58%, #d2a6f0 145%); }
 
     .metric-label {
         position: relative;
@@ -319,6 +321,8 @@
         'vacant_clean' => '&#9989;',
         'renovated' => '&#128736;',
         'out_of_order' => '&#9888;',
+        'owner_unit' => '&#128081;',
+        'complimentary' => '&#127873;',
     ];
 @endphp
 
@@ -389,3 +393,4 @@
     </section>
 </div>
 @endsection
+
