@@ -67,13 +67,19 @@
 
     .dashboard-hero p {
         margin: 0;
-        max-width: 720px;
+        max-width: 760px;
         color: rgba(255,255,255,0.8);
         line-height: 1.7;
     }
 
-    .dashboard-total {
+    .dashboard-totals {
         margin-top: 1.6rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-total {
         display: inline-flex;
         flex-direction: column;
         gap: 0.2rem;
@@ -81,6 +87,7 @@
         border-radius: 18px;
         background: rgba(255,255,255,0.11);
         border: 1px solid rgba(255,255,255,0.12);
+        min-width: 180px;
     }
 
     .dashboard-total-label {
@@ -198,6 +205,107 @@
         font-size: 0.92rem;
     }
 
+    .dashboard-shell {
+        border: 1px solid rgba(255,255,255,0.55);
+        border-radius: 24px;
+        background: rgba(255,255,255,0.78);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 18px 42px rgba(16, 35, 59, 0.08);
+        overflow: hidden;
+        margin-top: 1.5rem;
+    }
+
+    .dashboard-shell-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.35rem 1.5rem 1rem;
+        border-bottom: 1px solid rgba(16, 35, 59, 0.08);
+    }
+
+    .dashboard-shell-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #10233b;
+    }
+
+    .dashboard-shell-subtitle {
+        margin: 0.3rem 0 0;
+        color: #66768d;
+        font-size: 0.92rem;
+    }
+
+    .dashboard-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0.5rem 0.8rem;
+        background: rgba(179, 138, 81, 0.12);
+        color: #8d6635;
+        font-weight: 700;
+        font-size: 0.82rem;
+    }
+
+    .breakdown-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid rgba(16, 35, 59, 0.06);
+    }
+
+    .breakdown-item:first-child {
+        border-top: 0;
+    }
+
+    .breakdown-left {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+    }
+
+    .breakdown-icon {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        background: rgba(16, 35, 59, 0.08);
+    }
+
+    .breakdown-text strong {
+        display: block;
+        color: #10233b;
+    }
+
+    .breakdown-text span {
+        display: block;
+        color: #6b7b90;
+        font-size: 0.88rem;
+        margin-top: 0.18rem;
+    }
+
+    .breakdown-right {
+        text-align: right;
+        min-width: 120px;
+    }
+
+    .breakdown-right strong {
+        display: block;
+        font-size: 1.05rem;
+        color: #10233b;
+    }
+
+    .breakdown-right span {
+        color: #6b7b90;
+        font-size: 0.9rem;
+    }
+
     @media (max-width: 991.98px) {
         .dashboard-hero h1 { font-size: 1.9rem; }
         .metric-value { font-size: 2.7rem; }
@@ -218,10 +326,16 @@
     <section class="dashboard-hero">
         <div class="dashboard-kicker">Quantum Hotel Dashboard</div>
         <h1>Room Status Overview</h1>
-        <p>This dashboard follows the room-status logic from the legacy Visual Basic application and presents the result in a simpler executive format: count and percentage only.</p>
-        <div class="dashboard-total">
-            <span class="dashboard-total-label">Total Active Rooms</span>
-            <span class="dashboard-total-value">{{ number_format($totalRooms, 0, ',', '.') }}</span>
+        <p>This dashboard follows the full room-status logic from the legacy Visual Basic application, including occupied-clean and occupied-dirty behavior before and after two days of stay, while keeping the output focused on count and percentage only.</p>
+        <div class="dashboard-totals">
+            <div class="dashboard-total">
+                <span class="dashboard-total-label">Total Active Rooms</span>
+                <span class="dashboard-total-value">{{ number_format($totalRooms, 0, ',', '.') }}</span>
+            </div>
+            <div class="dashboard-total">
+                <span class="dashboard-total-label">Operational Base</span>
+                <span class="dashboard-total-value">{{ number_format($operationalBase, 0, ',', '.') }}</span>
+            </div>
         </div>
     </section>
 
@@ -239,11 +353,39 @@
                     <div class="metric-progress-bar" style="width: {{ min($metric['percentage'], 100) }}%;"></div>
                 </div>
                 <p class="metric-copy">
-                    {{ $metric['count'] }} room{{ $metric['count'] === 1 ? '' : 's' }} out of {{ number_format($totalRooms, 0, ',', '.') }} total active rooms.
+                    {{ $metric['count'] }} room{{ $metric['count'] === 1 ? '' : 's' }} recorded under {{ $metric['label'] }}.
                 </p>
             </div>
         </div>
         @endforeach
+    </section>
+
+    <section class="dashboard-shell">
+        <div class="dashboard-shell-header">
+            <div>
+                <h2 class="dashboard-shell-title">Occupied Breakdown</h2>
+                <p class="dashboard-shell-subtitle">Converted from the VB6 logic that splits occupied rooms into clean/dirty and stay-length based groups.</p>
+            </div>
+            <span class="dashboard-badge">Count + Percentage</span>
+        </div>
+
+        <div>
+            @foreach($occupiedBreakdown as $item)
+            <div class="breakdown-item">
+                <div class="breakdown-left">
+                    <span class="breakdown-icon">{!! $item['icon'] !!}</span>
+                    <div class="breakdown-text">
+                        <strong>{{ $item['label'] }}</strong>
+                        <span>Legacy occupied-room branch</span>
+                    </div>
+                </div>
+                <div class="breakdown-right">
+                    <strong>{{ number_format($item['count'], 0, ',', '.') }}</strong>
+                    <span>{{ number_format($item['percentage'], 2) }}%</span>
+                </div>
+            </div>
+            @endforeach
+        </div>
     </section>
 </div>
 @endsection

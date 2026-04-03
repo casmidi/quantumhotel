@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -51,60 +52,201 @@ class DashboardController extends Controller
             ->leftJoinSub($guestSubquery, 'MasDATA2', function ($join) {
                 $join->on('MasROOM.Kode', '=', 'MasDATA2.Kode');
             })
-            ->selectRaw("MasROOM.Kode, {$statusExpression} as Status")
+            ->selectRaw("MasROOM.Kode, MasROOM.StatusKamar, MasROOM.Status2, MasDATA2.Payment, MasDATA2.TglIn, {$statusExpression} as Status")
             ->orderBy('MasROOM.Urut')
             ->get();
 
-        $totalRooms = $roomStatuses->count();
+        $today = Carbon::today();
 
-        $metrics = [
+        $counts = [
+            'occupied' => 0,
+            'vacant_dirty' => 0,
+            'vacant_clean' => 0,
+            'renovated' => 0,
+            'out_of_order' => 0,
+            'complimentary' => 0,
+            'owner_unit' => 0,
+            'check_out' => 0,
+            'occupied_clean' => 0,
+            'occupied_dirty' => 0,
+            'occupied_clean_short' => 0,
+            'occupied_clean_long' => 0,
+            'occupied_dirty_short' => 0,
+            'occupied_dirty_long' => 0,
+        ];
+
+        foreach ($roomStatuses as $room) {
+            $status = trim((string) $room->Status);
+            $rawStatus = trim((string) $room->StatusKamar);
+            $payment = strtoupper(trim((string) $room->Payment));
+            $status2 = trim((string) $room->Status2);
+            $daysStayed = 0;
+
+            if (!empty($room->TglIn) && $room->TglIn !== '2000-01-01') {
+                $daysStayed = Carbon::parse($room->TglIn)->startOfDay()->diffInDays($today);
+            }
+
+            if ($status === 'Occupied') {
+                if ($payment === 'COMPLIMENT') {
+                    $counts['complimentary']++;
+                    continue;
+                }
+
+                $counts['occupied']++;
+
+                if ($status2 === 'Occupied Clean') {
+                    $counts['occupied_clean']++;
+
+                    if ($daysStayed > 2) {
+                        $counts['occupied_clean_long']++;
+                    } else {
+                        $counts['occupied_clean_short']++;
+                    }
+                } else {
+                    $counts['occupied_dirty']++;
+
+                    if ($daysStayed > 2) {
+                        $counts['occupied_dirty_long']++;
+                    } else {
+                        $counts['occupied_dirty_short']++;
+                    }
+                }
+
+                continue;
+            }
+
+            if ($rawStatus === 'Check Out') {
+                $counts['check_out']++;
+                $counts['vacant_dirty']++;
+                continue;
+            }
+
+            if ($status === 'Vacant Dirty') {
+                $counts['vacant_dirty']++;
+                continue;
+            }
+
+            if ($status === 'Vacant Clean' || $status === 'Vacant Ready') {
+                $counts['vacant_clean']++;
+                continue;
+            }
+
+            if ($status === 'Renovated') {
+                $counts['renovated']++;
+                continue;
+            }
+
+            if ($status === 'Out Of Order') {
+                $counts['out_of_order']++;
+                continue;
+            }
+
+            if ($status === 'Owner Unit') {
+                $counts['complimentary']++;
+                $counts['owner_unit']++;
+                continue;
+            }
+
+            if ($status === 'Complimentary') {
+                $counts['complimentary']++;
+            }
+        }
+
+        $totalRooms = $roomStatuses->count();
+        $operationalBase = $totalRooms - $counts['check_out'] - $counts['renovated'] - $counts['out_of_order'] - $counts['complimentary'];
+        $operationalBase = $operationalBase > 0 ? $operationalBase : 1;
+        $totalBase = $totalRooms > 0 ? $totalRooms : 1;
+
+        $metrics = collect([
             [
                 'key' => 'occupied',
                 'label' => 'Occupied',
-                'count' => $roomStatuses->where('Status', 'Occupied')->count(),
+                'count' => $counts['occupied'],
+                'percentage' => round(($counts['occupied'] / $operationalBase) * 100, 2),
                 'tone' => 'occupied',
             ],
             [
                 'key' => 'vacant_dirty',
                 'label' => 'Vacant Dirty',
-                'count' => $roomStatuses->where('Status', 'Vacant Dirty')->count(),
+                'count' => $counts['vacant_dirty'],
+                'percentage' => round(($counts['vacant_dirty'] / $operationalBase) * 100, 2),
                 'tone' => 'dirty',
             ],
             [
                 'key' => 'vacant_clean',
                 'label' => 'Vacant Clean',
-                'count' => $roomStatuses->filter(function ($room) {
-                    return in_array($room->Status, ['Vacant Clean', 'Vacant Ready'], true);
-                })->count(),
+                'count' => $counts['vacant_clean'],
+                'percentage' => round(($counts['vacant_clean'] / $operationalBase) * 100, 2),
                 'tone' => 'clean',
             ],
             [
                 'key' => 'renovated',
                 'label' => 'Renovated',
-                'count' => $roomStatuses->where('Status', 'Renovated')->count(),
+                'count' => $counts['renovated'],
+                'percentage' => round(($counts['renovated'] / $totalBase) * 100, 2),
                 'tone' => 'renovated',
             ],
             [
                 'key' => 'out_of_order',
                 'label' => 'Out Of Order',
-                'count' => $roomStatuses->where('Status', 'Out Of Order')->count(),
+                'count' => $counts['out_of_order'],
+                'percentage' => round(($counts['out_of_order'] / $totalBase) * 100, 2),
                 'tone' => 'out-of-order',
             ],
-        ];
+        ]);
 
-        $metrics = collect($metrics)
-            ->map(function ($metric) use ($totalRooms) {
-                $metric['percentage'] = $totalRooms > 0
-                    ? round(($metric['count'] / $totalRooms) * 100, 2)
-                    : 0;
-
-                return $metric;
-            })
-            ->values();
+        $occupiedBreakdown = collect([
+            [
+                'label' => 'Occupied Clean',
+                'count' => $counts['occupied_clean'],
+                'percentage' => round(($counts['occupied_clean'] / $totalBase) * 100, 2),
+                'icon' => '&#128719;',
+                'tone' => 'occupied-clean',
+            ],
+            [
+                'label' => 'Occupied Dirty',
+                'count' => $counts['occupied_dirty'],
+                'percentage' => round(($counts['occupied_dirty'] / $totalBase) * 100, 2),
+                'icon' => '&#129532;',
+                'tone' => 'occupied-dirty',
+            ],
+            [
+                'label' => 'Occ Clean <= 2',
+                'count' => $counts['occupied_clean_short'],
+                'percentage' => round(($counts['occupied_clean_short'] / $totalBase) * 100, 2),
+                'icon' => '&#9989;',
+                'tone' => 'occupied-clean-short',
+            ],
+            [
+                'label' => 'Occ Clean > 2',
+                'count' => $counts['occupied_clean_long'],
+                'percentage' => round(($counts['occupied_clean_long'] / $totalBase) * 100, 2),
+                'icon' => '&#9201;',
+                'tone' => 'occupied-clean-long',
+            ],
+            [
+                'label' => 'Occ Dirty <= 2',
+                'count' => $counts['occupied_dirty_short'],
+                'percentage' => round(($counts['occupied_dirty_short'] / $totalBase) * 100, 2),
+                'icon' => '&#129533;',
+                'tone' => 'occupied-dirty-short',
+            ],
+            [
+                'label' => 'Occ Dirty > 2',
+                'count' => $counts['occupied_dirty_long'],
+                'percentage' => round(($counts['occupied_dirty_long'] / $totalBase) * 100, 2),
+                'icon' => '&#8987;',
+                'tone' => 'occupied-dirty-long',
+            ],
+        ]);
 
         return view('dashboard', [
             'metrics' => $metrics,
+            'occupiedBreakdown' => $occupiedBreakdown,
             'totalRooms' => $totalRooms,
+            'operationalBase' => $operationalBase,
         ]);
     }
 }
+
+
