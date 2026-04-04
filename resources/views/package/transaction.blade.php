@@ -90,6 +90,8 @@
 .package-table tbody tr:nth-child(odd) { background:rgba(16,35,59,.045); }
 .package-table tbody tr:nth-child(even) { background:rgba(255,255,255,.96); }
 .package-table tbody tr:hover { background:rgba(179,138,81,.06); transform:translateY(-1px); box-shadow:inset 4px 0 0 #b38a51; }
+.package-table tbody tr.package-row-locked { cursor:default; }
+.package-table tbody tr.package-row-locked:hover { background:inherit; transform:none; box-shadow:none; }
 .package-table tbody td { border-top:1px solid rgba(16,35,59,.06); padding:1rem 1.2rem; vertical-align:middle; color:#10233b; }
 .package-code { display:inline-flex; align-items:center; min-width:120px; justify-content:center; padding:.45rem .7rem; border-radius:999px; background:rgba(23,55,97,.08); color:#173761; font-weight:700; letter-spacing:.06em; }
 .package-delete { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:rgba(178,34,34,.08); color:#aa2f2f; border:1px solid rgba(178,34,34,.12); text-decoration:none; font-size:1rem; transition:all .18s ease; }
@@ -203,7 +205,7 @@
         </div>
         <div class="package-table-wrap"><div class="table-responsive"><table class="table package-table" id="tablePackageTransaction"><thead><tr><th>Invoice</th><th>Package Code</th><th>Items</th><th>Expired</th><th class="text-right">Nominal</th><th class="text-center" width="90">Action</th></tr></thead><tbody>
             @forelse($packages as $package)
-            <tr data-nofak="{{ $package->Nofak }}" data-meja="{{ $package->Meja }}" data-expired="{{ \Carbon\Carbon::parse($package->Expired)->format('Y-m-d') }}" data-details='@json(json_decode($package->detail_json, true))' data-used="{{ $package->is_used ? '1' : '0' }}">
+            <tr class="{{ $package->is_used ? 'package-row-locked' : '' }}" data-nofak="{{ $package->Nofak }}" data-meja="{{ $package->Meja }}" data-expired="{{ \Carbon\Carbon::parse($package->Expired)->format('Y-m-d') }}" data-details='@json(json_decode($package->detail_json, true))' data-used="{{ $package->is_used ? '1' : '0' }}">
                 <td>
                     <span class="package-code">{{ $package->Nofak }}</span>
                     @if($package->is_used)
@@ -358,7 +360,7 @@ detailGridBody.addEventListener('input', function(event){const row=event.target.
 
   detailGridBody.addEventListener('click', function(event){const removeButton=event.target.closest('.package-row-remove'); if(!removeButton){return;} const row=removeButton.closest('[data-row]'); if(!row){return;} const rows=getRows(); if(rows.length<=1){row.querySelector('.item-code').value=''; row.querySelector('.item-name').value=''; row.querySelector('.item-qty').value='1'; row.querySelector('.item-price').value=''; row.querySelector('.item-price').dataset.autofill='1'; updateTotals(); return;} row.remove(); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();});
 
-transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} if(row.dataset.used==='1'){window.showCrudNotice('This package transaction is already used in guest transactions and cannot be updated.', 'Package Locked'); return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; setGeneratedNofak(row.dataset.nofak); mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
+transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} if(row.dataset.used==='1'){return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; setGeneratedNofak(row.dataset.nofak); mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
 
   newTransactionButton.addEventListener('click', function(){activateCreateMode();});
   resetButton.addEventListener('click', function(){activateCreateMode();});
