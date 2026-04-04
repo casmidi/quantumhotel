@@ -12,6 +12,7 @@ class PackageTransactionController extends Controller
     {
         $searchType = trim((string) $request->query('search_type', 'all'));
         $searchValue = trim((string) $request->query('search', ''));
+        $perPage = 10;
 
         $items = DB::table('StockPackage')
             ->selectRaw("RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Kind) as Kind, Hj")
@@ -42,40 +43,56 @@ class PackageTransactionController extends Controller
             });
         }
 
-        $packages = $packagesQuery->get();
+        $summary = [
+            'total' => (clone $packagesQuery)->count(),
+            'nominal' => (float) (clone $packagesQuery)->sum('JumlahRes'),
+        ];
+
+        $packages = $packagesQuery->paginate($perPage)->appends($request->query());
+        $packageNofaks = $packages->getCollection()->pluck('Nofak')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
 
         $details = DB::table('PackageD')
             ->selectRaw("RTRIM(Nofak) as Nofak, RTRIM(KodeBrg) as KodeBrg, Qty, Harga, Jumlah, NoUrut")
+            ->when(!empty($packageNofaks), fn ($query) => $query->whereIn(DB::raw('RTRIM(Nofak)'), $packageNofaks))
             ->orderBy('NoUrut')
             ->get()
             ->groupBy('Nofak');
 
+        $usedPackages = collect();
+        if (!empty($packageNofaks)) {
+            $usedPackages = DB::table('DATA2')
+                ->selectRaw("RTRIM(Package) as Package")
+                ->whereIn(DB::raw('RTRIM(Package)'), $packageNofaks)
+                ->get()
+                ->pluck('Package')
+                ->map(fn ($value) => trim((string) $value))
+                ->flip();
+        }
+
         $itemMap = $items->keyBy('KodeBrg');
-        $packages = $packages->map(function ($package) use ($details, $itemMap) {
-            $detailRows = collect($details->get($package->Nofak, []))->map(function ($detail) use ($itemMap) {
-                $mapped = $itemMap->get($detail->KodeBrg);
+        $packages->setCollection(
+            $packages->getCollection()->map(function ($package) use ($details, $itemMap, $usedPackages) {
+                $detailRows = collect($details->get($package->Nofak, []))->map(function ($detail) use ($itemMap) {
+                    $mapped = $itemMap->get($detail->KodeBrg);
 
-                return [
-                    'kode' => $detail->KodeBrg,
-                    'name' => $mapped->NamaBrg ?? $detail->KodeBrg,
-                    'kind' => $mapped->Kind ?? '',
-                    'qty' => (float) $detail->Qty,
-                    'price' => (float) $detail->Harga,
-                    'amount' => (float) $detail->Jumlah,
-                    'sort' => (int) $detail->NoUrut,
-                ];
-            })->values();
+                    return [
+                        'kode' => $detail->KodeBrg,
+                        'name' => $mapped->NamaBrg ?? $detail->KodeBrg,
+                        'kind' => $mapped->Kind ?? '',
+                        'qty' => (float) $detail->Qty,
+                        'price' => (float) $detail->Harga,
+                        'amount' => (float) $detail->Jumlah,
+                        'sort' => (int) $detail->NoUrut,
+                    ];
+                })->values();
 
-            $package->detail_json = $detailRows->toJson();
-            $package->detail_summary = $detailRows->pluck('kode')->implode(', ');
+                $package->detail_json = $detailRows->toJson();
+                $package->detail_summary = $detailRows->pluck('kode')->implode(', ');
+                $package->is_used = $usedPackages->has(trim((string) $package->Nofak));
 
-            return $package;
-        });
-
-        $summary = [
-            'total' => $packages->count(),
-            'nominal' => $packages->sum('JumlahRes'),
-        ];
+                return $package;
+            })
+        );
 
         $nextNofak = $this->previewPackageNofak();
 
@@ -95,6 +112,10 @@ class PackageTransactionController extends Controller
     public function destroy($nofak)
     {
         $normalized = trim((string) $nofak);
+
+        if ($this->packageIsUsed($normalized)) {
+            return redirect('/menu-package-transaction')->with('error', 'This package transaction is already used in guest transactions and cannot be deleted.');
+        }
 
         DB::transaction(function () use ($normalized) {
             DB::table('PackageD')->whereRaw('RTRIM(Nofak) = ?', [$normalized])->delete();
@@ -136,6 +157,10 @@ class PackageTransactionController extends Controller
 
         if ($existingNofak && !$this->packageExists($existingNofak)) {
             return redirect('/menu-package-transaction')->with('error', 'Package transaction was not found.');
+        }
+
+        if ($existingNofak && $this->packageIsUsed($existingNofak)) {
+            return redirect('/menu-package-transaction')->with('error', 'This package transaction is already used in guest transactions and cannot be updated.');
         }
 
         if ($this->hasDuplicatePackageCode($packageCode, $expired, $existingNofak)) {
@@ -272,6 +297,13 @@ class PackageTransactionController extends Controller
             ->exists();
     }
 
+    private function packageIsUsed(string $nofak): bool
+    {
+        return DB::table('DATA2')
+            ->whereRaw('RTRIM(Package) = ?', [trim($nofak)])
+            ->exists();
+    }
+
     private function hasDuplicatePackageCode(string $packageCode, Carbon $expired, ?string $existingNofak = null): bool
     {
         $query = DB::table('Package')
@@ -333,5 +365,3 @@ class PackageTransactionController extends Controller
         return is_numeric($normalized) ? (float) $normalized : 0;
     }
 }
-
-

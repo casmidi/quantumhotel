@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Package Transactions')
 
@@ -21,7 +21,7 @@
         }
     }
 
-    while (count($initialRows) < 3) {
+    while (count($initialRows) < 2) {
         $initialRows[] = [
             'kode' => '',
             'qty' => '1',
@@ -95,6 +95,15 @@
 .package-delete { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:rgba(178,34,34,.08); color:#aa2f2f; border:1px solid rgba(178,34,34,.12); text-decoration:none; font-size:1rem; transition:all .18s ease; }
 .package-delete:hover { background:#aa2f2f; color:#fff; text-decoration:none; transform:translateY(-1px); }
 .package-empty { text-align:center; padding:2.2rem 1rem; color:#6b7b90; }
+.package-used-badge { display:inline-flex; align-items:center; gap:.35rem; margin-top:.55rem; padding:.28rem .55rem; border-radius:999px; background:rgba(179,52,70,.12); color:#9e2f41; font-size:.72rem; font-weight:700; letter-spacing:.04em; }
+.package-disabled-action { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:rgba(16,35,59,.08); color:#6b7b90; border:1px solid rgba(16,35,59,.1); }
+.package-pagination-wrap { display:flex; justify-content:flex-end; padding:1rem 1.4rem 1.4rem; border-top:1px solid rgba(16,35,59,.08); background:rgba(255,255,255,.58); }
+.package-pagination { display:flex; align-items:center; gap:.45rem; margin:0; padding:0; list-style:none; }
+.package-page-item { display:flex; }
+.package-page-link { display:inline-flex; align-items:center; justify-content:center; min-width:40px; height:40px; padding:0 .85rem; border-radius:12px; border:1px solid rgba(16,35,59,.12); background:rgba(255,255,255,.92); color:#173761; font-weight:700; text-decoration:none; transition:all .18s ease; }
+.package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
+.package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
+.package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
 @media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } }
 </style>
 
@@ -194,18 +203,58 @@
         </div>
         <div class="package-table-wrap"><div class="table-responsive"><table class="table package-table" id="tablePackageTransaction"><thead><tr><th>Invoice</th><th>Package Code</th><th>Items</th><th>Expired</th><th class="text-right">Nominal</th><th class="text-center" width="90">Action</th></tr></thead><tbody>
             @forelse($packages as $package)
-            <tr data-nofak="{{ $package->Nofak }}" data-meja="{{ $package->Meja }}" data-expired="{{ \Carbon\Carbon::parse($package->Expired)->format('Y-m-d') }}" data-details='@json(json_decode($package->detail_json, true))'>
-                <td><span class="package-code">{{ $package->Nofak }}</span></td>
+            <tr data-nofak="{{ $package->Nofak }}" data-meja="{{ $package->Meja }}" data-expired="{{ \Carbon\Carbon::parse($package->Expired)->format('Y-m-d') }}" data-details='@json(json_decode($package->detail_json, true))' data-used="{{ $package->is_used ? '1' : '0' }}">
+                <td>
+                    <span class="package-code">{{ $package->Nofak }}</span>
+                    @if($package->is_used)
+                    <div><span class="package-used-badge"><i class="fa-solid fa-lock"></i>Used in DATA2</span></div>
+                    @endif
+                </td>
                 <td>{{ $package->Meja }}</td>
                 <td>{{ $package->detail_summary }}</td>
                 <td>{{ \Carbon\Carbon::parse($package->Expired)->format('d-m-Y') }}</td>
                 <td class="text-right">Rp {{ number_format($package->JumlahRes ?? 0, 0, ',', '.') }}</td>
-                <td class="text-center"><a href="/menu-package-transaction/{{ $package->Nofak }}/delete" class="package-delete" title="Delete" aria-label="Delete" data-confirm-delete="Do you want to delete this package transaction?">&#128465;</a></td>
+                <td class="text-center">
+                    @if($package->is_used)
+                    <span class="package-disabled-action" title="This package transaction is already used in guest transactions." aria-label="Locked"><i class="fa-solid fa-lock"></i></span>
+                    @else
+                    <a href="/menu-package-transaction/{{ $package->Nofak }}/delete" class="package-delete" title="Delete" aria-label="Delete" data-confirm-delete="Do you want to delete this package transaction?">&#128465;</a>
+                    @endif
+                </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="package-empty">No package transactions yet. Create the first manual package transaction to get started.</td></tr>
+            <tr><td colspan="6" class="package-empty">No package transactions found for the current filter.</td></tr>
             @endforelse
         </tbody></table></div></div>
+        @if($packages->hasPages())
+        @php
+            $currentPage = $packages->currentPage();
+            $lastPage = $packages->lastPage();
+            $startPage = max(1, $currentPage - 2);
+            $endPage = min($lastPage, $currentPage + 2);
+        @endphp
+        <div class="package-pagination-wrap">
+            <ul class="package-pagination">
+                <li class="package-page-item {{ $packages->onFirstPage() ? 'disabled' : '' }}"><a class="package-page-link" href="{{ $packages->previousPageUrl() ?: '#' }}">&lt;</a></li>
+                @if($startPage > 1)
+                <li class="package-page-item"><a class="package-page-link" href="{{ $packages->url(1) }}">1</a></li>
+                @if($startPage > 2)
+                <li class="package-page-item disabled"><span class="package-page-link">...</span></li>
+                @endif
+                @endif
+                @for($page = $startPage; $page <= $endPage; $page++)
+                <li class="package-page-item {{ $page === $currentPage ? 'active' : '' }}"><a class="package-page-link" href="{{ $packages->url($page) }}">{{ $page }}</a></li>
+                @endfor
+                @if($endPage < $lastPage)
+                @if($endPage < $lastPage - 1)
+                <li class="package-page-item disabled"><span class="package-page-link">...</span></li>
+                @endif
+                <li class="package-page-item"><a class="package-page-link" href="{{ $packages->url($lastPage) }}">{{ $lastPage }}</a></li>
+                @endif
+                <li class="package-page-item {{ $packages->hasMorePages() ? '' : 'disabled' }}"><a class="package-page-link" href="{{ $packages->nextPageUrl() ?: '#' }}">&gt;</a></li>
+            </ul>
+        </div>
+        @endif
     </section>
 </div>
 
@@ -309,7 +358,7 @@ detailGridBody.addEventListener('input', function(event){const row=event.target.
 
   detailGridBody.addEventListener('click', function(event){const removeButton=event.target.closest('.package-row-remove'); if(!removeButton){return;} const row=removeButton.closest('[data-row]'); if(!row){return;} const rows=getRows(); if(rows.length<=1){row.querySelector('.item-code').value=''; row.querySelector('.item-name').value=''; row.querySelector('.item-qty').value='1'; row.querySelector('.item-price').value=''; row.querySelector('.item-price').dataset.autofill='1'; updateTotals(); return;} row.remove(); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();});
 
-transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; setGeneratedNofak(row.dataset.nofak); mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
+transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} if(row.dataset.used==='1'){window.alert('This package transaction is already used in guest transactions and cannot be updated.'); return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; setGeneratedNofak(row.dataset.nofak); mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
 
   newTransactionButton.addEventListener('click', function(){activateCreateMode();});
   resetButton.addEventListener('click', function(){activateCreateMode();});

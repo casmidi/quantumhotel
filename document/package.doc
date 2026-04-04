@@ -1,4 +1,4 @@
-﻿DOKUMENTASI MODUL: PACKAGE
+DOKUMENTASI MODUL: PACKAGE
 File document: D:\laravel\quantum\document\package.doc
 Table utama: Package
 Table detail: PackageD
@@ -42,6 +42,7 @@ Automatic process:
 A. Manual transaction membaca:
 - Package: Nofak, Meja, JumlahRes, Expired
 - Hanya package dengan Expired >= tanggal hari ini yang ditampilkan di Transaction Directory
+- Data grid ditampilkan per halaman dengan pagination 10 baris per page
 - PackageD: Nofak, KodeBrg, Qty, Harga, Jumlah, NoUrut
 - StockPackage: KodeBrg, NamaBrg, Kind, Hj
 
@@ -94,6 +95,7 @@ Flow:
 - Navigasi Enter di form manual mengikuti aturan baku project: Enter pindah ke field berikutnya, dan Enter pada field input terakhir default menjalankan save.
 - Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama.
 - Transaction Directory menyediakan search dengan opsi berdasarkan Invoice, Package Code / Name, atau Package Nominal.
+- Grid transaksi memakai pagination standar dengan tombol nomor halaman serta navigasi < dan >.
 - Field Package Invoice menampilkan preview nofak berikutnya saat halaman dibuka atau saat tombol New Transaction ditekan.
 - Preview nofak tetap mengikuti pola prefix aktif dan sequence 4 digit, tetapi nofak final untuk transaksi baru baru benar-benar direserve saat proses save.
 - Save akan membuat header di Package dan detail di PackageD.
@@ -105,10 +107,12 @@ Logika penting:
 - item code yang sama tidak boleh dipilih lebih dari sekali dalam satu transaksi package
 - Saat update, sistem hapus dulu detail lama di PackageD lalu insert ulang detail baru.
 - Update hanya boleh dilakukan bila header Package memang masih ada.
+- Jika nofak package sudah dipakai di tabel DATA2 pada field PACKAGE, package tidak boleh diupdate.
 - Klik row tabel memuat transaksi ke form edit.
 - Transaction Directory hanya menampilkan package yang belum expired.
 - Hasil search tetap hanya mengambil package dengan Expired >= hari ini.
 - Delete akan menghapus detail PackageD lebih dulu, lalu header Package.
+- Delete akan ditolak bila nofak package sudah dipakai di tabel DATA2 pada field PACKAGE.
 - Total nominal dihitung otomatis dari seluruh baris grid yang valid.
 
 7. AUTOMATIC PACKAGE
