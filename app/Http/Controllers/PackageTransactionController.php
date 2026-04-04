@@ -8,18 +8,41 @@ use Illuminate\Support\Facades\DB;
 
 class PackageTransactionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $searchType = trim((string) $request->query('search_type', 'all'));
+        $searchValue = trim((string) $request->query('search', ''));
+
         $items = DB::table('StockPackage')
             ->selectRaw("RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Kind) as Kind, Hj")
             ->orderBy('KodeBrg')
             ->get();
 
-        $packages = DB::table('Package')
+        $packagesQuery = DB::table('Package')
             ->selectRaw("RTRIM(Nofak) as Nofak, RTRIM(Meja) as Meja, JumlahRes, Expired")
             ->whereDate('Expired', '>=', Carbon::today()->format('Y-m-d'))
-            ->orderByDesc('Nofak')
-            ->get();
+            ->orderByDesc('Nofak');
+
+        if ($searchValue !== '') {
+            $normalizedSearch = strtoupper($searchValue);
+            $normalizedNominal = $this->normalizeMoney($searchValue);
+
+            $packagesQuery->where(function ($query) use ($searchType, $normalizedSearch, $normalizedNominal) {
+                if (in_array($searchType, ['all', 'invoice'], true)) {
+                    $query->orWhereRaw('UPPER(RTRIM(Nofak)) LIKE ?', ['%' . $normalizedSearch . '%']);
+                }
+
+                if (in_array($searchType, ['all', 'package'], true)) {
+                    $query->orWhereRaw('UPPER(RTRIM(Meja)) LIKE ?', ['%' . $normalizedSearch . '%']);
+                }
+
+                if ($normalizedNominal > 0 && in_array($searchType, ['all', 'nominal'], true)) {
+                    $query->orWhere('JumlahRes', '=', $normalizedNominal);
+                }
+            });
+        }
+
+        $packages = $packagesQuery->get();
 
         $details = DB::table('PackageD')
             ->selectRaw("RTRIM(Nofak) as Nofak, RTRIM(KodeBrg) as KodeBrg, Qty, Harga, Jumlah, NoUrut")
@@ -56,7 +79,7 @@ class PackageTransactionController extends Controller
 
         $nextNofak = $this->previewPackageNofak();
 
-        return view('package.transaction', compact('items', 'packages', 'summary', 'nextNofak'));
+        return view('package.transaction', compact('items', 'packages', 'summary', 'nextNofak', 'searchType', 'searchValue'));
     }
 
     public function store(Request $request)
@@ -310,3 +333,5 @@ class PackageTransactionController extends Controller
         return is_numeric($normalized) ? (float) $normalized : 0;
     }
 }
+
+

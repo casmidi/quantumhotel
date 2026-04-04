@@ -1,4 +1,4 @@
-# AGENTS.md - Migrasi VB6 ke Laravel (quantum.or.id)
+﻿# AGENTS.md - Migrasi VB6 ke Laravel (quantum.or.id)
 
 Kamu adalah Senior Fullstack Laravel Engineer spesialis migrasi Visual Basic 6 ke Laravel untuk project hotel system ini.
 
@@ -73,6 +73,7 @@ Kamu adalah Senior Fullstack Laravel Engineer spesialis migrasi Visual Basic 6 k
 - Jika user meminta look premium / hotel bintang 5, pertahankan gaya visual yang elegan dan konsisten dengan modul yang sudah ada.
 - Default user-facing messages, labels, alerts, confirmation, dan empty states harus menggunakan bahasa Inggris, kecuali user secara eksplisit minta bahasa lain.
 - Delete action harus memiliki confirmation dialog dalam bahasa Inggris.
+- Untuk CRUD standar, aksi minimum yang harus tersedia adalah Add, Edit, Delete, dan Search.
 - Untuk form CRUD model lama, pertahankan UX desktop-style bila relevan, misalnya:
   - Enter pindah ke field berikutnya
   - Setiap kali user menekan Enter pada kolom input, cursor wajib berpindah ke kolom input berikutnya
@@ -129,5 +130,6 @@ Urutan kerja default yang diinginkan:
 - Semua perubahan bermakna harus diakhiri dengan commit dan push ke `main`.
 
 Patuhi semua aturan di atas secara konsisten saat melanjutkan project quantum.or.id.
+
 
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Package Transactions')
 
@@ -80,6 +80,9 @@
 .package-row-remove { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(178,34,34,.12); background:rgba(178,34,34,.08); color:#aa2f2f; text-decoration:none; }
 .package-row-remove:hover { background:#aa2f2f; color:#fff; text-decoration:none; }
 .package-grid-hint { margin-top:.8rem; color:#6b7b90; font-size:.84rem; }
+.package-search-form { display:flex; align-items:flex-end; gap:.75rem; flex-wrap:wrap; }
+.package-search-group { min-width:180px; flex:1 1 180px; }
+.package-search-actions { display:flex; gap:.65rem; flex-wrap:wrap; }
 .package-table-wrap { border-radius:0 0 24px 24px; overflow:hidden; }
 .package-table { margin-bottom:0; }
 .package-table thead th { border-top:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.02), rgba(16,35,59,.06)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.76rem; font-weight:700; padding:1rem 1.2rem; }
@@ -161,7 +164,34 @@
     </section>
 
     <section class="package-shell">
-        <div class="package-shell-header"><div><h2 class="package-shell-title">Transaction Directory</h2><p class="package-shell-subtitle">Click a row to load the transaction into the form and continue in update mode.</p></div><span class="package-shell-badge">{{ number_format($summary['total'], 0, ',', '.') }} Records</span></div>
+        <div class="package-shell-header">
+            <div>
+                <h2 class="package-shell-title">Transaction Directory</h2>
+                <p class="package-shell-subtitle">Click a row to load the transaction into the form and continue in update mode.</p>
+            </div>
+            <span class="package-shell-badge">{{ number_format($summary['total'], 0, ',', '.') }} Records</span>
+        </div>
+        <div class="package-shell-body pb-0">
+            <form method="GET" action="/menu-package-transaction" class="package-search-form">
+                <div class="package-search-group">
+                    <label class="package-label" for="search_type">Search Option</label>
+                    <select name="search_type" id="search_type" class="form-control package-select">
+                        <option value="all" {{ ($searchType ?? 'all') === 'all' ? 'selected' : '' }}>All</option>
+                        <option value="invoice" {{ ($searchType ?? '') === 'invoice' ? 'selected' : '' }}>Invoice</option>
+                        <option value="package" {{ ($searchType ?? '') === 'package' ? 'selected' : '' }}>Package Code / Name</option>
+                        <option value="nominal" {{ ($searchType ?? '') === 'nominal' ? 'selected' : '' }}>Package Nominal</option>
+                    </select>
+                </div>
+                <div class="package-search-group">
+                    <label class="package-label" for="search">Search Keyword</label>
+                    <input type="text" name="search" id="search" class="form-control package-input" value="{{ $searchValue ?? '' }}" placeholder="Search invoice, package code, or nominal">
+                </div>
+                <div class="package-search-actions">
+                    <button type="submit" class="btn package-btn-primary"><i class="fa-solid fa-magnifying-glass mr-2"></i>Search</button>
+                    <a href="/menu-package-transaction" class="btn package-btn-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
         <div class="package-table-wrap"><div class="table-responsive"><table class="table package-table" id="tablePackageTransaction"><thead><tr><th>Invoice</th><th>Package Code</th><th>Items</th><th>Expired</th><th class="text-right">Nominal</th><th class="text-center" width="90">Action</th></tr></thead><tbody>
             @forelse($packages as $package)
             <tr data-nofak="{{ $package->Nofak }}" data-meja="{{ $package->Meja }}" data-expired="{{ \Carbon\Carbon::parse($package->Expired)->format('Y-m-d') }}" data-details='@json(json_decode($package->detail_json, true))'>
@@ -300,6 +330,7 @@ mejaField.focus();
 </script>
 
 @endsection
+
 
 
 
