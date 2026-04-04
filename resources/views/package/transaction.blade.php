@@ -116,8 +116,9 @@
             <form method="POST" action="/menu-package-transaction" id="formPackageTransaction">
                 @csrf
                 <input type="hidden" id="CurrentNofak" value="">
+                <input type="hidden" name="GeneratedNofak" id="GeneratedNofak" value="{{ old('GeneratedNofak', $nextNofak) }}">
                 <div class="form-row">
-                    <div class="form-group col-md-4"><label class="package-label">Package Invoice</label><input type="text" id="DisplayNofak" class="form-control package-input" value="Generated after save" readonly></div>
+                    <div class="form-group col-md-4"><label class="package-label">Package Invoice</label><input type="text" id="DisplayNofak" class="form-control package-input" value="{{ old('GeneratedNofak', $nextNofak) }}" readonly></div>
                     <div class="form-group col-md-4"><label class="package-label" for="Meja">Package Code</label><input type="text" name="Meja" id="Meja" class="form-control package-input" value="{{ old('Meja') }}" required></div>
                     <div class="form-group col-md-4"><label class="package-label" for="ExpiredDisplay">Expired</label><input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', now()->format('Y-m-d')) }}"><input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', now()->format('Y-m-d')))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required></div>
                 </div>
@@ -212,6 +213,7 @@ const expiredField=document.getElementById('Expired');
 const expiredDisplayField=document.getElementById('ExpiredDisplay');
 const totalNominalField=document.getElementById('TotalNominal');
   const currentNofakField=document.getElementById('CurrentNofak');
+  const generatedNofakField=document.getElementById('GeneratedNofak');
   const displayNofakField=document.getElementById('DisplayNofak');
   const saveButton=document.getElementById('saveButton');
   const newTransactionButton=document.getElementById('newTransactionButton');
@@ -222,6 +224,7 @@ const rowTemplate=document.getElementById('detailRowTemplate');
 const transactionTableBody=document.querySelector('#tablePackageTransaction tbody');
   const initialRows=@json($initialRows);
   const minimumRows=2;
+  const defaultGeneratedNofak=@json(old('GeneratedNofak', $nextNofak));
 
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
@@ -262,7 +265,8 @@ function createRow(detail={}){
   }
   function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.value=formatRibuan(Math.round(total).toString()); renameRows();}
   function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:(initialRows&&initialRows.length?initialRows.slice(0, minimumRows):[{qty:'1'},{qty:'1'}]); rows.forEach((detail)=>createRow(detail)); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();}
-  function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; displayNofakField.value='Generated after save'; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); mejaField.focus();}
+  function setGeneratedNofak(value){const normalized=(value||'').toString().trim(); generatedNofakField.value=normalized; displayNofakField.value=normalized;}
+  function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); setGeneratedNofak(defaultGeneratedNofak); mejaField.focus();}
 
 addRowButton.addEventListener('click', function(){const row=createRow({qty:'1'}); const select=row.querySelector('.item-code'); if(select){select.focus();}});
 
@@ -272,7 +276,7 @@ detailGridBody.addEventListener('input', function(event){const row=event.target.
 
   detailGridBody.addEventListener('click', function(event){const removeButton=event.target.closest('.package-row-remove'); if(!removeButton){return;} const row=removeButton.closest('[data-row]'); if(!row){return;} const rows=getRows(); if(rows.length<=1){row.querySelector('.item-code').value=''; row.querySelector('.item-name').value=''; row.querySelector('.item-qty').value='1'; row.querySelector('.item-price').value=''; row.querySelector('.item-price').dataset.autofill='1'; updateTotals(); return;} row.remove(); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();});
 
-transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; displayNofakField.value=row.dataset.nofak; mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
+transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; setGeneratedNofak(row.dataset.nofak); mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
 
   newTransactionButton.addEventListener('click', function(){activateCreateMode();});
   resetButton.addEventListener('click', function(){activateCreateMode();});
@@ -285,11 +289,14 @@ const successAlert=document.getElementById('successAlert');
 if(successAlert){setTimeout(()=>{successAlert.style.transition='opacity .3s ease, transform .3s ease'; successAlert.style.opacity='0'; successAlert.style.transform='translateY(-8px)'; setTimeout(()=>successAlert.remove(),300);},3000);}
 
 resetGrid();
+setGeneratedNofak(defaultGeneratedNofak);
 expiredDisplayField.value=formatDisplayDate(expiredField.value);
 mejaField.focus();
 </script>
 
 @endsection
+
+
 
 
 

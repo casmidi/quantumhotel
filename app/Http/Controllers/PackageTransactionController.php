@@ -54,7 +54,16 @@ class PackageTransactionController extends Controller
             'nominal' => $packages->sum('JumlahRes'),
         ];
 
-        return view('package.transaction', compact('items', 'packages', 'summary'));
+        $nextNofak = $this->generatePackageNofak();
+
+        return view('package.transaction', compact('items', 'packages', 'summary', 'nextNofak'));
+    }
+
+    public function nextInvoice()
+    {
+        return response()->json([
+            'nofak' => $this->generatePackageNofak(),
+        ]);
     }
 
     public function store(Request $request)
@@ -121,7 +130,7 @@ class PackageTransactionController extends Controller
 
         $nominal = collect($details)->sum('amount');
         $now = Carbon::now();
-        $nofak = $existingNofak ?: $this->generatePackageNofak();
+        $nofak = $existingNofak ?: $this->resolveNewPackageNofak($request->input('GeneratedNofak'));
 
         DB::transaction(function () use ($existingNofak, $nofak, $packageCode, $nominal, $expired, $username, $details, $now) {
             if ($existingNofak) {
@@ -255,7 +264,7 @@ class PackageTransactionController extends Controller
 
     private function generatePackageNofak(): string
     {
-        $prefix = Carbon::now()->format('Ym') . '9002';
+        $prefix = $this->getPackageNofakPrefix();
 
         $latest = DB::table('Package')
             ->selectRaw('MAX(RTRIM(Nofak)) as latest_nofak')
@@ -278,3 +287,5 @@ class PackageTransactionController extends Controller
         return is_numeric($normalized) ? (float) $normalized : 0;
     }
 }
+
+
