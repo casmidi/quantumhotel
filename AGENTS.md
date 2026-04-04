@@ -76,6 +76,7 @@ Kamu adalah Senior Fullstack Laravel Engineer spesialis migrasi Visual Basic 6 k
 - Untuk CRUD standar, aksi minimum yang harus tersedia adalah Add, Edit, Delete, dan Search.
 - Untuk grid / directory / list CRUD, gunakan pagination standar. Jangan tampilkan seluruh data dalam satu halaman.
 - Default pagination yang diutamakan adalah 10 data per halaman, kecuali user meminta jumlah lain atau ada kebutuhan modul yang lebih tepat.
+- Warning, duplicate notification, atau blocking notice pada CRUD harus tampil sebagai centered on-screen notice atau modal di tengah layar, bukan browser alert bawaan.
 - Untuk form CRUD model lama, pertahankan UX desktop-style bila relevan, misalnya:
   - Enter pindah ke field berikutnya
   - Setiap kali user menekan Enter pada kolom input, cursor wajib berpindah ke kolom input berikutnya

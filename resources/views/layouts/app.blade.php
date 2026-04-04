@@ -47,6 +47,13 @@
         .content-wrapper { background:radial-gradient(circle at top right, rgba(199,165,106,.12), transparent 18%), linear-gradient(180deg,#f4f7fb 0%,#edf2f8 100%); min-height:100vh; padding:1.2rem; margin-top:0!important; }
         .content-wrapper > h3 { display:none; }
         .content-shell { min-height:calc(100vh - 2.4rem); }
+        .crud-notice-modal .modal-content { border:0; border-radius:24px; overflow:hidden; box-shadow:0 28px 70px rgba(15,31,54,.28); background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%); }
+        .crud-notice-modal .modal-header { border-bottom:1px solid rgba(16,35,59,.08); padding:1.15rem 1.35rem .95rem; background:linear-gradient(135deg, rgba(23,55,97,.08), rgba(199,165,106,.12)); }
+        .crud-notice-modal .modal-title { display:flex; align-items:center; gap:.75rem; font-size:1.05rem; font-weight:700; color:#173761; }
+        .crud-notice-modal .modal-title i { width:42px; height:42px; display:inline-flex; align-items:center; justify-content:center; border-radius:14px; background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; box-shadow:0 12px 22px rgba(23,55,97,.18); }
+        .crud-notice-modal .modal-body { padding:1.35rem; color:#10233b; font-size:1rem; font-weight:600; line-height:1.6; }
+        .crud-notice-modal .modal-footer { border-top:1px solid rgba(16,35,59,.08); padding:0 1.35rem 1.25rem; justify-content:center; }
+        .crud-notice-modal .btn-crud-notice { min-width:160px; border:0; border-radius:999px; padding:.72rem 1.35rem; font-weight:700; background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; box-shadow:0 14px 28px rgba(23,55,97,.18); }
         @media (max-width:991.98px){ .content-wrapper { padding:.85rem; } .sidebar-panel { border-radius:18px; } .sidebar { height:auto; } }
     </style>
 </head>
@@ -170,10 +177,42 @@
     </div>
 </div>
 
+<div class="modal fade crud-notice-modal" id="crudNoticeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crudNoticeTitle">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>Notice</span>
+                </h5>
+            </div>
+            <div class="modal-body" id="crudNoticeBody"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-crud-notice" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 <script>
+window.showCrudNotice = function (message, title = "Notice") {
+    const titleNode = document.querySelector("#crudNoticeTitle span");
+    const bodyNode = document.getElementById("crudNoticeBody");
+
+    if (titleNode) {
+        titleNode.textContent = title;
+    }
+
+    if (bodyNode) {
+        bodyNode.textContent = message;
+    }
+
+    $("#crudNoticeModal").modal("show");
+};
+
 document.addEventListener("click", function (event) {
     const trigger = event.target.closest("[data-confirm-delete]");
     if (!trigger) {
