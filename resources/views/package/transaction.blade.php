@@ -119,7 +119,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-4"><label class="package-label">Package Invoice</label><input type="text" id="DisplayNofak" class="form-control package-input" value="Generated after save" readonly></div>
                     <div class="form-group col-md-4"><label class="package-label" for="Meja">Package Code</label><input type="text" name="Meja" id="Meja" class="form-control package-input" value="{{ old('Meja') }}" required></div>
-                    <div class="form-group col-md-4"><label class="package-label" for="Expired">Expired</label><input type="date" name="Expired" id="Expired" class="form-control package-input" value="{{ old('Expired', now()->format('Y-m-d')) }}" required></div>
+                    <div class="form-group col-md-4"><label class="package-label" for="ExpiredDisplay">Expired</label><input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', now()->format('Y-m-d')) }}"><input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', now()->format('Y-m-d')))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required></div>
                 </div>
 
                 <div class="package-grid-wrap">
@@ -201,12 +201,15 @@
 function normalizeNumber(value){if(value===null||value===undefined){return '';}const raw=value.toString().trim();if(raw===''){return '';}if(raw.includes('.')){const [integerPart,decimalPart='']=raw.split('.');const cleanInteger=integerPart.replace(/\D/g,'');if(/^0+$/.test(decimalPart)){return cleanInteger;}}return raw.replace(/\D/g,'');}
 function formatRibuan(value){const normalized=normalizeNumber(value);if(!normalized){return '';}return normalized.replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
 function unformat(value){return (value||'').toString().replace(/\./g,'');}
+function formatDisplayDate(value){if(!value){return '';} const normalized=value.toString().trim().replace(/\//g,'-'); const parts=normalized.split('-'); if(parts.length===3 && parts[0].length===4){return [parts[2],parts[1],parts[0]].join('-');} if(parts.length===3 && parts[2].length===4){return [parts[0].padStart(2,'0'),parts[1].padStart(2,'0'),parts[2]].join('-');} return value;}
+function normalizeDisplayDate(value){const normalized=(value||'').toString().trim().replace(/\//g,'-'); const parts=normalized.split('-'); if(parts.length!==3){return '';} const day=parts[0].padStart(2,'0'); const month=parts[1].padStart(2,'0'); const year=parts[2]; if(year.length!==4){return '';} const iso=year + '-' + month + '-' + day; const testDate=new Date(iso + 'T00:00:00'); if(Number.isNaN(testDate.getTime())){return '';} return testDate.getFullYear().toString()===year && (testDate.getMonth()+1).toString().padStart(2,'0')===month && testDate.getDate().toString().padStart(2,'0')===day ? iso : '';}
 function qtyValue(value){const normalized=(value||'').toString().replace(',', '.').replace(/[^\d.]/g,'');const parsed=parseFloat(normalized);return parsed>0?parsed:0;}
 function escapeHtml(value){return (value||'').toString().replace(/[&<>"']/g, function(char){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[char];});}
 
 const form=document.getElementById('formPackageTransaction');
 const mejaField=document.getElementById('Meja');
 const expiredField=document.getElementById('Expired');
+const expiredDisplayField=document.getElementById('ExpiredDisplay');
 const totalNominalField=document.getElementById('TotalNominal');
 const currentNofakField=document.getElementById('CurrentNofak');
 const displayNofakField=document.getElementById('DisplayNofak');
@@ -267,16 +270,19 @@ detailGridBody.addEventListener('input', function(event){const row=event.target.
 
 detailGridBody.addEventListener('click', function(event){const removeButton=event.target.closest('.package-row-remove'); if(!removeButton){return;} const row=removeButton.closest('[data-row]'); if(!row){return;} const rows=getRows(); if(rows.length<=1){row.querySelector('.item-code').value=''; row.querySelector('.item-name').value=''; row.querySelector('.item-qty').value='1'; row.querySelector('.item-price').value=''; row.querySelector('.item-price').dataset.autofill='1'; updateTotals(); return;} row.remove(); while(getRows().length<3){createRow({qty:'1'});} updateTotals();});
 
-transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; displayNofakField.value=row.dataset.nofak; mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
+transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; displayNofakField.value=row.dataset.nofak; mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
 
-resetButton.addEventListener('click', function(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; displayNofakField.value='Generated after save'; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); mejaField.focus();});
+resetButton.addEventListener('click', function(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; displayNofakField.value='Generated after save'; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); mejaField.focus();});
 
-form.addEventListener('submit', function(){mejaField.value=(mejaField.value||'').toString().trim().toUpperCase(); getRows().forEach((row)=>{const priceField=row.querySelector('.item-price'); if(priceField){priceField.value=unformat(priceField.value);} const qtyField=row.querySelector('.item-qty'); if(qtyField&&qtyField.value.trim()===''){qtyField.value='1';}});});
+form.addEventListener('submit', function(event){mejaField.value=(mejaField.value||'').toString().trim().toUpperCase(); const normalizedExpired=normalizeDisplayDate(expiredDisplayField.value); if(!normalizedExpired){event.preventDefault(); window.alert('Expired date must use format dd-MM-yyyy.'); expiredDisplayField.focus(); return;} expiredField.value=normalizedExpired; getRows().forEach((row)=>{const priceField=row.querySelector('.item-price'); if(priceField){priceField.value=unformat(priceField.value);} const qtyField=row.querySelector('.item-qty'); if(qtyField&&qtyField.value.trim()===''){qtyField.value='1';}});});
+
+expiredDisplayField.addEventListener('blur', function(){const normalizedExpired=normalizeDisplayDate(this.value); if(normalizedExpired){expiredField.value=normalizedExpired; this.value=formatDisplayDate(normalizedExpired);}});
 
 const successAlert=document.getElementById('successAlert');
 if(successAlert){setTimeout(()=>{successAlert.style.transition='opacity .3s ease, transform .3s ease'; successAlert.style.opacity='0'; successAlert.style.transform='translateY(-8px)'; setTimeout(()=>successAlert.remove(),300);},3000);}
 
 resetGrid();
+expiredDisplayField.value=formatDisplayDate(expiredField.value);
 mejaField.focus();
 </script>
 

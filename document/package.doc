@@ -84,6 +84,7 @@ Tujuan:
 Flow:
 - User isi package code.
 - User pilih expired.
+- Tanggal expired ditampilkan ke user dengan format Indonesia dd-MM-yyyy, lalu dinormalisasi ke format internal saat submit.
 - User pilih item package dari dropdown item global.
 - User isi qty dan harga per item.
 - Sistem menghitung total nominal package.
