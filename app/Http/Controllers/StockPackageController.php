@@ -9,22 +9,19 @@ class StockPackageController extends Controller
 {
     public function index()
     {
-        $items = DB::table('StockPackage')
-            ->selectRaw("
-                RTRIM(KodeBrg) as KodeBrg,
-                RTRIM(NamaBrg) as NamaBrg,
-                RTRIM(Satuan) as Satuan,
-                RTRIM(Kind) as Kind,
-                Hj
-            ")
-            ->orderBy('KodeBrg')
-            ->get();
+        $itemQuery = DB::table('StockPackage')
+            ->selectRaw("RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Satuan) as Satuan, RTRIM(Kind) as Kind, Hj");
 
         $summary = [
-            'total' => $items->count(),
-            'room' => $items->where('Kind', 'ROOM')->count(),
-            'restaurant' => $items->where('Kind', 'RESTAURANT')->count(),
+            'total' => (clone $itemQuery)->count(),
+            'room' => (clone $itemQuery)->whereRaw("RTRIM(Kind) = 'ROOM'")->count(),
+            'restaurant' => (clone $itemQuery)->whereRaw("RTRIM(Kind) = 'RESTAURANT'")->count(),
+            'avgSellingPrice' => (float) ((clone $itemQuery)->avg('Hj') ?? 0),
         ];
+
+        $items = $itemQuery
+            ->orderBy('KodeBrg')
+            ->paginate(10);
 
         return view('package.item-global', compact('items', 'summary'));
     }

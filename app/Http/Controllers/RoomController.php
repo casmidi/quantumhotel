@@ -9,30 +9,26 @@ class RoomController extends Controller
 {
     public function index()
     {
-        $rooms = DB::table('ROOM')
-            ->selectRaw("
-                RTRIM(Kode) as Kode,
-                RTRIM(Nama) as Nama,
-                RTRIM(Fasilitas) as Fasilitas,
-                RTRIM(ExtNo) as ExtNo,
-                RTRIM(KUNCI) as KUNCI,
-                Rate1,
-                Rate2
-            ")
-            ->whereRaw("RTRIM(Kode) <> '999'")
+        $roomQuery = DB::table('ROOM')
+            ->selectRaw("RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, RTRIM(Fasilitas) as Fasilitas, RTRIM(ExtNo) as ExtNo, RTRIM(KUNCI) as KUNCI, Rate1, Rate2")
+            ->whereRaw("RTRIM(Kode) <> '999'");
+
+        $summary = [
+            'total' => (clone $roomQuery)->count(),
+            'avgRate' => (float) ((clone $roomQuery)->avg('Rate1') ?? 0),
+            'avgBasicRate' => (float) ((clone $roomQuery)->avg('Rate2') ?? 0),
+        ];
+
+        $rooms = $roomQuery
             ->orderBy('Kode')
-            ->get();
+            ->paginate(10);
 
         $classes = DB::table('KELAS')
-            ->selectRaw("
-                RTRIM(Kode) as Kode,
-                RTRIM(Nama) as Nama,
-                Rate1
-            ")
+            ->selectRaw("RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1")
             ->orderBy('Kode')
             ->get();
 
-        return view('room.index', compact('rooms', 'classes'));
+        return view('room.index', compact('rooms', 'classes', 'summary'));
     }
 
     public function store(Request $request)

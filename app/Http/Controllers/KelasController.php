@@ -2,36 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\KelasUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Events\KelasUpdated;
 
 class KelasController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | INDEX (LIST + SEARCH)
-    |--------------------------------------------------------------------------
-    */
     public function index(Request $request)
     {
         $query = DB::table('KELAS');
 
         if ($request->q) {
-            $query->where('Kode', 'like', '%' . $request->q . '%')
-                  ->orWhere('Nama', 'like', '%' . $request->q . '%');
+            $search = trim((string) $request->q);
+            $query->where(function ($builder) use ($search) {
+                $builder->where('Kode', 'like', '%' . $search . '%')
+                    ->orWhere('Nama', 'like', '%' . $search . '%');
+            });
         }
 
-        $kelas = $query->orderBy('Kode')->get();
+        $summaryQuery = clone $query;
 
-        return view('kelas.index', compact('kelas'));
+        $kelas = $query
+            ->orderBy('Kode')
+            ->paginate(10)
+            ->appends($request->query());
+
+        $summary = [
+            'total' => (clone $summaryQuery)->count(),
+            'avgRate' => (float) ((clone $summaryQuery)->avg('Rate1') ?? 0),
+            'avgDepo' => (float) ((clone $summaryQuery)->avg('Depo1') ?? 0),
+        ];
+
+        return view('kelas.index', compact('kelas', 'summary'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | STORE (INSERT)
-    |--------------------------------------------------------------------------
-    */
     public function store(Request $request)
     {
         $kode = trim((string) $request->Kode);
@@ -61,17 +65,11 @@ class KelasController extends Controller
             'Depo1' => is_numeric($request->Depo1) ? $request->Depo1 : 0,
         ]);
 
-        // 🔥 trigger realtime
         event(new KelasUpdated());
 
         return redirect('/kelas')->with('success', 'Data saved successfully');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE
-    |--------------------------------------------------------------------------
-    */
     public function update(Request $request, $kode)
     {
         DB::table('KELAS')
@@ -82,32 +80,20 @@ class KelasController extends Controller
                 'Depo1' => is_numeric($request->Depo1) ? $request->Depo1 : 0,
             ]);
 
-        // 🔥 trigger realtime
         event(new KelasUpdated());
 
         return redirect('/kelas')->with('success', 'Data updated successfully');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE
-    |--------------------------------------------------------------------------
-    */
     public function destroy($kode)
     {
         DB::table('KELAS')->where('Kode', $kode)->delete();
 
-        // 🔥 trigger realtime
         event(new KelasUpdated());
 
         return redirect('/kelas')->with('success', 'Data deleted successfully');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DATA API (UNTUK AJAX / REALTIME LOAD)
-    |--------------------------------------------------------------------------
-    */
     public function data()
     {
         return response()->json(

@@ -5,9 +5,9 @@
 @section('content')
 
 @php
-    $totalKelas = $kelas->count();
-    $avgRate = $kelas->avg('Rate1') ?? 0;
-    $avgDepo = $kelas->avg('Depo1') ?? 0;
+    $totalKelas = $summary['total'] ?? $kelas->total();
+    $avgRate = $summary['avgRate'] ?? 0;
+    $avgDepo = $summary['avgDepo'] ?? 0;
 @endphp
 
 <style>
@@ -314,6 +314,34 @@
         color: #6b7b90;
     }
 
+    .kelas-pagination-wrap {
+        display: flex;
+        justify-content: flex-end;
+        padding: 1rem 1.5rem 1.35rem;
+        border-top: 1px solid rgba(16, 35, 59, 0.08);
+        background: rgba(255, 255, 255, 0.58);
+    }
+
+    .kelas-pagination-wrap .pagination {
+        margin-bottom: 0;
+        justify-content: flex-end;
+    }
+
+    .kelas-pagination-wrap .page-link {
+        border-radius: 12px;
+        margin: 0 0.2rem;
+        border: 1px solid rgba(16, 35, 59, 0.12);
+        color: #173761;
+        font-weight: 700;
+        box-shadow: none;
+    }
+
+    .kelas-pagination-wrap .page-item.active .page-link {
+        background: linear-gradient(135deg, #173761 0%, #1e4b80 55%, #b38a51 150%);
+        border-color: transparent;
+        color: #fff;
+    }
+
     @media (max-width: 991.98px) {
         .kelas-hero {
             padding: 1.5rem;
@@ -450,6 +478,11 @@
                 </table>
             </div>
         </div>
+        @if($kelas->hasPages())
+        <div class="kelas-pagination-wrap">
+            {{ $kelas->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
+        @endif
     </section>
 </div>
 

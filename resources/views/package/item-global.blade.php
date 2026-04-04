@@ -5,7 +5,7 @@
 @section('content')
 
 @php
-    $avgSellingPrice = $items->avg('Hj') ?? 0;
+    $avgSellingPrice = $summary['avgSellingPrice'] ?? 0;
 @endphp
 
 <style>
@@ -52,6 +52,10 @@
     .package-delete { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:rgba(178,34,34,.08); color:#aa2f2f; border:1px solid rgba(178,34,34,.12); text-decoration:none; font-size:1rem; transition:all .18s ease; }
     .package-delete:hover { background:#aa2f2f; color:#fff; text-decoration:none; transform:translateY(-1px); }
     .package-empty { text-align:center; padding:2.2rem 1rem; color:#6b7b90; }
+    .package-pagination-wrap { display:flex; justify-content:flex-end; padding:1rem 1.5rem 1.35rem; border-top:1px solid rgba(16,35,59,.08); background:rgba(255,255,255,.58); }
+    .package-pagination-wrap .pagination { margin-bottom:0; justify-content:flex-end; }
+    .package-pagination-wrap .page-link { border-radius:12px; margin:0 .2rem; border:1px solid rgba(16,35,59,.12); color:#173761; font-weight:700; box-shadow:none; }
+    .package-pagination-wrap .page-item.active .page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); border-color:transparent; color:#fff; }
 </style>
 
 <div class="container-fluid package-page">
@@ -102,6 +106,11 @@
             <tr><td colspan="6" class="package-empty">No package items yet. Create the first global item to get started.</td></tr>
             @endforelse
         </tbody></table></div></div>
+        @if($items->hasPages())
+        <div class="package-pagination-wrap">
+            {{ $items->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
+        @endif
     </section>
 </div>
 

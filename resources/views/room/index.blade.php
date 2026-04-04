@@ -5,9 +5,9 @@
 @section('content')
 
 @php
-    $totalRooms = $rooms->count();
-    $avgRate = $rooms->avg('Rate1') ?? 0;
-    $avgBasicRate = $rooms->avg('Rate2') ?? 0;
+    $totalRooms = $summary['total'] ?? $rooms->total();
+    $avgRate = $summary['avgRate'] ?? 0;
+    $avgBasicRate = $summary['avgBasicRate'] ?? 0;
 @endphp
 
 <style>
@@ -315,6 +315,34 @@
         color: #6b7b90;
     }
 
+    .room-pagination-wrap {
+        display: flex;
+        justify-content: flex-end;
+        padding: 1rem 1.5rem 1.35rem;
+        border-top: 1px solid rgba(16, 35, 59, 0.08);
+        background: rgba(255, 255, 255, 0.58);
+    }
+
+    .room-pagination-wrap .pagination {
+        margin-bottom: 0;
+        justify-content: flex-end;
+    }
+
+    .room-pagination-wrap .page-link {
+        border-radius: 12px;
+        margin: 0 0.2rem;
+        border: 1px solid rgba(16, 35, 59, 0.12);
+        color: #173761;
+        font-weight: 700;
+        box-shadow: none;
+    }
+
+    .room-pagination-wrap .page-item.active .page-link {
+        background: linear-gradient(135deg, #173761 0%, #1e4b80 55%, #b38a51 150%);
+        border-color: transparent;
+        color: #fff;
+    }
+
     @media (max-width: 991.98px) {
         .room-hero {
             padding: 1.5rem;
@@ -486,6 +514,11 @@
                 </table>
             </div>
         </div>
+        @if($rooms->hasPages())
+        <div class="room-pagination-wrap">
+            {{ $rooms->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
+        @endif
     </section>
 </div>
 

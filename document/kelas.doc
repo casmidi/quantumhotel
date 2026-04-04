@@ -38,7 +38,7 @@ Kolom utama yang dipakai di modul ini:
 - Depo1
 
 Fungsi pembacaan data:
-- index() membaca seluruh data KELAS lalu mengurutkannya berdasarkan Kode.
+- index() membaca data KELAS, menghitung summary modul, lalu menampilkan directory dengan pagination 10 data per halaman berdasarkan urutan Kode.
 - Jika ada query pencarian, data difilter berdasarkan Kode atau Nama.
 - View juga menghitung total class, average rate, dan average deposit untuk ditampilkan di hero summary.
 

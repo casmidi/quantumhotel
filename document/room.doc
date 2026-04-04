@@ -87,7 +87,7 @@ File: D:\laravel\quantum\app\Http\Controllers\RoomController.php
 
 Method index()
 Fungsi:
-- Membaca seluruh room dari tabel ROOM kecuali kode dummy 999.
+- Membaca room dari tabel ROOM kecuali kode dummy 999, menghitung summary, lalu menampilkan directory dengan pagination 10 data per halaman.
 - Membaca seluruh room class dari tabel KELAS.
 - Mengirim dua data utama ke view:
   - rooms

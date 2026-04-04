@@ -56,7 +56,7 @@ Saat insert/update, modul menulis:
 
 6. PENJELASAN CONTROLLER
 Method index()
-- Membaca seluruh item dari StockPackage.
+- Membaca item dari StockPackage, menghitung summary modul, lalu menampilkan directory dengan pagination 10 data per halaman.
 - Menghitung summary total item, room item, dan restaurant item.
 - Mengirim data ke view package.item-global.
 
@@ -81,7 +81,7 @@ Method destroy($kode)
 Halaman terdiri dari:
 - Hero summary
 - Form CRUD item global
-- Tabel daftar item global
+- Tabel daftar item global dengan pagination standar 10 data per halaman
 
 Flow utama:
 - Enter berpindah antar field
