@@ -154,7 +154,7 @@
                     <div class="form-group col-md-6"><label class="package-label">Total Nominal</label><input type="text" id="TotalNominal" class="form-control package-input text-right" value="0" readonly></div>
                 </div>
 
-                <div class="package-actions"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="resetButton">Reset Form</button></div>
+                <div class="package-actions"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button><button type="button" class="btn package-btn-secondary" id="resetButton">Reset Form</button></div>
             </form>
         </div>
     </section>
@@ -211,10 +211,11 @@ const mejaField=document.getElementById('Meja');
 const expiredField=document.getElementById('Expired');
 const expiredDisplayField=document.getElementById('ExpiredDisplay');
 const totalNominalField=document.getElementById('TotalNominal');
-const currentNofakField=document.getElementById('CurrentNofak');
-const displayNofakField=document.getElementById('DisplayNofak');
-const saveButton=document.getElementById('saveButton');
-const resetButton=document.getElementById('resetButton');
+  const currentNofakField=document.getElementById('CurrentNofak');
+  const displayNofakField=document.getElementById('DisplayNofak');
+  const saveButton=document.getElementById('saveButton');
+  const newTransactionButton=document.getElementById('newTransactionButton');
+  const resetButton=document.getElementById('resetButton');
 const addRowButton=document.getElementById('addRowButton');
 const detailGridBody=document.getElementById('detailGridBody');
 const rowTemplate=document.getElementById('detailRowTemplate');
@@ -244,7 +245,7 @@ function createRow(detail={}){
     return row;
 }
   function findDuplicateRow(sourceRow, code){if(!code){return null;} return getRows().find((row)=>row!==sourceRow && (row.querySelector('.item-code')?.value||'').trim()===code.trim())||null;}
-function updateRow(row){
+  function updateRow(row){
     const codeSelect=row.querySelector('.item-code');
     const selected=codeSelect.options[codeSelect.selectedIndex];
     const nameField=row.querySelector('.item-name');
@@ -258,9 +259,10 @@ function updateRow(row){
     const price=parseFloat(unformat(priceField.value)||'0')||0;
     lineTotal.textContent='Rp '+formatRibuan(Math.round(qty*price).toString()||'0');
     return qty*price;
-}
+  }
   function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.value=formatRibuan(Math.round(total).toString()); renameRows();}
   function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:(initialRows&&initialRows.length?initialRows.slice(0, minimumRows):[{qty:'1'},{qty:'1'}]); rows.forEach((detail)=>createRow(detail)); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();}
+  function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; displayNofakField.value='Generated after save'; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); mejaField.focus();}
 
 addRowButton.addEventListener('click', function(){const row=createRow({qty:'1'}); const select=row.querySelector('.item-code'); if(select){select.focus();}});
 
@@ -272,7 +274,8 @@ detailGridBody.addEventListener('input', function(event){const row=event.target.
 
 transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; displayNofakField.value=row.dataset.nofak; mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
 
-  resetButton.addEventListener('click', function(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; displayNofakField.value='Generated after save'; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); mejaField.focus();});
+  newTransactionButton.addEventListener('click', function(){activateCreateMode();});
+  resetButton.addEventListener('click', function(){activateCreateMode();});
 
 form.addEventListener('submit', function(event){mejaField.value=(mejaField.value||'').toString().trim().toUpperCase(); const normalizedExpired=normalizeDisplayDate(expiredDisplayField.value); if(!normalizedExpired){event.preventDefault(); window.alert('Expired date must use format dd-MM-yyyy.'); expiredDisplayField.focus(); return;} expiredField.value=normalizedExpired; getRows().forEach((row)=>{const priceField=row.querySelector('.item-price'); if(priceField){priceField.value=unformat(priceField.value);} const qtyField=row.querySelector('.item-qty'); if(qtyField&&qtyField.value.trim()===''){qtyField.value='1';}});});
 

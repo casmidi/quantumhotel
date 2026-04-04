@@ -90,6 +90,7 @@ Flow:
 - Sistem menghitung total nominal package.
 - Grid default menampilkan 2 baris awal.
 - Penambahan baris berikutnya dilakukan manual melalui tombol Add Row.
+- Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama.
 - Save akan membuat header di Package dan detail di PackageD.
 
 Logika penting:
