@@ -94,6 +94,7 @@ Logika penting:
 - expired tidak boleh lebih kecil dari hari ini
 - kombinasi package code dan expired yang sama akan ditolak
 - item code yang tidak ada di StockPackage akan diabaikan agar detail selalu valid
+- item code yang sama tidak boleh dipilih lebih dari sekali dalam satu transaksi package
 - Saat update, sistem hapus dulu detail lama di PackageD lalu insert ulang detail baru.
 - Update hanya boleh dilakukan bila header Package memang masih ada.
 - Klik row tabel memuat transaksi ke form edit.
@@ -140,3 +141,4 @@ Alur cepat:
 - Jika struktur Package atau PackageD berubah, periksa controller manual dan automatic sekaligus.
 - Jika format nofak ingin disesuaikan, ubah di helper generatePackageNofak pada controller terkait.
 - Grid transaksi manual sengaja dibuat fleksibel; bila ingin memperkaya perilaku seperti keyboard navigation ala Excel, lanjutkan dari JavaScript di view transaction.
+

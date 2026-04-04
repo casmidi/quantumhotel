@@ -84,6 +84,7 @@ class PackageTransactionController extends Controller
         $expired = $request->Expired ? Carbon::parse($request->Expired)->startOfDay() : null;
         $username = strtoupper(trim((string) session('user', 'SYSTEM')));
         $details = $this->extractDetails($request);
+        $duplicateItemCodes = $this->findDuplicateItemCodes($request);
 
         if ($packageCode === '') {
             return redirect('/menu-package-transaction')->with('error', 'Package code is required.')->withInput();
@@ -95,6 +96,12 @@ class PackageTransactionController extends Controller
 
         if ($expired->lt(Carbon::today())) {
             return redirect('/menu-package-transaction')->with('error', 'Expired date must be greater than or equal to today.')->withInput();
+        }
+
+        if (!empty($duplicateItemCodes)) {
+            return redirect('/menu-package-transaction')
+                ->with('error', 'Duplicate item codes are not allowed in one package transaction: ' . implode(', ', $duplicateItemCodes) . '.')
+                ->withInput();
         }
 
         if (empty($details)) {
@@ -200,6 +207,29 @@ class PackageTransactionController extends Controller
         }
 
         return $details;
+    }
+
+    private function findDuplicateItemCodes(Request $request): array
+    {
+        $duplicates = [];
+        $seen = [];
+
+        foreach ($request->input('ItemCode', []) as $code) {
+            $normalizedCode = strtoupper(trim((string) $code));
+
+            if ($normalizedCode === '') {
+                continue;
+            }
+
+            if (isset($seen[$normalizedCode])) {
+                $duplicates[$normalizedCode] = $normalizedCode;
+                continue;
+            }
+
+            $seen[$normalizedCode] = true;
+        }
+
+        return array_values($duplicates);
     }
 
     private function packageExists(string $nofak): bool

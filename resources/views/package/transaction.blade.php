@@ -75,6 +75,7 @@
 .package-grid-table .package-input,
 .package-grid-table .package-select { height:calc(2.35rem + 2px); border-radius:12px; }
 .package-grid-table .item-name { background:rgba(236,242,249,.9); }
+.package-grid-table .item-code.is-invalid { border-color:#c94c5e; box-shadow:0 0 0 .18rem rgba(201,76,94,.14); background:rgba(255,244,246,.96); }
 .package-grid-table .line-total { font-weight:700; color:#173761; min-width:130px; display:inline-block; text-align:right; }
 .package-row-remove { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(178,34,34,.12); background:rgba(178,34,34,.08); color:#aa2f2f; text-decoration:none; }
 .package-row-remove:hover { background:#aa2f2f; color:#fff; text-decoration:none; }
@@ -239,6 +240,7 @@ function createRow(detail={}){
     return row;
 }
 function ensureTrailingBlankRow(){const rows=getRows(); if(rows.length===0){createRow(); return;} const lastRow=rows[rows.length-1]; if(rowHasMeaningfulData(lastRow)){createRow({qty:'1'});} }
+function findDuplicateRow(sourceRow, code){if(!code){return null;} return getRows().find((row)=>row!==sourceRow && (row.querySelector('.item-code')?.value||'').trim()===code.trim())||null;}
 function updateRow(row){
     const codeSelect=row.querySelector('.item-code');
     const selected=codeSelect.options[codeSelect.selectedIndex];
@@ -259,7 +261,7 @@ function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&
 
 addRowButton.addEventListener('click', function(){const row=createRow({qty:'1'}); const select=row.querySelector('.item-code'); if(select){select.focus();}});
 
-detailGridBody.addEventListener('change', function(event){const row=event.target.closest('[data-row]'); if(!row){return;} if(event.target.classList.contains('item-code')){const selected=event.target.options[event.target.selectedIndex]; row.querySelector('.item-name').value=selected?.dataset.name||''; const priceField=row.querySelector('.item-price'); priceField.dataset.autofill='1';} updateTotals();});
+detailGridBody.addEventListener('change', function(event){const row=event.target.closest('[data-row]'); if(!row){return;} if(event.target.classList.contains('item-code')){const codeSelect=event.target; const selected=codeSelect.options[codeSelect.selectedIndex]; const selectedCode=(codeSelect.value||'').trim(); const duplicateRow=findDuplicateRow(row, selectedCode); if(duplicateRow){window.alert('The same item code cannot be selected more than once in one package transaction.'); codeSelect.value=''; codeSelect.classList.add('is-invalid'); row.querySelector('.item-name').value=''; const priceField=row.querySelector('.item-price'); priceField.value=''; priceField.dataset.autofill='1'; updateTotals(); codeSelect.focus(); return;} codeSelect.classList.remove('is-invalid'); row.querySelector('.item-name').value=selected?.dataset.name||''; const priceField=row.querySelector('.item-price'); priceField.dataset.autofill='1';} updateTotals();});
 
 detailGridBody.addEventListener('input', function(event){const row=event.target.closest('[data-row]'); if(!row){return;} if(event.target.classList.contains('item-price')){event.target.value=formatRibuan(event.target.value.replace(/\D/g,'')); event.target.dataset.autofill='0';} if(event.target.classList.contains('item-qty')){event.target.value=event.target.value.replace(/[^\d.,]/g,'');} updateTotals();});
 
@@ -279,3 +281,5 @@ mejaField.focus();
 </script>
 
 @endsection
+
+
