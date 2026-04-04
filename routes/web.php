@@ -120,7 +120,7 @@ Route::get('/item-package-global/{kode}/delete', function ($kode) {
 
 Route::get('/menu-package-transaction', function () {
     if (!session('user')) return redirect('/');
-    return app(PackageTransactionController::class)->index();
+    return app(PackageTransactionController::class)->index(request());
 });
 
 Route::post('/menu-package-transaction', function () {
@@ -192,3 +192,5 @@ Route::get('/change-password', function () {
     if (!session('user')) return redirect('/');
     return "Change Password Page";
 });
+
+
