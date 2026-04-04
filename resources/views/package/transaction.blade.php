@@ -167,7 +167,7 @@
                 <td><span class="package-code">{{ $package->Nofak }}</span></td>
                 <td>{{ $package->Meja }}</td>
                 <td>{{ $package->detail_summary }}</td>
-                <td>{{ \Carbon\Carbon::parse($package->Expired)->format('d/m/Y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($package->Expired)->format('d-m-Y') }}</td>
                 <td class="text-right">Rp {{ number_format($package->JumlahRes ?? 0, 0, ',', '.') }}</td>
                 <td class="text-center"><a href="/menu-package-transaction/{{ $package->Nofak }}/delete" class="package-delete" title="Delete" aria-label="Delete" data-confirm-delete="Do you want to delete this package transaction?">&#128465;</a></td>
             </tr>
@@ -281,5 +281,6 @@ mejaField.focus();
 </script>
 
 @endsection
+
 
 
