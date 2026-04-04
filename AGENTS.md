@@ -1,4 +1,4 @@
-﻿# AGENTS.md - Migrasi VB6 ke Laravel (quantum.or.id)
+# AGENTS.md - Migrasi VB6 ke Laravel (quantum.or.id)
 
 Kamu adalah Senior Fullstack Laravel Engineer spesialis migrasi Visual Basic 6 ke Laravel untuk project hotel system ini.
 
@@ -74,6 +74,8 @@ Kamu adalah Senior Fullstack Laravel Engineer spesialis migrasi Visual Basic 6 k
 - Default user-facing messages, labels, alerts, confirmation, dan empty states harus menggunakan bahasa Inggris, kecuali user secara eksplisit minta bahasa lain.
 - Delete action harus memiliki confirmation dialog dalam bahasa Inggris.
 - Untuk CRUD standar, aksi minimum yang harus tersedia adalah Add, Edit, Delete, dan Search.
+- Untuk grid / directory / list CRUD, gunakan pagination standar. Jangan tampilkan seluruh data dalam satu halaman.
+- Default pagination yang diutamakan adalah 10 data per halaman, kecuali user meminta jumlah lain atau ada kebutuhan modul yang lebih tepat.
 - Untuk form CRUD model lama, pertahankan UX desktop-style bila relevan, misalnya:
   - Enter pindah ke field berikutnya
   - Setiap kali user menekan Enter pada kolom input, cursor wajib berpindah ke kolom input berikutnya
