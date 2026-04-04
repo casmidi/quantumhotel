@@ -17,6 +17,7 @@ class PackageTransactionController extends Controller
 
         $packages = DB::table('Package')
             ->selectRaw("RTRIM(Nofak) as Nofak, RTRIM(Meja) as Meja, JumlahRes, Expired")
+            ->whereDate('Expired', '>=', Carbon::today()->format('Y-m-d'))
             ->orderByDesc('Nofak')
             ->get();
 
