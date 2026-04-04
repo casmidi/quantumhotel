@@ -28,6 +28,26 @@
             'price' => '',
         ];
     }
+
+    $sortBy = $sortBy ?? 'invoice';
+    $sortDir = $sortDir ?? 'desc';
+    $sortUrl = function (string $column) use ($sortBy, $sortDir) {
+        $query = array_merge(request()->except('page'), [
+            'sort_by' => $column,
+            'sort_dir' => $sortBy === $column && $sortDir === 'asc' ? 'desc' : 'asc',
+        ]);
+
+        $queryString = http_build_query($query);
+
+        return url()->current() . ($queryString !== '' ? '?' . $queryString : '');
+    };
+    $sortIcon = function (string $column) use ($sortBy, $sortDir) {
+        if ($sortBy !== $column) {
+            return 'fa-solid fa-sort';
+        }
+
+        return $sortDir === 'asc' ? 'fa-solid fa-sort-up' : 'fa-solid fa-sort-down';
+    };
 @endphp
 
 <style>
@@ -86,6 +106,10 @@
 .package-table-wrap { border-radius:0 0 24px 24px; overflow:hidden; }
 .package-table { margin-bottom:0; }
 .package-table thead th { border-top:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.02), rgba(16,35,59,.06)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.76rem; font-weight:700; padding:1rem 1.2rem; }
+.package-sort-link { display:inline-flex; align-items:center; gap:.45rem; color:inherit; text-decoration:none; }
+.package-sort-link:hover { color:#173761; text-decoration:none; }
+.package-sort-link.is-active { color:#173761; }
+.package-sort-link i { font-size:.8rem; opacity:.72; }
 .package-table tbody tr { transition:transform .18s ease, box-shadow .18s ease, background-color .18s ease; cursor:pointer; }
 .package-table tbody tr:nth-child(odd) { background:rgba(16,35,59,.045); }
 .package-table tbody tr:nth-child(even) { background:rgba(255,255,255,.96); }
@@ -203,13 +227,13 @@
                 </div>
             </form>
         </div>
-        <div class="package-table-wrap"><div class="table-responsive"><table class="table package-table" id="tablePackageTransaction"><thead><tr><th>Invoice</th><th>Package Code</th><th>Items</th><th>Expired</th><th class="text-right">Nominal</th><th class="text-center" width="90">Action</th></tr></thead><tbody>
+        <div class="package-table-wrap"><div class="table-responsive"><table class="table package-table" id="tablePackageTransaction"><thead><tr><th><a href="{{ $sortUrl('invoice') }}" class="package-sort-link {{ $sortBy === 'invoice' ? 'is-active' : '' }}">Invoice <i class="{{ $sortIcon('invoice') }}"></i></a></th><th><a href="{{ $sortUrl('package') }}" class="package-sort-link {{ $sortBy === 'package' ? 'is-active' : '' }}">Package Code <i class="{{ $sortIcon('package') }}"></i></a></th><th><a href="{{ $sortUrl('items') }}" class="package-sort-link {{ $sortBy === 'items' ? 'is-active' : '' }}">Items <i class="{{ $sortIcon('items') }}"></i></a></th><th><a href="{{ $sortUrl('expired') }}" class="package-sort-link {{ $sortBy === 'expired' ? 'is-active' : '' }}">Expired <i class="{{ $sortIcon('expired') }}"></i></a></th><th class="text-right"><a href="{{ $sortUrl('nominal') }}" class="package-sort-link {{ $sortBy === 'nominal' ? 'is-active' : '' }}">Nominal <i class="{{ $sortIcon('nominal') }}"></i></a></th><th class="text-center" width="90">Action</th></tr></thead><tbody>
             @forelse($packages as $package)
             <tr class="{{ $package->is_used ? 'package-row-locked' : '' }}" data-nofak="{{ $package->Nofak }}" data-meja="{{ $package->Meja }}" data-expired="{{ \Carbon\Carbon::parse($package->Expired)->format('Y-m-d') }}" data-details='@json(json_decode($package->detail_json, true))' data-used="{{ $package->is_used ? '1' : '0' }}">
                 <td>
                     <span class="package-code">{{ $package->Nofak }}</span>
                     @if($package->is_used)
-                    <div><span class="package-used-badge"><i class="fa-solid fa-lock"></i>Used in DATA2</span></div>
+                    <div><span class="package-used-badge"><i class="fa-solid fa-lock"></i>Used in</span></div>
                     @endif
                 </td>
                 <td>{{ $package->Meja }}</td>
@@ -218,7 +242,7 @@
                 <td class="text-right">Rp {{ number_format($package->JumlahRes ?? 0, 0, ',', '.') }}</td>
                 <td class="text-center">
                     @if($package->is_used)
-                    <span class="package-disabled-action" title="This package transaction is already used in guest transactions." aria-label="Locked"><i class="fa-solid fa-lock"></i></span>
+                    <span class="package-disabled-action" title="This package transaction is already used." aria-label="Locked"><i class="fa-solid fa-lock"></i></span>
                     @else
                     <a href="/menu-package-transaction/{{ $package->Nofak }}/delete" class="package-delete" title="Delete" aria-label="Delete" data-confirm-delete="Do you want to delete this package transaction?">&#128465;</a>
                     @endif
