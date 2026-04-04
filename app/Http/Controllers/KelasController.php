@@ -20,17 +20,16 @@ class KelasController extends Controller
             });
         }
 
-        $summaryQuery = clone $query;
-
-        $kelas = $query
+        $kelasCollection = $query
             ->orderBy('Kode')
-            ->paginate(10)
-            ->appends($request->query());
+            ->get();
+
+        $kelas = $this->paginateCollection($kelasCollection, 10, $request);
 
         $summary = [
-            'total' => (clone $summaryQuery)->count(),
-            'avgRate' => (float) ((clone $summaryQuery)->avg('Rate1') ?? 0),
-            'avgDepo' => (float) ((clone $summaryQuery)->avg('Depo1') ?? 0),
+            'total' => $kelasCollection->count(),
+            'avgRate' => (float) ($kelasCollection->avg('Rate1') ?? 0),
+            'avgDepo' => (float) ($kelasCollection->avg('Depo1') ?? 0),
         ];
 
         return view('kelas.index', compact('kelas', 'summary'));

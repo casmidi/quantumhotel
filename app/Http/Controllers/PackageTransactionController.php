@@ -43,12 +43,14 @@ class PackageTransactionController extends Controller
             });
         }
 
+        $packageCollection = $packagesQuery->get();
+
         $summary = [
-            'total' => (clone $packagesQuery)->count(),
-            'nominal' => (float) (clone $packagesQuery)->sum('JumlahRes'),
+            'total' => $packageCollection->count(),
+            'nominal' => (float) $packageCollection->sum('JumlahRes'),
         ];
 
-        $packages = $packagesQuery->paginate($perPage)->appends($request->query());
+        $packages = $this->paginateCollection($packageCollection, $perPage, $request);
         $packageNofaks = $packages->getCollection()->pluck('Nofak')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
 
         $details = DB::table('PackageD')

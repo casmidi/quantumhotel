@@ -13,15 +13,17 @@ class RoomController extends Controller
             ->selectRaw("RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, RTRIM(Fasilitas) as Fasilitas, RTRIM(ExtNo) as ExtNo, RTRIM(KUNCI) as KUNCI, Rate1, Rate2")
             ->whereRaw("RTRIM(Kode) <> '999'");
 
+        $roomCollection = $roomQuery
+            ->orderBy('Kode')
+            ->get();
+
         $summary = [
-            'total' => (clone $roomQuery)->count(),
-            'avgRate' => (float) ((clone $roomQuery)->avg('Rate1') ?? 0),
-            'avgBasicRate' => (float) ((clone $roomQuery)->avg('Rate2') ?? 0),
+            'total' => $roomCollection->count(),
+            'avgRate' => (float) ($roomCollection->avg('Rate1') ?? 0),
+            'avgBasicRate' => (float) ($roomCollection->avg('Rate2') ?? 0),
         ];
 
-        $rooms = $roomQuery
-            ->orderBy('Kode')
-            ->paginate(10);
+        $rooms = $this->paginateCollection($roomCollection, 10);
 
         $classes = DB::table('KELAS')
             ->selectRaw("RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1")
