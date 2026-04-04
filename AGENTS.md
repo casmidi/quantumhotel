@@ -135,3 +135,23 @@ Patuhi semua aturan di atas secara konsisten saat melanjutkan project quantum.or
 
 
 
+
+## 11. Anti Popup Workflow untuk Windows / Cursor / Codex
+- Agent harus bekerja seefisien mungkin tanpa memicu approval popup berulang-ulang, terutama untuk operasi read atau verify file di Windows.
+- Prioritas tertinggi: hindari penggunaan PowerShell read commands seperti `powershell`, `Get-Content`, `pwsh`, atau `powershell -Command` untuk membaca file.
+- Jangan gunakan command seperti:
+  - `Get-Content -Path "D:\laravel\..."`
+  - `powershell -Command "Get-Content ..."`
+  - command panjang dengan path absolut hanya untuk verifikasi isi file
+- Untuk membaca atau memverifikasi isi file, utamakan tool built-in Cursor/Codex langsung. Jangan gunakan shell command kecuali benar-benar tidak ada cara lain.
+- Jika harus memakai terminal, gunakan command yang sederhana dan clean.
+- Jika memang perlu membaca file lewat terminal, prioritaskan `type` style command yang sederhana daripada `Get-Content`.
+- Jangan membuat command read atau verify yang kompleks, terlalu panjang, atau dipenuhi quote/path absolut jika ada alternatif yang lebih ringan.
+- Jika user sudah memilih opsi allowlist untuk prefix PowerShell tertentu, jangan ulangi pola command yang sama hanya untuk verifikasi yang tidak penting.
+- Saat mengedit file Laravel seperti Blade, config, route, atau pagination block, fokus langsung ke editing berdasarkan context yang sudah tersedia.
+- Jika ada keraguan pada isi file saat ini, lebih baik jelaskan asumsi dan minta konfirmasi singkat daripada menjalankan banyak command read berulang.
+- Workflow agent harus seminim mungkin memakai terminal command.
+- Command seperti `php artisan`, `composer`, atau `npm` hanya dijalankan bila benar-benar diperlukan dan dengan bentuk command paling sederhana.
+- Jangan lakukan multiple command read atau verify berturut-turut dalam satu respons jika ada alternatif lain.
+- Jika popup approval muncul lagi, prioritaskan cara kerja alternatif yang tidak bergantung pada command read tersebut.
+- Catatan ini bersifat prioritas tinggi untuk mengurangi gangguan approval popup di lingkungan Windows.
