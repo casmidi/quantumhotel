@@ -91,8 +91,8 @@ Flow:
 - Grid default menampilkan 2 baris awal.
 - Penambahan baris berikutnya dilakukan manual melalui tombol Add Row.
 - Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama.
-- Field Package Invoice langsung diisi nofak berikutnya saat halaman dibuka atau saat tombol New Transaction ditekan.
-- Pola counter nofak mengikuti alur VB6: ambil prefix aktif, cari nofak terakhir dengan prefix itu, lalu tambah sequence 4 digit.
+- Field Package Invoice menampilkan preview nofak berikutnya saat halaman dibuka atau saat tombol New Transaction ditekan.
+- Preview nofak tetap mengikuti pola prefix aktif dan sequence 4 digit, tetapi nofak final untuk transaksi baru baru benar-benar direserve saat proses save.
 - Save akan membuat header di Package dan detail di PackageD.
 
 Logika penting:
@@ -131,7 +131,7 @@ Automatic Package membuat:
 - kode item room dengan prefix R
 - kode item restaurant dengan prefix M bila diperlukan
 - nofak baru dengan prefix berdasarkan tahun-bulan + 9002 + sequence 4 digit
-- preview nofak ditampilkan dulu di form, lalu dipakai saat save selama belum dipakai transaksi lain
+- preview nofak ditampilkan dulu di form sebagai referensi operator, tetapi nofak final diamankan saat save dengan lock agar dua user yang submit bersamaan tetap mendapat nomor berbeda
 
 9. HUBUNGAN ANTAR MODUL
 Alur manual:
@@ -146,6 +146,8 @@ Alur cepat:
 
 10. CATATAN MAINTENANCE
 - Jika struktur Package atau PackageD berubah, periksa controller manual dan automatic sekaligus.
-- Jika format nofak ingin disesuaikan, ubah di helper generatePackageNofak pada controller terkait.
+- Jika format nofak ingin disesuaikan, ubah di helper previewPackageNofak dan reservePackageNofak pada controller terkait.
 - Grid transaksi manual sengaja dibuat fleksibel; bila ingin memperkaya perilaku seperti keyboard navigation ala Excel, lanjutkan dari JavaScript di view transaction.
+
+
 

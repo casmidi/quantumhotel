@@ -54,16 +54,9 @@ class PackageTransactionController extends Controller
             'nominal' => $packages->sum('JumlahRes'),
         ];
 
-        $nextNofak = $this->generatePackageNofak();
+        $nextNofak = $this->previewPackageNofak();
 
         return view('package.transaction', compact('items', 'packages', 'summary', 'nextNofak'));
-    }
-
-    public function nextInvoice()
-    {
-        return response()->json([
-            'nofak' => $this->generatePackageNofak(),
-        ]);
     }
 
     public function store(Request $request)
@@ -130,9 +123,12 @@ class PackageTransactionController extends Controller
 
         $nominal = collect($details)->sum('amount');
         $now = Carbon::now();
-        $nofak = $existingNofak ?: $this->resolveNewPackageNofak($request->input('GeneratedNofak'));
+        $savedNofak = $existingNofak;
 
-        DB::transaction(function () use ($existingNofak, $nofak, $packageCode, $nominal, $expired, $username, $details, $now) {
+        DB::transaction(function () use ($existingNofak, $packageCode, $nominal, $expired, $username, $details, $now, &$savedNofak) {
+            $nofak = $existingNofak ?: $this->reservePackageNofak();
+            $savedNofak = $nofak;
+
             if ($existingNofak) {
                 DB::table('PackageD')->whereRaw('RTRIM(Nofak) = ?', [$nofak])->delete();
 
@@ -174,7 +170,11 @@ class PackageTransactionController extends Controller
             }
         });
 
-        return redirect('/menu-package-transaction')->with('success', $existingNofak ? 'Package transaction updated successfully' : 'Package transaction saved successfully');
+        if ($existingNofak) {
+            return redirect('/menu-package-transaction')->with('success', 'Package transaction updated successfully');
+        }
+
+        return redirect('/menu-package-transaction')->with('success', 'Package transaction saved successfully. Invoice: ' . $savedNofak);
     }
 
     private function extractDetails(Request $request): array
@@ -262,7 +262,7 @@ class PackageTransactionController extends Controller
         return $query->exists();
     }
 
-    private function generatePackageNofak(): string
+    private function previewPackageNofak(): string
     {
         $prefix = $this->getPackageNofakPrefix();
 
@@ -280,6 +280,29 @@ class PackageTransactionController extends Controller
         return $prefix . str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
     }
 
+    private function reservePackageNofak(): string
+    {
+        $prefix = $this->getPackageNofakPrefix();
+
+        $latest = DB::selectOne(
+            "SELECT TOP 1 RTRIM(Nofak) AS Nofak FROM Package WITH (TABLOCKX, HOLDLOCK) WHERE RTRIM(Nofak) LIKE ? ORDER BY RTRIM(Nofak) DESC",
+            [$prefix . '%']
+        );
+
+        $sequence = 1;
+
+        if ($latest && !empty($latest->Nofak)) {
+            $sequence = ((int) substr(trim((string) $latest->Nofak), -4)) + 1;
+        }
+
+        return $prefix . str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+    }
+
+    private function getPackageNofakPrefix(): string
+    {
+        return Carbon::now()->format('Ym') . '9002';
+    }
+
     private function normalizeMoney($value): float
     {
         $normalized = preg_replace('/[^\d]/', '', (string) $value);
@@ -287,5 +310,3 @@ class PackageTransactionController extends Controller
         return is_numeric($normalized) ? (float) $normalized : 0;
     }
 }
-
-
