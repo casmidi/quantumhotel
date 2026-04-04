@@ -126,7 +126,7 @@
                     <div class="package-grid-toolbar">
                         <div>
                             <h3 class="package-grid-title">Package Line Grid</h3>
-                            <p class="package-grid-note">Default starts with 3 rows, but you can keep adding more lines without a fixed limit.</p>
+                            <p class="package-grid-note">Default starts with 2 rows, and additional lines can be added from the Add Row button.</p>
                         </div>
                         <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
                     </div>
@@ -148,7 +148,7 @@
                     </div>
                 </div>
 
-                <p class="package-grid-hint">The last row stays available as a ready-to-use blank line, and totals update automatically while you type.</p>
+                <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
 
                 <div class="form-row mt-3">
                     <div class="form-group col-md-6"><label class="package-label">Total Nominal</label><input type="text" id="TotalNominal" class="form-control package-input text-right" value="0" readonly></div>
@@ -219,7 +219,8 @@ const addRowButton=document.getElementById('addRowButton');
 const detailGridBody=document.getElementById('detailGridBody');
 const rowTemplate=document.getElementById('detailRowTemplate');
 const transactionTableBody=document.querySelector('#tablePackageTransaction tbody');
-const initialRows=@json($initialRows);
+  const initialRows=@json($initialRows);
+  const minimumRows=2;
 
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
@@ -242,8 +243,7 @@ function createRow(detail={}){
     updateRow(row);
     return row;
 }
-function ensureTrailingBlankRow(){const rows=getRows(); if(rows.length===0){createRow(); return;} const lastRow=rows[rows.length-1]; if(rowHasMeaningfulData(lastRow)){createRow({qty:'1'});} }
-function findDuplicateRow(sourceRow, code){if(!code){return null;} return getRows().find((row)=>row!==sourceRow && (row.querySelector('.item-code')?.value||'').trim()===code.trim())||null;}
+  function findDuplicateRow(sourceRow, code){if(!code){return null;} return getRows().find((row)=>row!==sourceRow && (row.querySelector('.item-code')?.value||'').trim()===code.trim())||null;}
 function updateRow(row){
     const codeSelect=row.querySelector('.item-code');
     const selected=codeSelect.options[codeSelect.selectedIndex];
@@ -259,8 +259,8 @@ function updateRow(row){
     lineTotal.textContent='Rp '+formatRibuan(Math.round(qty*price).toString()||'0');
     return qty*price;
 }
-function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.value=formatRibuan(Math.round(total).toString()); ensureTrailingBlankRow(); renameRows();}
-function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:initialRows; rows.forEach((detail)=>createRow(detail)); while(getRows().length<3){createRow({qty:'1'});} ensureTrailingBlankRow(); updateTotals();}
+  function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.value=formatRibuan(Math.round(total).toString()); renameRows();}
+  function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:(initialRows&&initialRows.length?initialRows.slice(0, minimumRows):[{qty:'1'},{qty:'1'}]); rows.forEach((detail)=>createRow(detail)); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();}
 
 addRowButton.addEventListener('click', function(){const row=createRow({qty:'1'}); const select=row.querySelector('.item-code'); if(select){select.focus();}});
 
@@ -268,11 +268,11 @@ detailGridBody.addEventListener('change', function(event){const row=event.target
 
 detailGridBody.addEventListener('input', function(event){const row=event.target.closest('[data-row]'); if(!row){return;} if(event.target.classList.contains('item-price')){event.target.value=formatRibuan(event.target.value.replace(/\D/g,'')); event.target.dataset.autofill='0';} if(event.target.classList.contains('item-qty')){event.target.value=event.target.value.replace(/[^\d.,]/g,'');} updateTotals();});
 
-detailGridBody.addEventListener('click', function(event){const removeButton=event.target.closest('.package-row-remove'); if(!removeButton){return;} const row=removeButton.closest('[data-row]'); if(!row){return;} const rows=getRows(); if(rows.length<=1){row.querySelector('.item-code').value=''; row.querySelector('.item-name').value=''; row.querySelector('.item-qty').value='1'; row.querySelector('.item-price').value=''; row.querySelector('.item-price').dataset.autofill='1'; updateTotals(); return;} row.remove(); while(getRows().length<3){createRow({qty:'1'});} updateTotals();});
+  detailGridBody.addEventListener('click', function(event){const removeButton=event.target.closest('.package-row-remove'); if(!removeButton){return;} const row=removeButton.closest('[data-row]'); if(!row){return;} const rows=getRows(); if(rows.length<=1){row.querySelector('.item-code').value=''; row.querySelector('.item-name').value=''; row.querySelector('.item-qty').value='1'; row.querySelector('.item-price').value=''; row.querySelector('.item-price').dataset.autofill='1'; updateTotals(); return;} row.remove(); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();});
 
 transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; displayNofakField.value=row.dataset.nofak; mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
 
-resetButton.addEventListener('click', function(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; displayNofakField.value='Generated after save'; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); mejaField.focus();});
+  resetButton.addEventListener('click', function(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; displayNofakField.value='Generated after save'; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); mejaField.focus();});
 
 form.addEventListener('submit', function(event){mejaField.value=(mejaField.value||'').toString().trim().toUpperCase(); const normalizedExpired=normalizeDisplayDate(expiredDisplayField.value); if(!normalizedExpired){event.preventDefault(); window.alert('Expired date must use format dd-MM-yyyy.'); expiredDisplayField.focus(); return;} expiredField.value=normalizedExpired; getRows().forEach((row)=>{const priceField=row.querySelector('.item-price'); if(priceField){priceField.value=unformat(priceField.value);} const qtyField=row.querySelector('.item-qty'); if(qtyField&&qtyField.value.trim()===''){qtyField.value='1';}});});
 

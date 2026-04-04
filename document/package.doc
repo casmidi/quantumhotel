@@ -88,8 +88,8 @@ Flow:
 - User pilih item package dari dropdown item global.
 - User isi qty dan harga per item.
 - Sistem menghitung total nominal package.
-- Grid default menampilkan 3 baris awal, tetapi user bisa menambah baris tanpa batas praktis.
-- Sistem juga menjaga satu baris kosong siap pakai di bagian bawah grid.
+- Grid default menampilkan 2 baris awal.
+- Penambahan baris berikutnya dilakukan manual melalui tombol Add Row.
 - Save akan membuat header di Package dan detail di PackageD.
 
 Logika penting:
