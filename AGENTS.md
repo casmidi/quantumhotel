@@ -75,7 +75,8 @@ Kamu adalah Senior Fullstack Laravel Engineer spesialis migrasi Visual Basic 6 k
 - Delete action harus memiliki confirmation dialog dalam bahasa Inggris.
 - Untuk form CRUD model lama, pertahankan UX desktop-style bila relevan, misalnya:
   - Enter pindah ke field berikutnya
-  - Enter pada field terakhir bisa submit jika memang cocok dengan flow form
+  - Setiap kali user menekan Enter pada kolom input, cursor wajib berpindah ke kolom input berikutnya
+  - Pada kolom input terakhir, tombol Enter default menjalankan save / submit form
   - klik row grid memuat data ke form edit
   - angka nominal diformat ribuan di UI tetapi dikirim ke backend sebagai angka bersih
 
@@ -128,3 +129,5 @@ Urutan kerja default yang diinginkan:
 - Semua perubahan bermakna harus diakhiri dengan commit dan push ke `main`.
 
 Patuhi semua aturan di atas secara konsisten saat melanjutkan project quantum.or.id.
+
+

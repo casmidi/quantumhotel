@@ -267,6 +267,9 @@ function createRow(detail={}){
   function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:(initialRows&&initialRows.length?initialRows.slice(0, minimumRows):[{qty:'1'},{qty:'1'}]); rows.forEach((detail)=>createRow(detail)); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();}
   function setGeneratedNofak(value){const normalized=(value||'').toString().trim(); generatedNofakField.value=normalized; displayNofakField.value=normalized;}
   function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); setGeneratedNofak(defaultGeneratedNofak); mejaField.focus();}
+  function getEnterFlowFields(){return [mejaField, expiredDisplayField, ...getRows().flatMap((row)=>[row.querySelector('.item-code'), row.querySelector('.item-qty'), row.querySelector('.item-price')]).filter((field)=>field && !field.disabled)];}
+  function focusNextEnterField(currentField){const fields=getEnterFlowFields(); const index=fields.indexOf(currentField); if(index!==-1 && index < fields.length-1){const nextField=fields[index+1]; nextField.focus(); if(typeof nextField.select==='function' && nextField.tagName!=='SELECT'){nextField.select();} return true;} return false;}
+  function submitFromEnter(){if(typeof form.requestSubmit==='function'){form.requestSubmit(saveButton);} else {saveButton.click();}}
 
 addRowButton.addEventListener('click', function(){const row=createRow({qty:'1'}); const select=row.querySelector('.item-code'); if(select){select.focus();}});
 
@@ -280,6 +283,8 @@ transactionTableBody.addEventListener('click', function(event){if(event.target.c
 
   newTransactionButton.addEventListener('click', function(){activateCreateMode();});
   resetButton.addEventListener('click', function(){activateCreateMode();});
+
+form.addEventListener('keydown', function(event){if(event.key!=='Enter'){return;} const target=event.target; const managedField=target===mejaField || target===expiredDisplayField || target.classList.contains('item-code') || target.classList.contains('item-qty') || target.classList.contains('item-price'); if(!managedField){return;} event.preventDefault(); if(target===expiredDisplayField){const normalizedExpired=normalizeDisplayDate(expiredDisplayField.value); if(!normalizedExpired){window.alert('Expired date must use format dd-MM-yyyy.'); expiredDisplayField.focus(); return;} expiredField.value=normalizedExpired; expiredDisplayField.value=formatDisplayDate(normalizedExpired);} if(focusNextEnterField(target)){return;} submitFromEnter();});
 
 form.addEventListener('submit', function(event){mejaField.value=(mejaField.value||'').toString().trim().toUpperCase(); const normalizedExpired=normalizeDisplayDate(expiredDisplayField.value); if(!normalizedExpired){event.preventDefault(); window.alert('Expired date must use format dd-MM-yyyy.'); expiredDisplayField.focus(); return;} expiredField.value=normalizedExpired; getRows().forEach((row)=>{const priceField=row.querySelector('.item-price'); if(priceField){priceField.value=unformat(priceField.value);} const qtyField=row.querySelector('.item-qty'); if(qtyField&&qtyField.value.trim()===''){qtyField.value='1';}});});
 
@@ -295,6 +300,7 @@ mejaField.focus();
 </script>
 
 @endsection
+
 
 
 
