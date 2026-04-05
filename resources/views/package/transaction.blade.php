@@ -200,7 +200,7 @@
                 <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
 
                 <div class="package-actions">
-                    <div class="package-actions-main"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button><button type="button" class="btn package-btn-secondary" id="resetButton">Reset Form</button></div>
+                    <div class="package-actions-main"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button></div>
                 </div>
             </form>
         </div>
@@ -247,7 +247,6 @@ const totalNominalField=document.getElementById('TotalNominal');
   const displayNofakField=document.getElementById('DisplayNofak');
   const saveButton=document.getElementById('saveButton');
   const newTransactionButton=document.getElementById('newTransactionButton');
-  const resetButton=document.getElementById('resetButton');
 const addRowButton=document.getElementById('addRowButton');
 const detailGridBody=document.getElementById('detailGridBody');
 const rowTemplate=document.getElementById('detailRowTemplate');
@@ -299,7 +298,7 @@ function createRow(detail={}){
   function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.textContent=formatRibuan(Math.round(total).toString()); renameRows();}
   function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:(initialRows&&initialRows.length?initialRows.slice(0, minimumRows):[{qty:'1'},{qty:'1'}]); rows.forEach((detail)=>createRow(detail)); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();}
   function setGeneratedNofak(value){const normalized=(value||'').toString().trim(); generatedNofakField.value=normalized; displayNofakField.value=normalized;}
-  function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); setGeneratedNofak(defaultGeneratedNofak); mejaField.focus();}
+  function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; saveButton.textContent='Save Package Transaction'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); setGeneratedNofak(defaultGeneratedNofak); mejaField.focus();}
   function getEnterFlowFields(){return [mejaField, expiredDisplayField, ...getRows().flatMap((row)=>[row.querySelector('.item-code'), row.querySelector('.item-qty')]).filter((field)=>field && !field.disabled)];}
   function focusNextEnterField(currentField){const fields=getEnterFlowFields(); const index=fields.indexOf(currentField); if(index!==-1 && index < fields.length-1){const nextField=fields[index+1]; nextField.focus(); if(typeof nextField.select==='function' && nextField.tagName!=='SELECT'){nextField.select();} return true;} return false;}
   function submitFromEnter(){if(typeof form.requestSubmit==='function'){form.requestSubmit(saveButton);} else {saveButton.click();}}
@@ -339,7 +338,6 @@ packageDirectoryShell.addEventListener('click', function(event){
     expiredDisplayField.value=formatDisplayDate(row.dataset.expired||'');
     form.action='/menu-package-transaction/'+row.dataset.nofak+'/update';
     saveButton.textContent='Update Package Transaction';
-    resetButton.textContent='Cancel Edit';
     resetGrid(details);
     mejaField.focus();
 });
@@ -353,7 +351,6 @@ packageDirectoryShell.addEventListener('submit', function(event){
 });
 
   newTransactionButton.addEventListener('click', function(){activateCreateMode();});
-  resetButton.addEventListener('click', function(){activateCreateMode();});
 
 form.addEventListener('keydown', function(event){if(event.key!=='Enter'){return;} const target=event.target; const managedField=target===mejaField || target===expiredDisplayField || target.classList.contains('item-code') || target.classList.contains('item-qty'); if(!managedField){return;} event.preventDefault(); if(target===expiredDisplayField){const normalizedExpired=normalizeDisplayDate(expiredDisplayField.value); if(!normalizedExpired){window.showCrudNotice('Expired date must use format dd-MM-yyyy.', 'Invalid Date'); expiredDisplayField.focus(); return;} expiredField.value=normalizedExpired; expiredDisplayField.value=formatDisplayDate(normalizedExpired);} if(focusNextEnterField(target)){return;} submitFromEnter();});
 
