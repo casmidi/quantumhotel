@@ -74,7 +74,8 @@
 .package-label { display:block; font-size:.84rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#5f6f84; margin-bottom:.55rem; }
 .package-input, .package-select { height:calc(2.6rem + 2px); border-radius:14px; border:1px solid rgba(16,35,59,.12); box-shadow:inset 0 1px 2px rgba(16,35,59,.04); background:rgba(255,255,255,.92); color:#10233b; font-weight:600; }
 .package-input:focus, .package-select:focus { border-color:rgba(179,138,81,.78); box-shadow:0 0 0 .2rem rgba(179,138,81,.14); }
-.package-actions { display:flex; gap:.75rem; margin-top:.75rem; flex-wrap:wrap; }
+.package-actions { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:.95rem; flex-wrap:wrap; }
+.package-actions-main { display:flex; gap:.75rem; flex-wrap:wrap; }
 .package-btn-primary { border:0; border-radius:999px; padding:.75rem 1.4rem; font-weight:700; background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); box-shadow:0 12px 26px rgba(23,55,97,.2); color:#fff; }
 .package-btn-secondary { border-radius:999px; padding:.75rem 1.3rem; font-weight:700; border:1px solid rgba(16,35,59,.12); background:rgba(255,255,255,.78); color:#173761; }
 .package-btn-add { border-radius:999px; padding:.72rem 1.2rem; font-weight:700; border:1px dashed rgba(23,55,97,.22); background:rgba(23,55,97,.05); color:#173761; }
@@ -106,7 +107,6 @@
 .package-row-remove { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(178,34,34,.12); background:rgba(178,34,34,.08); color:#aa2f2f; text-decoration:none; }
 .package-row-remove:hover { background:#aa2f2f; color:#fff; text-decoration:none; }
 .package-grid-hint { margin-top:.8rem; color:#6b7b90; font-size:.84rem; }
-.package-grid-actions { margin-top:1rem; display:flex; justify-content:flex-end; }
 .package-search-form { display:flex; align-items:flex-end; gap:.75rem; flex-wrap:wrap; }
 .package-search-group { min-width:180px; flex:1 1 180px; }
 .package-search-actions { display:flex; gap:.65rem; flex-wrap:wrap; }
@@ -138,7 +138,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-total-value { font-size:1.7rem; } .package-grid-actions { justify-content:flex-start; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-total-value { font-size:1.7rem; } .package-actions { align-items:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -199,11 +199,11 @@
                 </div>
 
                 <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
-                <div class="package-grid-actions">
+
+                <div class="package-actions">
+                    <div class="package-actions-main"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button><button type="button" class="btn package-btn-secondary" id="resetButton">Reset Form</button></div>
                     <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
                 </div>
-
-                <div class="package-actions"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button><button type="button" class="btn package-btn-secondary" id="resetButton">Reset Form</button></div>
             </form>
         </div>
     </section>
