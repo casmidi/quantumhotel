@@ -346,13 +346,11 @@ class PackageTransactionController extends Controller
     {
         $codes = $request->input('ItemCode', []);
         $qtys = $request->input('Qty', []);
-        $prices = $request->input('Price', []);
         $details = [];
-        $existingItemCodes = DB::table('StockPackage')
-            ->selectRaw('RTRIM(KodeBrg) as KodeBrg')
-            ->pluck('KodeBrg')
-            ->map(fn ($code) => strtoupper(trim((string) $code)))
-            ->flip();
+        $stockItems = DB::table('StockPackage')
+            ->selectRaw('RTRIM(KodeBrg) as KodeBrg, Hj')
+            ->get()
+            ->keyBy(fn ($item) => strtoupper(trim((string) $item->KodeBrg)));
 
         foreach ($codes as $index => $code) {
             $normalizedCode = strtoupper(trim((string) $code));
@@ -361,13 +359,15 @@ class PackageTransactionController extends Controller
                 continue;
             }
 
-            if (!$existingItemCodes->has($normalizedCode)) {
+            $stockItem = $stockItems->get($normalizedCode);
+
+            if (!$stockItem) {
                 continue;
             }
 
             $qty = (float) preg_replace('/[^\d.]/', '', (string) ($qtys[$index] ?? '1'));
             $qty = $qty > 0 ? $qty : 1;
-            $price = $this->normalizeMoney($prices[$index] ?? 0);
+            $price = (float) ($stockItem->Hj ?? 0);
 
             if ($price <= 0) {
                 continue;

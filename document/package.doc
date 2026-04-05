@@ -88,13 +88,13 @@ Flow:
 - User pilih expired.
 - Tanggal expired ditampilkan ke user dengan format Indonesia dd-MM-yyyy, lalu dinormalisasi ke format internal saat submit.
 - User pilih item package dari dropdown item global.
-- User isi qty dan harga per item.
+- User isi qty per item, sedangkan harga otomatis mengikuti master StockPackage dan tidak bisa diubah manual.
 - Sistem menghitung total nominal package.
 - Grid default menampilkan 2 baris awal.
 - Penambahan baris berikutnya dilakukan manual melalui tombol Add Row.
 - Total amount ditampilkan di toolbar kanan atas pada area grid, dan field total terpisah di bawah grid sudah dihilangkan agar tampilan lebih ringkas serta sejajar dengan kolom Amount.
 - Format nominal pada grid dan total toolbar memakai prefix `Rp.` dalam satu baris yang sama dengan angka, alignment total toolbar mengikuti posisi header kolom Amount melalui JavaScript, total diposisikan sejajar dengan judul Package Line Grid agar lebih hemat tinggi area, dan tombol Add Row disatukan dalam satu row dengan tombol aksi utama.
-- Navigasi Enter di form manual mengikuti aturan baku project: Enter pindah ke field berikutnya, dan Enter pada field input terakhir default menjalankan save.
+- Navigasi Enter di form manual mengikuti aturan baku project: Enter pindah ke field berikutnya, dan pada grid package alurnya berjalan dari item code ke qty lalu langsung ke item code berikutnya karena field price bersifat read-only.
 - Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama.
 - Transaction Directory menyediakan search dengan opsi berdasarkan Invoice, Package Code / Name, atau Package Nominal.
 - Grid transaksi memakai pagination standar dengan tombol nomor halaman serta navigasi < dan >.`r`n- Saat user klik nomor halaman atau header sort, yang direfresh hanya Transaction Directory melalui JavaScript, sehingga form input di atas tidak ikut reset.`r`n- Query directory sekarang hanya mengambil record untuk halaman aktif saja, bukan memuat semua package lebih dulu, supaya perpindahan halaman terasa lebih ringan.`r`n- Header pada Transaction Directory bisa diklik untuk mengurutkan data berdasarkan Invoice, Package Code, Items, Expired, atau Nominal, baik ascending maupun descending.
@@ -107,6 +107,7 @@ Logika penting:
 - kombinasi package code dan expired yang sama akan ditolak
 - item code yang tidak ada di StockPackage akan diabaikan agar detail selalu valid
 - item code yang sama tidak boleh dipilih lebih dari sekali dalam satu transaksi package
+- harga item selalu diambil ulang dari StockPackage saat save, sehingga backend tidak mempercayai harga kiriman form
 - Saat update, sistem hapus dulu detail lama di PackageD lalu insert ulang detail baru.
 - Update hanya boleh dilakukan bila header Package memang masih ada.
 - Jika nofak package sudah dipakai di tabel DATA2 pada field PACKAGE, package tidak boleh diupdate walaupun directory tidak lagi menampilkan badge khusus.
