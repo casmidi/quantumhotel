@@ -106,10 +106,11 @@
 .package-table-wrap { border-radius:0 0 24px 24px; overflow:hidden; }
 .package-table { margin-bottom:0; }
 .package-table thead th { border-top:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.02), rgba(16,35,59,.06)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.76rem; font-weight:700; padding:1rem 1.2rem; }
-.package-sort-link { display:inline-flex; align-items:center; gap:.45rem; color:inherit; text-decoration:none; }
-.package-sort-link:hover { color:#173761; text-decoration:none; }
-.package-sort-link.is-active { color:#173761; }
-.package-sort-link i { font-size:.8rem; opacity:.72; }
+.package-sort-link { display:inline-flex; align-items:center; gap:.55rem; padding:.38rem .72rem; border-radius:999px; color:inherit; text-decoration:none; transition:all .18s ease; }
+.package-sort-link:hover { color:#173761; text-decoration:none; background:rgba(23,55,97,.08); }
+.package-sort-link.is-active { color:#fff; background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); box-shadow:0 10px 22px rgba(23,55,97,.18); }
+.package-sort-link i { font-size:.82rem; opacity:.62; transition:transform .18s ease, opacity .18s ease; }
+.package-sort-link.is-active i { opacity:1; transform:scale(1.14); }
 .package-table tbody tr { transition:transform .18s ease, box-shadow .18s ease, background-color .18s ease; cursor:pointer; }
 .package-table tbody tr:nth-child(odd) { background:rgba(16,35,59,.045); }
 .package-table tbody tr:nth-child(even) { background:rgba(255,255,255,.96); }
