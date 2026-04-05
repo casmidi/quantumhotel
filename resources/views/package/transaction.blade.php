@@ -84,10 +84,10 @@
 .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
 .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
 .package-grid-wrap { position:relative; border:1px solid rgba(16,35,59,.08); border-radius:22px; background:rgba(255,255,255,.58); overflow:hidden; }
-.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:110px; padding:1rem 1.15rem 3.4rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
+.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:92px; padding:1rem 1.15rem 2.35rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
 .package-grid-title { margin:0; font-size:.98rem; font-weight:700; color:#173761; }
 .package-grid-note { margin:.3rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-total { position:absolute; bottom:1rem; text-align:right; pointer-events:none; }
+.package-grid-total { position:absolute; top:1rem; text-align:right; pointer-events:none; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
 .package-grid-total-currency { font-size:1.15rem; line-height:1; }
