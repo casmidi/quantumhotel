@@ -82,6 +82,7 @@ Tujuan:
 - Memberi jalur manual untuk user yang ingin membentuk package dari item global yang sudah ada di StockPackage.
 - Form manual sekarang memakai grid fleksibel seperti spreadsheet ringan, bukan lagi form fixed tiga baris.
 - Hero manual transaction disederhanakan agar fokus ke input operasional, tanpa kartu summary total package/nominal/rata-rata, dan halaman manual transaction memakai satu judul utama saja agar tidak terasa berulang.
+- Tampilan manual transaction saat ini diarahkan ke gaya luxe: judul besar di tengah, subtitle singkat, blok Total Amount terpisah di kanan atas, dan area grid menggunakan bingkai putih-gold yang lebih elegan.
 - Modul ini juga mengikuti standar CRUD project: Add, Edit, Delete, dan Search.
 
 Flow:
@@ -94,7 +95,7 @@ Flow:
 - Grid default menampilkan 2 baris awal.
 - Penambahan baris berikutnya dilakukan manual melalui tombol Add Row.
 - Total amount ditampilkan di toolbar kanan atas pada area grid, dan field total terpisah di bawah grid sudah dihilangkan agar tampilan lebih ringkas serta sejajar dengan kolom Amount.
-- Format nominal pada grid dan total toolbar memakai prefix `Rp.` dalam satu baris yang sama dengan angka, alignment total toolbar mengikuti posisi header kolom Amount melalui JavaScript, panel total baru ditampilkan setelah alignment siap agar tidak sempat bertumpuk saat initial render, total diposisikan sejajar dengan judul Package Line Grid agar lebih hemat tinggi area, dan tombol Add Row ditempatkan di sisi kanan atas area grid sebagai aksi pendamping yang lebih kecil dari tombol utama.
+- Format nominal pada grid dan total toolbar memakai prefix `Rp`/`Rp.` dalam satu baris yang sama dengan angka, Total Amount ditampilkan sebagai blok ringkas di kanan atas form, dan tombol Add Row ditempatkan di kanan atas area grid sebagai aksi pendamping yang lebih kecil dari tombol utama.
 - Navigasi Enter di form manual mengikuti aturan baku project: Enter pindah ke field berikutnya, dan pada grid package alurnya berjalan dari item code ke qty lalu langsung ke item code berikutnya karena field price bersifat read-only.
 - Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama. Tombol reset terpisah sengaja tidak dipakai agar aksi form tidak dobel.
 - Transaction Directory menyediakan search dengan opsi berdasarkan Invoice, Package Code / Name, atau Package Nominal.

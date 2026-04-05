@@ -54,48 +54,43 @@
 .content-wrapper { background: radial-gradient(circle at top right, rgba(183,148,92,.12), transparent 22%), radial-gradient(circle at left top, rgba(17,24,39,.08), transparent 28%), linear-gradient(180deg, #f8f4ec 0%, #eef1f6 45%, #e7edf5 100%); min-height: 100vh; }
 .content-wrapper > h3 { display:none; }
 .package-page { padding:0 0 2rem; color:#10233b; }
-.package-hero { position:relative; overflow:hidden; background:linear-gradient(135deg,#10233b 0%,#19395f 55%,#b38a51 140%); border-radius:24px; color:#fff; padding:2rem; margin-bottom:1.5rem; box-shadow:0 24px 60px rgba(16,35,59,.2); }
-.package-hero::after { content:''; position:absolute; top:-80px; right:-20px; width:240px; height:240px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,0)); }
-.package-kicker { display:inline-flex; align-items:center; gap:.55rem; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); padding:.45rem .85rem; border-radius:999px; font-size:.76rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; margin-bottom:1rem; }
-.package-hero h1 { font-size:2.2rem; font-weight:700; line-height:1.1; margin:0 0 .75rem; }
-.package-hero p { max-width:760px; margin:0; color:rgba(255,255,255,.82); font-size:1rem; }
-.package-summary { margin-top:1.5rem; }
-.package-stat { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15); border-radius:18px; padding:1rem 1.1rem; backdrop-filter:blur(12px); min-height:100%; }
-.package-stat-label { display:block; font-size:.78rem; text-transform:uppercase; letter-spacing:.12em; color:rgba(255,255,255,.72); margin-bottom:.5rem; }
-.package-stat-value { display:block; font-size:1.35rem; font-weight:700; color:#fff; }
-.package-shell { background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.6); box-shadow:0 18px 50px rgba(16,35,59,.1); backdrop-filter:blur(16px); border-radius:24px; overflow:hidden; }
+.package-shell { background:linear-gradient(180deg, rgba(255,252,246,.98), rgba(255,255,255,.96)); border:1px solid rgba(199,165,106,.58); box-shadow:0 24px 60px rgba(125,96,42,.1), inset 0 1px 0 rgba(255,255,255,.7); border-radius:28px; overflow:hidden; }
 .package-shell + .package-shell { margin-top:1.5rem; }
 .package-shell.package-directory-loading { opacity:.72; pointer-events:none; transition:opacity .18s ease; }
-.package-shell-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.35rem 1.5rem 1rem; border-bottom:1px solid rgba(16,35,59,.08); }
-.package-shell-title { margin:0; font-size:1.28rem; font-weight:700; color:#10233b; line-height:1.2; }
-.package-shell-subtitle { margin:.35rem 0 0; font-size:.9rem; color:#5f6f84; }
-.package-shell-badge { display:inline-flex; align-items:center; gap:.4rem; padding:.55rem .8rem; border-radius:999px; background:rgba(179,138,81,.12); color:#8b6232; font-weight:700; font-size:.82rem; }
-.package-shell-body { padding:1.5rem; }
+.package-shell-header { display:flex; align-items:center; justify-content:center; text-align:center; gap:1rem; padding:1.7rem 1.9rem .85rem; }
+.package-shell-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:2.6rem; font-weight:500; color:#233f6b; line-height:1; letter-spacing:.01em; }
+.package-shell-subtitle { margin:.45rem 0 0; font-size:1rem; color:#c19a58; }
+.package-shell-body { padding:1.25rem 1.9rem 1.75rem; }
+.package-form-head { display:flex; align-items:flex-start; gap:1.5rem; margin-bottom:1.15rem; }
+.package-form-fields { flex:1 1 auto; }
+.package-total-card { flex:0 0 260px; padding:.25rem 0 0 1.1rem; text-align:right; }
+.package-total-card .package-grid-total-label { font-family:Georgia,"Times New Roman",serif; font-size:1rem; font-weight:600; letter-spacing:0; text-transform:none; color:#6e7f9b; }
+.package-total-card .package-grid-total-value { font-family:Georgia,"Times New Roman",serif; font-size:3rem; font-weight:500; color:#c7a56a; justify-content:flex-end; }
+.package-total-card .package-grid-total-currency { font-size:1.1em; }
 .package-label { display:block; font-size:.84rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#5f6f84; margin-bottom:.55rem; }
-.package-input, .package-select { height:calc(2.6rem + 2px); border-radius:14px; border:1px solid rgba(16,35,59,.12); box-shadow:inset 0 1px 2px rgba(16,35,59,.04); background:rgba(255,255,255,.92); color:#10233b; font-weight:600; }
-.package-input:focus, .package-select:focus { border-color:rgba(179,138,81,.78); box-shadow:0 0 0 .2rem rgba(179,138,81,.14); }
+.package-input, .package-select { height:calc(2.7rem + 2px); border-radius:14px; border:1px solid rgba(199,165,106,.34); box-shadow:inset 0 1px 2px rgba(16,35,59,.04); background:rgba(255,255,255,.95); color:#10233b; font-weight:600; }
+.package-input:focus, .package-select:focus { border-color:rgba(199,165,106,.88); box-shadow:0 0 0 .2rem rgba(199,165,106,.12); }
 .package-actions { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:.95rem; flex-wrap:wrap; }
 .package-actions-main { display:flex; gap:.75rem; flex-wrap:wrap; }
-.package-btn-primary { border:0; border-radius:999px; padding:.75rem 1.4rem; font-weight:700; background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); box-shadow:0 12px 26px rgba(23,55,97,.2); color:#fff; }
-.package-btn-secondary { border-radius:999px; padding:.75rem 1.3rem; font-weight:700; border:1px solid rgba(16,35,59,.12); background:rgba(255,255,255,.78); color:#173761; }
-.package-btn-add { border-radius:999px; padding:.48rem .9rem; font-size:.82rem; font-weight:700; line-height:1.1; border:1px dashed rgba(23,55,97,.22); background:rgba(23,55,97,.05); color:#173761; }
-.package-btn-add:hover { background:rgba(23,55,97,.1); }
+.package-btn-primary { border:0; border-radius:999px; padding:.82rem 1.5rem; font-weight:700; background:linear-gradient(135deg,#cba246 0%,#d8b86a 55%,#b58a36 100%); box-shadow:0 14px 28px rgba(201,164,83,.24); color:#fff; }
+.package-btn-secondary { border-radius:999px; padding:.78rem 1.35rem; font-weight:700; border:1px solid rgba(199,165,106,.52); background:rgba(255,255,255,.9); color:#bb9857; }
+.package-btn-add { border-radius:999px; padding:.42rem .82rem; font-size:.78rem; font-weight:700; line-height:1.1; border:1px dashed rgba(199,165,106,.62); background:rgba(199,165,106,.09); color:#8f6a2d; }
+.package-btn-add:hover { background:rgba(199,165,106,.16); color:#7e5920; }
 .package-alert, .package-error { border:0; border-radius:18px; padding:.95rem 1.15rem; box-shadow:0 14px 30px rgba(16,35,59,.08); }
 .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
 .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
-.package-grid-wrap { position:relative; border:1px solid rgba(16,35,59,.08); border-radius:22px; background:rgba(255,255,255,.58); overflow:hidden; }
-.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:92px; padding:1rem 1.15rem 2.35rem; padding-right:9.75rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
-.package-grid-title { margin:0; font-size:.98rem; font-weight:700; color:#173761; }
-.package-grid-note { margin:.3rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-total { position:absolute; top:1rem; text-align:right; pointer-events:none; opacity:0; visibility:hidden; }
-.package-grid-total.is-ready { opacity:1; visibility:visible; }
-.package-grid-add-row { position:absolute; top:.85rem; right:1.15rem; }
+.package-grid-wrap { position:relative; border:1px solid rgba(199,165,106,.18); border-radius:22px; background:rgba(255,255,255,.82); overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.8); }
+.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:auto; padding:1rem 1.2rem .7rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
+.package-grid-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:1.05rem; font-weight:500; color:#284670; }
+.package-grid-note { margin:.28rem 0 0; font-size:.84rem; color:#6b7b90; }
+.package-grid-total { opacity:1; visibility:visible; }
+.package-grid-add-row { position:static; margin-top:.15rem; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
 .package-grid-total-currency { font-size:1.15rem; line-height:1; }
 .package-grid-table-wrap { overflow:auto; }
 .package-grid-table { width:100%; min-width:980px; border-collapse:separate; border-spacing:0; }
-.package-grid-table thead th { position:sticky; top:0; z-index:1; border:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.05), rgba(16,35,59,.02)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.74rem; font-weight:700; padding:.9rem .85rem; }
+.package-grid-table thead th { position:sticky; top:0; z-index:1; border:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(245,239,228,.78)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.74rem; font-weight:700; padding:.9rem .85rem; }
 .package-grid-table thead th.text-right { text-align:right; }
 .package-grid-table tbody td { border:0; border-bottom:1px solid rgba(16,35,59,.06); padding:.7rem .75rem; background:rgba(255,255,255,.72); vertical-align:middle; }
 .package-grid-table tbody tr:nth-child(odd) td { background:rgba(16,35,59,.03); }
@@ -141,7 +136,8 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar { min-height:0; padding-right:1.15rem; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-add-row { position:static; margin-top:.55rem; } .package-grid-total-value { font-size:1.7rem; } .package-actions { align-items:flex-start; } }
+@media (max-width:991.98px){ .package-form-head { flex-direction:column; } .package-total-card { width:100%; padding-left:0; text-align:left; } .package-total-card .package-grid-total-value { justify-content:flex-start; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-add-row { position:static; margin-top:.55rem; } .package-total-card .package-grid-total-value, .package-grid-total-value { font-size:2rem; } .package-actions { align-items:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -149,29 +145,34 @@
     @if(session('error'))<div class="alert package-error mb-4">{{ session('error') }}</div>@endif
 
     <section class="package-shell">
-        <div class="package-shell-header"><div><h2 class="package-shell-title">Manual Package Transaction Input</h2><p class="package-shell-subtitle">Build package transactions with a flexible grid instead of a fixed three-line form. The transaction number is generated automatically, and the final number is reserved safely on save.</p></div></div>
+        <div class="package-shell-header"><div><h2 class="package-shell-title">Package Transaction</h2><p class="package-shell-subtitle">Manual Input &bull; Secure &amp; Elegant</p></div></div>
         <div class="package-shell-body">
             <form method="POST" action="/menu-package-transaction" id="formPackageTransaction" autocomplete="off">
                 @csrf
                 <input type="hidden" id="CurrentNofak" value="">
                 <input type="hidden" name="GeneratedNofak" id="GeneratedNofak" value="{{ old('GeneratedNofak', $nextNofak) }}">
-                <div class="form-row">
-                    <div class="form-group col-md-4"><label class="package-label">Transaction Number</label><input type="text" id="DisplayNofak" class="form-control package-input" value="{{ old('GeneratedNofak', $nextNofak) }}" readonly></div>
-                    <div class="form-group col-md-4"><label class="package-label" for="Meja">Package Code</label><input type="text" name="Meja" id="Meja" class="form-control package-input" value="{{ old('Meja') }}" required></div>
-                    <div class="form-group col-md-4"><label class="package-label" for="ExpiredDisplay">Expired</label><input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', now()->format('Y-m-d')) }}"><input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', now()->format('Y-m-d')))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required></div>
+                <div class="package-form-head">
+                    <div class="package-form-fields">
+                        <div class="form-row">
+                            <div class="form-group col-lg-4"><label class="package-label">Transaction Number</label><input type="text" id="DisplayNofak" class="form-control package-input" value="{{ old('GeneratedNofak', $nextNofak) }}" readonly></div>
+                            <div class="form-group col-lg-5"><label class="package-label" for="Meja">Package Code</label><input type="text" name="Meja" id="Meja" class="form-control package-input" value="{{ old('Meja') }}" placeholder="Enter Package Code" required></div>
+                            <div class="form-group col-lg-3"><label class="package-label" for="ExpiredDisplay">Expiry Date</label><input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', now()->format('Y-m-d')) }}"><input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', now()->format('Y-m-d')))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required></div>
+                        </div>
+                    </div>
+                    <div class="package-total-card">
+                        <div class="package-grid-total" id="totalNominalPanel">
+                            <span class="package-grid-total-label">Total Amount</span>
+                            <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="package-grid-wrap">
                     <div class="package-grid-toolbar">
                         <div>
-                            <h3 class="package-grid-title">Package Line Grid</h3>
-                            <p class="package-grid-note">Default starts with 2 rows, and additional lines can be added from the Add Row button.</p>
+                            <h3 class="package-grid-title">Package Items</h3>
                         </div>
                         <button type="button" class="btn package-btn-add package-grid-add-row" id="addRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Row</button>
-                        <div class="package-grid-total" id="totalNominalPanel">
-                            <span class="package-grid-total-label">Total Amount</span>
-                            <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp.</span><span id="TotalNominal">0</span></strong>
-                        </div>
                     </div>
                     <div class="package-grid-table-wrap">
                         <table class="package-grid-table">
@@ -181,7 +182,7 @@
                                     <th width="300">Item Code</th>
                                     <th width="260">Item Name</th>
                                     <th width="120" class="text-right">Qty</th>
-                                    <th width="120" class="text-right">Price</th>
+                                    <th width="120" class="text-right">Unit Price</th>
                                     <th width="150" class="text-right" data-amount-header>Amount</th>
                                     <th width="90" class="text-center">Action</th>
                                 </tr>
@@ -254,7 +255,7 @@ const totalNominalPanel=document.getElementById('totalNominalPanel');
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
 function renameRows(){getRows().forEach((row,index)=>{row.querySelector('[data-line-number]').textContent=index+1;});}
-function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); if(!amountHeader||!totalNominalPanel){return;} if(window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const toolbar=amountHeader.closest('.package-grid-wrap')?.querySelector('.package-grid-toolbar'); if(!toolbar){return;} const toolbarRect=toolbar.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=(headerRect.left-toolbarRect.left)+'px'; totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
+function syncTotalAmountAlignment(){if(!totalNominalPanel){return;} totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready');}
 function createRow(detail={}){
     const fragment=rowTemplate.content.cloneNode(true);
     const row=fragment.querySelector('[data-row]');
