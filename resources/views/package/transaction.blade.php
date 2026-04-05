@@ -89,7 +89,7 @@
 .package-grid-toolbar-right { display:flex; align-items:flex-start; gap:1rem; margin-left:auto; }
 .package-grid-total { min-width:220px; text-align:right; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
-.package-grid-total-value { display:block; font-size:2.1rem; line-height:1; font-weight:800; color:#d9232e; letter-spacing:.03em; }
+.package-grid-total-value { display:block; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
 .package-grid-table-wrap { overflow:auto; }
 .package-grid-table { width:100%; min-width:980px; border-collapse:separate; border-spacing:0; }
 .package-grid-table thead th { position:sticky; top:0; z-index:1; border:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.05), rgba(16,35,59,.02)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.74rem; font-weight:700; padding:.9rem .85rem; }
