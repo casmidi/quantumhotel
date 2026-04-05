@@ -63,7 +63,10 @@
 .package-shell-body { padding:1.25rem 1.9rem 1.75rem; }
 .package-form-head { display:flex; align-items:flex-start; gap:1.5rem; margin-bottom:1.15rem; }
 .package-form-fields { flex:1 1 auto; }
-.package-total-card { flex:0 0 260px; padding:.25rem 0 0 1.1rem; text-align:right; }
+.package-total-card { flex:0 0 320px; padding:.25rem 0 0 1.1rem; }
+.package-total-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+.package-total-card-head .package-btn-add { margin-top:.15rem; flex-shrink:0; }
+.package-total-card .package-grid-total { margin-left:auto; text-align:right; }
 .package-total-card .package-grid-total-label { font-family:Georgia,"Times New Roman",serif; font-size:1rem; font-weight:600; letter-spacing:0; text-transform:none; color:#6e7f9b; }
 .package-total-card .package-grid-total-value { font-family:Georgia,"Times New Roman",serif; font-size:3rem; font-weight:500; color:#c7a56a; justify-content:flex-end; }
 .package-total-card .package-grid-total-currency { font-size:1.1em; }
@@ -136,7 +139,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:991.98px){ .package-form-head { flex-direction:column; } .package-total-card { width:100%; padding-left:0; text-align:left; } .package-total-card .package-grid-total-value { justify-content:flex-start; } }
+@media (max-width:991.98px){ .package-form-head { flex-direction:column; } .package-total-card { width:100%; padding-left:0; } .package-total-card-head { flex-wrap:wrap; } .package-total-card .package-grid-total { margin-left:0; text-align:left; } .package-total-card .package-grid-total-value { justify-content:flex-start; } }
 @media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-add-row { position:static; margin-top:.55rem; } .package-total-card .package-grid-total-value, .package-grid-total-value { font-size:2rem; } .package-actions { align-items:flex-start; } }
 </style>
 
@@ -160,9 +163,12 @@
                         </div>
                     </div>
                     <div class="package-total-card">
-                        <div class="package-grid-total" id="totalNominalPanel">
-                            <span class="package-grid-total-label">Total Amount</span>
-                            <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
+                        <div class="package-total-card-head">
+                            <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Row</button>
+                            <div class="package-grid-total" id="totalNominalPanel">
+                                <span class="package-grid-total-label">Total Amount</span>
+                                <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -172,7 +178,6 @@
                         <div>
                             <h3 class="package-grid-title">Package Items</h3>
                         </div>
-                        <button type="button" class="btn package-btn-add package-grid-add-row" id="addRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Row</button>
                     </div>
                     <div class="package-grid-table-wrap">
                         <table class="package-grid-table">
