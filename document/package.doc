@@ -81,7 +81,7 @@ Kolom yang diisi:
 Tujuan:
 - Memberi jalur manual untuk user yang ingin membentuk package dari item global yang sudah ada di StockPackage.
 - Form manual sekarang memakai grid fleksibel seperti spreadsheet ringan, bukan lagi form fixed tiga baris.
-- Hero manual transaction disederhanakan agar fokus ke input operasional, tanpa kartu summary total package/nominal/rata-rata.
+- Hero manual transaction disederhanakan agar fokus ke input operasional, tanpa kartu summary total package/nominal/rata-rata, dan halaman manual transaction memakai satu judul utama saja agar tidak terasa berulang.
 - Modul ini juga mengikuti standar CRUD project: Add, Edit, Delete, dan Search.
 
 Flow:

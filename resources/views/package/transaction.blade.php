@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Package Transactions')
+@section('title', '')
 
 @section('content')
 
@@ -147,12 +147,6 @@
 <div class="container-fluid package-page">
     @if(session('success'))<div class="alert package-alert mb-4" id="successAlert">{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert package-error mb-4">{{ session('error') }}</div>@endif
-
-    <section class="package-hero">
-        <div class="package-kicker"><span>Quantum Hotel</span><span>Package Transactions</span></div>
-        <h1>Package Transactions</h1>
-        <p>Create package transactions manually by selecting items from Package Items. This flexible line-item grid behaves like a lightweight spreadsheet so users can keep adding rows as needed.</p>
-    </section>
 
     <section class="package-shell">
         <div class="package-shell-header"><div><h2 class="package-shell-title">Manual Package Transaction Input</h2><p class="package-shell-subtitle">Build package transactions with a flexible grid instead of a fixed three-line form. The transaction number is generated automatically, and the final number is reserved safely on save.</p></div></div>
