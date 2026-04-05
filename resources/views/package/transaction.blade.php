@@ -82,12 +82,12 @@
 .package-alert, .package-error { border:0; border-radius:18px; padding:.95rem 1.15rem; box-shadow:0 14px 30px rgba(16,35,59,.08); }
 .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
 .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
-.package-grid-wrap { border:1px solid rgba(16,35,59,.08); border-radius:22px; background:rgba(255,255,255,.58); overflow:hidden; }
-.package-grid-toolbar { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.15rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
+.package-grid-wrap { position:relative; border:1px solid rgba(16,35,59,.08); border-radius:22px; background:rgba(255,255,255,.58); overflow:hidden; }
+.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; padding:1rem 1.15rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
 .package-grid-title { margin:0; font-size:.98rem; font-weight:700; color:#173761; }
 .package-grid-note { margin:.3rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-toolbar-right { display:grid; grid-template-columns:150px auto; align-items:flex-start; gap:1rem; margin-left:auto; }
-.package-grid-total { width:150px; text-align:right; }
+.package-grid-toolbar-right { display:flex; align-items:flex-start; gap:1rem; margin-left:auto; }
+.package-grid-total { position:absolute; top:1rem; text-align:right; pointer-events:none; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
 .package-grid-total-currency { font-size:1.15rem; line-height:1; }
@@ -138,7 +138,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar-right { width:100%; margin-left:0; grid-template-columns:1fr auto; } .package-grid-total { width:auto; } .package-grid-total-value { font-size:1.7rem; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar-right { width:100%; margin-left:0; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; } .package-grid-total-value { font-size:1.7rem; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -175,11 +175,11 @@
                             <h3 class="package-grid-title">Package Line Grid</h3>
                             <p class="package-grid-note">Default starts with 2 rows, and additional lines can be added from the Add Row button.</p>
                         </div>
+                        <div class="package-grid-total" id="totalNominalPanel">
+                            <span class="package-grid-total-label">Total Amount</span>
+                            <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp.</span><span id="TotalNominal">0</span></strong>
+                        </div>
                         <div class="package-grid-toolbar-right">
-                            <div class="package-grid-total">
-                                <span class="package-grid-total-label">Total Amount</span>
-                                <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp.</span><span id="TotalNominal">0</span></strong>
-                            </div>
                             <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
                         </div>
                     </div>
@@ -192,7 +192,7 @@
                                     <th width="260">Item Name</th>
                                     <th width="120" class="text-right">Qty</th>
                                     <th width="120" class="text-right">Price</th>
-                                    <th width="150" class="text-right">Amount</th>
+                                    <th width="150" class="text-right" data-amount-header>Amount</th>
                                     <th width="90" class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -254,6 +254,7 @@ const addRowButton=document.getElementById('addRowButton');
 const detailGridBody=document.getElementById('detailGridBody');
 const rowTemplate=document.getElementById('detailRowTemplate');
 const packageDirectoryShell=document.getElementById('packageDirectoryShell');
+const totalNominalPanel=document.getElementById('totalNominalPanel');
   const initialRows=@json($initialRows);
   const minimumRows=2;
   const defaultGeneratedNofak=@json(old('GeneratedNofak', $nextNofak));
@@ -261,6 +262,7 @@ const packageDirectoryShell=document.getElementById('packageDirectoryShell');
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
 function renameRows(){getRows().forEach((row,index)=>{row.querySelector('[data-line-number]').textContent=index+1;});}
+function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); if(!amountHeader||!totalNominalPanel){return;} if(window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; return;} const toolbar=amountHeader.closest('.package-grid-wrap')?.querySelector('.package-grid-toolbar'); if(!toolbar){return;} const toolbarRect=toolbar.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=(headerRect.left-toolbarRect.left)+'px'; totalNominalPanel.style.width=headerRect.width+'px';}
 function createRow(detail={}){
     const fragment=rowTemplate.content.cloneNode(true);
     const row=fragment.querySelector('[data-row]');
@@ -366,6 +368,8 @@ if(successAlert){setTimeout(()=>{successAlert.style.transition='opacity .3s ease
 resetGrid();
 setGeneratedNofak(defaultGeneratedNofak);
 expiredDisplayField.value=formatDisplayDate(expiredField.value);
+syncTotalAmountAlignment();
+window.addEventListener('resize', syncTotalAmountAlignment);
 mejaField.focus();
 </script>
 
