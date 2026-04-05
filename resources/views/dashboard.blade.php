@@ -322,6 +322,23 @@
         font-size: 0.82rem;
         font-weight: 600;
         padding-left: 0.1rem;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        transition: color 0.18s ease, transform 0.18s ease;
+    }
+
+    .breakdown-more:hover {
+        color: #173761;
+        transform: translateY(-1px);
+    }
+
+    .breakdown-code-extra {
+        display: none;
+    }
+
+    .breakdown-codes.is-expanded .breakdown-code-extra {
+        display: inline-flex;
     }
 
     .breakdown-right {
@@ -414,12 +431,15 @@
                     <div class="breakdown-text">
                         <strong>{{ $item['label'] }}</strong>
                         <span>Legacy occupied-room branch</span>
-                        <div class="breakdown-codes">
+                        <div class="breakdown-codes" data-breakdown-codes>
                             @foreach(array_slice($item['rooms'], 0, 8) as $roomCode)
                             <span class="breakdown-code">{{ $roomCode }}</span>
                             @endforeach
+                            @foreach(array_slice($item['rooms'], 8) as $roomCode)
+                            <span class="breakdown-code breakdown-code-extra">{{ $roomCode }}</span>
+                            @endforeach
                             @if(count($item['rooms']) > 8)
-                            <span class="breakdown-more">+{{ count($item['rooms']) - 8 }} more</span>
+                            <button type="button" class="breakdown-more" data-breakdown-toggle data-more-count="{{ count($item['rooms']) - 8 }}">+{{ count($item['rooms']) - 8 }} more</button>
                             @endif
                         </div>
                     </div>
@@ -433,4 +453,15 @@
         </div>
     </section>
 </div>
+<script>
+document.querySelectorAll('[data-breakdown-toggle]').forEach(function(button){
+    button.addEventListener('click', function(){
+        const codesWrap = button.closest('[data-breakdown-codes]');
+        if(!codesWrap){return;}
+        const isExpanded = codesWrap.classList.toggle('is-expanded');
+        const moreCount = button.getAttribute('data-more-count') || '0';
+        button.textContent = isExpanded ? 'Show less' : '+' + moreCount + ' more';
+    });
+});
+</script>
 @endsection
