@@ -86,7 +86,6 @@
 .package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:110px; padding:1rem 1.15rem 3.4rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
 .package-grid-title { margin:0; font-size:.98rem; font-weight:700; color:#173761; }
 .package-grid-note { margin:.3rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-toolbar-right { display:flex; align-items:flex-start; gap:1rem; margin-left:auto; }
 .package-grid-total { position:absolute; bottom:1rem; text-align:right; pointer-events:none; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
@@ -107,6 +106,7 @@
 .package-row-remove { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(178,34,34,.12); background:rgba(178,34,34,.08); color:#aa2f2f; text-decoration:none; }
 .package-row-remove:hover { background:#aa2f2f; color:#fff; text-decoration:none; }
 .package-grid-hint { margin-top:.8rem; color:#6b7b90; font-size:.84rem; }
+.package-grid-actions { margin-top:1rem; display:flex; justify-content:flex-end; }
 .package-search-form { display:flex; align-items:flex-end; gap:.75rem; flex-wrap:wrap; }
 .package-search-group { min-width:180px; flex:1 1 180px; }
 .package-search-actions { display:flex; gap:.65rem; flex-wrap:wrap; }
@@ -138,7 +138,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-toolbar-right { width:100%; margin-left:0; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-total-value { font-size:1.7rem; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-total-value { font-size:1.7rem; } .package-grid-actions { justify-content:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -179,9 +179,6 @@
                             <span class="package-grid-total-label">Total Amount</span>
                             <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp.</span><span id="TotalNominal">0</span></strong>
                         </div>
-                        <div class="package-grid-toolbar-right">
-                            <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
-                        </div>
                     </div>
                     <div class="package-grid-table-wrap">
                         <table class="package-grid-table">
@@ -202,6 +199,9 @@
                 </div>
 
                 <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
+                <div class="package-grid-actions">
+                    <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
+                </div>
 
                 <div class="package-actions"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button><button type="button" class="btn package-btn-secondary" id="resetButton">Reset Form</button></div>
             </form>
