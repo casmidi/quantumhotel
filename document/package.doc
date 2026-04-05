@@ -95,7 +95,7 @@ Flow:
 - Navigasi Enter di form manual mengikuti aturan baku project: Enter pindah ke field berikutnya, dan Enter pada field input terakhir default menjalankan save.
 - Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama.
 - Transaction Directory menyediakan search dengan opsi berdasarkan Invoice, Package Code / Name, atau Package Nominal.
-- Grid transaksi memakai pagination standar dengan tombol nomor halaman serta navigasi < dan >.`r`n- Header pada Transaction Directory bisa diklik untuk mengurutkan data berdasarkan Invoice, Package Code, Items, Expired, atau Nominal, baik ascending maupun descending.
+- Grid transaksi memakai pagination standar dengan tombol nomor halaman serta navigasi < dan >.`r`n- Saat user klik nomor halaman atau header sort, yang direfresh hanya Transaction Directory melalui JavaScript, sehingga form input di atas tidak ikut reset.`r`n- Header pada Transaction Directory bisa diklik untuk mengurutkan data berdasarkan Invoice, Package Code, Items, Expired, atau Nominal, baik ascending maupun descending.
 - Field Package Invoice menampilkan preview nofak berikutnya saat halaman dibuka atau saat tombol New Transaction ditekan.
 - Preview nofak tetap mengikuti pola prefix aktif dan sequence 4 digit, tetapi nofak final untuk transaksi baru baru benar-benar direserve saat proses save.
 - Save akan membuat header di Package dan detail di PackageD.

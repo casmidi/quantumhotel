@@ -65,6 +65,7 @@
 .package-stat-value { display:block; font-size:1.35rem; font-weight:700; color:#fff; }
 .package-shell { background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.6); box-shadow:0 18px 50px rgba(16,35,59,.1); backdrop-filter:blur(16px); border-radius:24px; overflow:hidden; }
 .package-shell + .package-shell { margin-top:1.5rem; }
+.package-shell.package-directory-loading { opacity:.72; pointer-events:none; transition:opacity .18s ease; }
 .package-shell-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.35rem 1.5rem 1rem; border-bottom:1px solid rgba(16,35,59,.08); }
 .package-shell-title { margin:0; font-size:1.1rem; font-weight:700; color:#10233b; }
 .package-shell-subtitle { margin:.35rem 0 0; font-size:.9rem; color:#5f6f84; }
@@ -199,7 +200,7 @@
         </div>
     </section>
 
-    <section class="package-shell">
+    <section class="package-shell" id="packageDirectoryShell">
         <div class="package-shell-header">
             <div>
                 <h2 class="package-shell-title">Transaction Directory</h2>
@@ -327,7 +328,7 @@ const totalNominalField=document.getElementById('TotalNominal');
 const addRowButton=document.getElementById('addRowButton');
 const detailGridBody=document.getElementById('detailGridBody');
 const rowTemplate=document.getElementById('detailRowTemplate');
-const transactionTableBody=document.querySelector('#tablePackageTransaction tbody');
+const packageDirectoryShell=document.getElementById('packageDirectoryShell');
   const initialRows=@json($initialRows);
   const minimumRows=2;
   const defaultGeneratedNofak=@json(old('GeneratedNofak', $nextNofak));
@@ -376,6 +377,7 @@ function createRow(detail={}){
   function getEnterFlowFields(){return [mejaField, expiredDisplayField, ...getRows().flatMap((row)=>[row.querySelector('.item-code'), row.querySelector('.item-qty'), row.querySelector('.item-price')]).filter((field)=>field && !field.disabled)];}
   function focusNextEnterField(currentField){const fields=getEnterFlowFields(); const index=fields.indexOf(currentField); if(index!==-1 && index < fields.length-1){const nextField=fields[index+1]; nextField.focus(); if(typeof nextField.select==='function' && nextField.tagName!=='SELECT'){nextField.select();} return true;} return false;}
   function submitFromEnter(){if(typeof form.requestSubmit==='function'){form.requestSubmit(saveButton);} else {saveButton.click();}}
+  function syncPackageDirectory(url){if(!packageDirectoryShell||!url){return;} packageDirectoryShell.classList.add('package-directory-loading'); fetch(url,{headers:{'X-Requested-With':'XMLHttpRequest'}}).then((response)=>response.text()).then((html)=>{const parser=new DOMParser(); const doc=parser.parseFromString(html,'text/html'); const nextShell=doc.getElementById('packageDirectoryShell'); if(!nextShell){window.location.href=url; return;} packageDirectoryShell.innerHTML=nextShell.innerHTML; window.history.replaceState({},'',url);}).catch(()=>{window.location.href=url;}).finally(()=>{packageDirectoryShell.classList.remove('package-directory-loading');});}
 
 addRowButton.addEventListener('click', function(){const row=createRow({qty:'1'}); const select=row.querySelector('.item-code'); if(select){select.focus();}});
 
@@ -385,7 +387,44 @@ detailGridBody.addEventListener('input', function(event){const row=event.target.
 
   detailGridBody.addEventListener('click', function(event){const removeButton=event.target.closest('.package-row-remove'); if(!removeButton){return;} const row=removeButton.closest('[data-row]'); if(!row){return;} const rows=getRows(); if(rows.length<=1){row.querySelector('.item-code').value=''; row.querySelector('.item-name').value=''; row.querySelector('.item-qty').value='1'; row.querySelector('.item-price').value=''; row.querySelector('.item-price').dataset.autofill='1'; updateTotals(); return;} row.remove(); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();});
 
-transactionTableBody.addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.nofak){return;} if(row.dataset.used==='1'){return;} const details=JSON.parse(row.dataset.details||'[]'); currentNofakField.value=row.dataset.nofak; setGeneratedNofak(row.dataset.nofak); mejaField.value=row.dataset.meja||''; expiredField.value=row.dataset.expired||''; expiredDisplayField.value=formatDisplayDate(row.dataset.expired||''); form.action='/menu-package-transaction/'+row.dataset.nofak+'/update'; saveButton.textContent='Update Package Transaction'; resetButton.textContent='Cancel Edit'; resetGrid(details); mejaField.focus();});
+packageDirectoryShell.addEventListener('click', function(event){
+    const pageLink = event.target.closest('.package-pagination .package-page-link');
+    const sortLink = event.target.closest('.package-sort-link');
+    const directoryLink = pageLink || sortLink;
+
+    if(directoryLink){
+        const href = directoryLink.getAttribute('href') || '';
+        if(href !== '' && href !== '#'){
+            event.preventDefault();
+            syncPackageDirectory(href);
+        }
+        return;
+    }
+
+    if(event.target.closest('a')){return;}
+    const row=event.target.closest('#tablePackageTransaction tbody tr');
+    if(!row||!row.dataset.nofak){return;}
+    if(row.dataset.used==='1'){return;}
+    const details=JSON.parse(row.dataset.details||'[]');
+    currentNofakField.value=row.dataset.nofak;
+    setGeneratedNofak(row.dataset.nofak);
+    mejaField.value=row.dataset.meja||'';
+    expiredField.value=row.dataset.expired||'';
+    expiredDisplayField.value=formatDisplayDate(row.dataset.expired||'');
+    form.action='/menu-package-transaction/'+row.dataset.nofak+'/update';
+    saveButton.textContent='Update Package Transaction';
+    resetButton.textContent='Cancel Edit';
+    resetGrid(details);
+    mejaField.focus();
+});
+
+packageDirectoryShell.addEventListener('submit', function(event){
+    const searchForm = event.target.closest('.package-search-form');
+    if(!searchForm){return;}
+    event.preventDefault();
+    const query = new URLSearchParams(new FormData(searchForm)).toString();
+    syncPackageDirectory(searchForm.action + (query ? '?' + query : ''));
+});
 
   newTransactionButton.addEventListener('click', function(){activateCreateMode();});
   resetButton.addEventListener('click', function(){activateCreateMode();});
