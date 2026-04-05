@@ -81,7 +81,7 @@
 .package-grid-total { position:absolute; top:.85rem; opacity:1; visibility:visible; text-align:right; pointer-events:none; }
 .package-grid-add-row { position:absolute; top:.82rem; right:1.2rem; margin-top:0; flex-shrink:0; pointer-events:auto; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-family:Georgia,"Times New Roman",serif; font-size:1rem; font-weight:600; letter-spacing:0; text-transform:none; color:#6e7f9b; }
-.package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-family:Georgia,"Times New Roman",serif; font-size:3rem; line-height:1; font-weight:500; color:#c7a56a; letter-spacing:0; }
+.package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-family:Georgia,"Times New Roman",serif; font-size:2.55rem; line-height:1; font-weight:500; color:#c7a56a; letter-spacing:0; }
 .package-grid-total-currency { font-size:1.1em; line-height:1; }
 .package-grid-table-wrap { overflow:auto; }
 .package-grid-table { width:100%; min-width:980px; border-collapse:separate; border-spacing:0; }
