@@ -89,7 +89,8 @@
 .package-grid-toolbar-right { display:grid; grid-template-columns:170px auto; align-items:flex-start; gap:1rem; margin-left:auto; }
 .package-grid-total { width:170px; text-align:right; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
-.package-grid-total-value { display:block; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
+.package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
+.package-grid-total-currency { font-size:1.15rem; line-height:1; }
 .package-grid-table-wrap { overflow:auto; }
 .package-grid-table { width:100%; min-width:980px; border-collapse:separate; border-spacing:0; }
 .package-grid-table thead th { position:sticky; top:0; z-index:1; border:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.05), rgba(16,35,59,.02)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.74rem; font-weight:700; padding:.9rem .85rem; }
@@ -177,7 +178,7 @@
                         <div class="package-grid-toolbar-right">
                             <div class="package-grid-total">
                                 <span class="package-grid-total-label">Total Amount</span>
-                                <strong class="package-grid-total-value" id="TotalNominal">Rp. 0</strong>
+                                <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp.</span><span id="TotalNominal">0</span></strong>
                             </div>
                             <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
                         </div>
@@ -294,7 +295,7 @@ function createRow(detail={}){
     lineTotal.textContent='Rp. '+formatRibuan(Math.round(qty*price).toString()||'0');
     return qty*price;
   }
-  function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.textContent='Rp. '+formatRibuan(Math.round(total).toString()); renameRows();}
+  function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.textContent=formatRibuan(Math.round(total).toString()); renameRows();}
   function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:(initialRows&&initialRows.length?initialRows.slice(0, minimumRows):[{qty:'1'},{qty:'1'}]); rows.forEach((detail)=>createRow(detail)); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();}
   function setGeneratedNofak(value){const normalized=(value||'').toString().trim(); generatedNofakField.value=normalized; displayNofakField.value=normalized;}
   function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); setGeneratedNofak(defaultGeneratedNofak); mejaField.focus();}
