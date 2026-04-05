@@ -333,13 +333,7 @@
         transform: translateY(-1px);
     }
 
-    .breakdown-code-extra {
-        display: none;
-    }
 
-    .breakdown-codes.is-expanded .breakdown-code-extra {
-        display: inline-flex;
-    }
 
     .breakdown-right {
         text-align: right;
@@ -436,7 +430,7 @@
                             <span class="breakdown-code">{{ $roomCode }}</span>
                             @endforeach
                             @foreach(array_slice($item['rooms'], 8) as $roomCode)
-                            <span class="breakdown-code breakdown-code-extra">{{ $roomCode }}</span>
+                            <span class="breakdown-code breakdown-code-extra" hidden>{{ $roomCode }}</span>
                             @endforeach
                             @if(count($item['rooms']) > 8)
                             <button type="button" class="breakdown-more" data-breakdown-toggle data-more-count="{{ count($item['rooms']) - 8 }}">+{{ count($item['rooms']) - 8 }} more</button>
@@ -458,9 +452,16 @@ document.querySelectorAll('[data-breakdown-toggle]').forEach(function(button){
     button.addEventListener('click', function(){
         const codesWrap = button.closest('[data-breakdown-codes]');
         if(!codesWrap){return;}
-        const isExpanded = codesWrap.classList.toggle('is-expanded');
+        const hiddenCodes = codesWrap.querySelectorAll('.breakdown-code-extra');
         const moreCount = button.getAttribute('data-more-count') || '0';
-        button.textContent = isExpanded ? 'Show less' : '+' + moreCount + ' more';
+        const isExpanded = button.getAttribute('data-expanded') === '1';
+
+        hiddenCodes.forEach(function(code){
+            code.hidden = isExpanded;
+        });
+
+        button.setAttribute('data-expanded', isExpanded ? '0' : '1');
+        button.textContent = isExpanded ? '+' + moreCount + ' more' : 'Show less';
     });
 });
 </script>
