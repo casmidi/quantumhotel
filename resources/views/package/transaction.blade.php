@@ -151,11 +151,6 @@
         <div class="package-kicker"><span>Quantum Hotel</span><span>Package Transactions</span></div>
         <h1>Package Transactions</h1>
         <p>Create package transactions manually by selecting items from Package Items. This flexible line-item grid behaves like a lightweight spreadsheet so users can keep adding rows as needed.</p>
-        <div class="row package-summary">
-            <div class="col-md-4 mb-3 mb-md-0"><div class="package-stat"><span class="package-stat-label">Total Package</span><span class="package-stat-value">{{ number_format($summary['total'], 0, ',', '.') }}</span></div></div>
-            <div class="col-md-4 mb-3 mb-md-0"><div class="package-stat"><span class="package-stat-label">Total Nominal</span><span class="package-stat-value">Rp {{ number_format($summary['nominal'], 0, ',', '.') }}</span></div></div>
-            <div class="col-md-4"><div class="package-stat"><span class="package-stat-label">Average Package</span><span class="package-stat-value">Rp {{ number_format($avgNominal, 0, ',', '.') }}</span></div></div>
-        </div>
     </section>
 
     <section class="package-shell">
