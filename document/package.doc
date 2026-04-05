@@ -95,7 +95,7 @@ Flow:
 - Grid default menampilkan 2 baris awal.
 - Penambahan baris berikutnya dilakukan manual melalui tombol Add Row.
 - Total amount ditampilkan di toolbar kanan atas pada area grid, dan field total terpisah di bawah grid sudah dihilangkan agar tampilan lebih ringkas serta sejajar dengan kolom Amount.
-- Format nominal pada grid dan total toolbar memakai prefix `Rp`/`Rp.` dalam satu baris yang sama dengan angka. Total Amount ditampilkan di header grid dan lebarnya mengikuti kolom Amount agar sejajar dengan nominal di grid, sedangkan tombol Add Row ditempatkan sebaris di pojok kanan sebagai aksi pendamping yang lebih kecil dari tombol utama.
+- Format nominal pada grid dan total toolbar memakai prefix `Rp`/`Rp.` dalam satu baris yang sama dengan angka. Total Amount ditampilkan di header grid, posisi kirinya mengikuti kolom Amount agar sejajar dengan nominal di grid, sedangkan tombol Add Row ditempatkan sebaris di pojok kanan sebagai aksi pendamping yang lebih kecil dari tombol utama.
 - Navigasi Enter di form manual mengikuti aturan baku project: Enter pindah ke field berikutnya, dan pada grid package alurnya berjalan dari item code ke qty lalu langsung ke item code berikutnya karena field price bersifat read-only.
 - Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama. Tombol reset terpisah sengaja tidak dipakai agar aksi form tidak dobel.
 - Transaction Directory menyediakan search dengan opsi berdasarkan Invoice, Package Code / Name, atau Package Nominal.

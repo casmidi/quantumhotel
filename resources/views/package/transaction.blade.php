@@ -75,12 +75,12 @@
 .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
 .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
 .package-grid-wrap { position:relative; border:1px solid rgba(199,165,106,.18); border-radius:22px; background:rgba(255,255,255,.82); overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.8); }
-.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:auto; padding:1rem 1.2rem .7rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
-.package-grid-toolbar-right { display:flex; align-items:flex-start; justify-content:flex-end; gap:.85rem; margin-left:auto; min-width:340px; }
+.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:106px; padding:1rem 1.2rem .7rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
+.package-grid-toolbar-right { position:absolute; top:.95rem; right:1.2rem; left:1.2rem; min-width:0; pointer-events:none; }
 .package-grid-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:1.05rem; font-weight:500; color:#284670; }
 .package-grid-note { margin:.28rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-total { opacity:1; visibility:visible; text-align:right; margin-left:auto; }
-.package-grid-add-row { position:static; margin-top:.15rem; flex-shrink:0; }
+.package-grid-total { position:absolute; top:0; opacity:1; visibility:visible; text-align:right; }
+.package-grid-add-row { position:absolute; top:.1rem; right:0; margin-top:0; flex-shrink:0; pointer-events:auto; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-family:Georgia,"Times New Roman",serif; font-size:1rem; font-weight:600; letter-spacing:0; text-transform:none; color:#6e7f9b; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-family:Georgia,"Times New Roman",serif; font-size:3rem; line-height:1; font-weight:500; color:#c7a56a; letter-spacing:0; }
 .package-grid-total-currency { font-size:1.1em; line-height:1; }
@@ -132,8 +132,8 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:991.98px){ .package-grid-toolbar-right { min-width:0; width:100%; justify-content:space-between; } }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-toolbar-right { width:100%; flex-wrap:wrap; gap:.55rem; } .package-grid-total { width:auto !important; pointer-events:auto; margin-top:.35rem; text-align:left; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
+@media (max-width:991.98px){ .package-grid-toolbar-right { left:1.2rem; right:1.2rem; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-toolbar-right { position:static; width:100%; pointer-events:auto; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.35rem; text-align:left; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -249,7 +249,7 @@ const totalNominalPanel=document.getElementById('totalNominalPanel');
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
 function renameRows(){getRows().forEach((row,index)=>{row.querySelector('[data-line-number]').textContent=index+1;});}
-function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); if(!totalNominalPanel){return;} if(!amountHeader || window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
+function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); const toolbar=totalNominalPanel?.closest('.package-grid-toolbar'); if(!totalNominalPanel){return;} if(!amountHeader || !toolbar || window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const toolbarRect=toolbar.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=(headerRect.left-toolbarRect.left)+'px'; totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
 function createRow(detail={}){
     const fragment=rowTemplate.content.cloneNode(true);
     const row=fragment.querySelector('[data-row]');
