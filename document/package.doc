@@ -92,6 +92,7 @@ Flow:
 - Sistem menghitung total nominal package.
 - Grid default menampilkan 2 baris awal.
 - Penambahan baris berikutnya dilakukan manual melalui tombol Add Row.
+- Total nominal ditampilkan di toolbar kanan atas pada area grid, dan field total nominal terpisah di bawah grid sudah dihilangkan agar tampilan lebih ringkas.
 - Navigasi Enter di form manual mengikuti aturan baku project: Enter pindah ke field berikutnya, dan Enter pada field input terakhir default menjalankan save.
 - Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama.
 - Transaction Directory menyediakan search dengan opsi berdasarkan Invoice, Package Code / Name, atau Package Nominal.

@@ -86,9 +86,14 @@
 .package-grid-toolbar { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.15rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
 .package-grid-title { margin:0; font-size:.98rem; font-weight:700; color:#173761; }
 .package-grid-note { margin:.3rem 0 0; font-size:.84rem; color:#6b7b90; }
+.package-grid-toolbar-right { display:flex; align-items:flex-start; gap:1rem; margin-left:auto; }
+.package-grid-total { min-width:220px; text-align:right; }
+.package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
+.package-grid-total-value { display:block; font-size:2.1rem; line-height:1; font-weight:800; color:#d9232e; letter-spacing:.03em; }
 .package-grid-table-wrap { overflow:auto; }
 .package-grid-table { width:100%; min-width:980px; border-collapse:separate; border-spacing:0; }
 .package-grid-table thead th { position:sticky; top:0; z-index:1; border:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.05), rgba(16,35,59,.02)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.74rem; font-weight:700; padding:.9rem .85rem; }
+.package-grid-table thead th.text-right { text-align:right; }
 .package-grid-table tbody td { border:0; border-bottom:1px solid rgba(16,35,59,.06); padding:.7rem .75rem; background:rgba(255,255,255,.72); vertical-align:middle; }
 .package-grid-table tbody tr:nth-child(odd) td { background:rgba(16,35,59,.03); }
 .package-grid-table tbody tr:hover td { background:rgba(179,138,81,.05); }
@@ -132,7 +137,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar-right { width:100%; margin-left:0; justify-content:space-between; } .package-grid-total { min-width:0; } .package-grid-total-value { font-size:1.7rem; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -169,7 +174,13 @@
                             <h3 class="package-grid-title">Package Line Grid</h3>
                             <p class="package-grid-note">Default starts with 2 rows, and additional lines can be added from the Add Row button.</p>
                         </div>
-                        <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
+                        <div class="package-grid-toolbar-right">
+                            <div class="package-grid-total">
+                                <span class="package-grid-total-label">Total Nominal</span>
+                                <strong class="package-grid-total-value" id="TotalNominal">Rp 0</strong>
+                            </div>
+                            <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
+                        </div>
                     </div>
                     <div class="package-grid-table-wrap">
                         <table class="package-grid-table">
@@ -178,8 +189,8 @@
                                     <th width="70">Line</th>
                                     <th width="300">Item Code</th>
                                     <th width="260">Item Name</th>
-                                    <th width="120">Qty</th>
-                                    <th width="170">Price</th>
+                                    <th width="120" class="text-right">Qty</th>
+                                    <th width="170" class="text-right">Price</th>
                                     <th width="170" class="text-right">Amount</th>
                                     <th width="90" class="text-center">Action</th>
                                 </tr>
@@ -190,10 +201,6 @@
                 </div>
 
                 <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
-
-                <div class="form-row mt-3">
-                    <div class="form-group col-md-6"><label class="package-label">Total Nominal</label><input type="text" id="TotalNominal" class="form-control package-input text-right" value="0" readonly></div>
-                </div>
 
                 <div class="package-actions"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button><button type="button" class="btn package-btn-secondary" id="resetButton">Reset Form</button></div>
             </form>
@@ -287,7 +294,7 @@ function createRow(detail={}){
     lineTotal.textContent='Rp '+formatRibuan(Math.round(qty*price).toString()||'0');
     return qty*price;
   }
-  function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.value=formatRibuan(Math.round(total).toString()); renameRows();}
+  function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.textContent='Rp '+formatRibuan(Math.round(total).toString()); renameRows();}
   function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:(initialRows&&initialRows.length?initialRows.slice(0, minimumRows):[{qty:'1'},{qty:'1'}]); rows.forEach((detail)=>createRow(detail)); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();}
   function setGeneratedNofak(value){const normalized=(value||'').toString().trim(); generatedNofakField.value=normalized; displayNofakField.value=normalized;}
   function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); setGeneratedNofak(defaultGeneratedNofak); mejaField.focus();}
