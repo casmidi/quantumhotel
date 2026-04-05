@@ -86,8 +86,8 @@
 .package-grid-toolbar { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.15rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
 .package-grid-title { margin:0; font-size:.98rem; font-weight:700; color:#173761; }
 .package-grid-note { margin:.3rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-toolbar-right { display:grid; grid-template-columns:170px auto; align-items:flex-start; gap:1rem; margin-left:auto; }
-.package-grid-total { width:170px; text-align:right; }
+.package-grid-toolbar-right { display:grid; grid-template-columns:150px auto; align-items:flex-start; gap:1rem; margin-left:auto; }
+.package-grid-total { width:150px; text-align:right; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
 .package-grid-total-currency { font-size:1.15rem; line-height:1; }
@@ -191,8 +191,8 @@
                                     <th width="300">Item Code</th>
                                     <th width="260">Item Name</th>
                                     <th width="120" class="text-right">Qty</th>
-                                    <th width="140" class="text-right">Price</th>
-                                    <th width="170" class="text-right">Amount</th>
+                                    <th width="120" class="text-right">Price</th>
+                                    <th width="150" class="text-right">Amount</th>
                                     <th width="90" class="text-center">Action</th>
                                 </tr>
                             </thead>
