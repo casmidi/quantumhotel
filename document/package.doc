@@ -107,7 +107,7 @@ Logika penting:
 - item code yang sama tidak boleh dipilih lebih dari sekali dalam satu transaksi package
 - Saat update, sistem hapus dulu detail lama di PackageD lalu insert ulang detail baru.
 - Update hanya boleh dilakukan bila header Package memang masih ada.
-- Jika nofak package sudah dipakai di tabel DATA2 pada field PACKAGE, package tidak boleh diupdate dan directory menandainya dengan badge "Used in".
+- Jika nofak package sudah dipakai di tabel DATA2 pada field PACKAGE, package tidak boleh diupdate walaupun directory tidak lagi menampilkan badge khusus.
 - Klik row tabel memuat transaksi ke form edit.
 - Transaction Directory hanya menampilkan package yang belum expired.
 - Hasil search tetap hanya mengambil package dengan Expired >= hari ini.

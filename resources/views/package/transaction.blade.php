@@ -123,7 +123,7 @@
 .package-delete { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:rgba(178,34,34,.08); color:#aa2f2f; border:1px solid rgba(178,34,34,.12); text-decoration:none; font-size:1rem; transition:all .18s ease; }
 .package-delete:hover { background:#aa2f2f; color:#fff; text-decoration:none; transform:translateY(-1px); }
 .package-empty { text-align:center; padding:2.2rem 1rem; color:#6b7b90; }
-.package-used-badge { display:inline-flex; align-items:center; gap:.35rem; margin-top:.55rem; padding:.28rem .55rem; border-radius:999px; background:rgba(179,52,70,.12); color:#9e2f41; font-size:.72rem; font-weight:700; letter-spacing:.04em; }
+
 .package-disabled-action { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:rgba(16,35,59,.08); color:#6b7b90; border:1px solid rgba(16,35,59,.1); }
 .package-pagination-wrap { display:flex; justify-content:flex-end; padding:1rem 1.4rem 1.4rem; border-top:1px solid rgba(16,35,59,.08); background:rgba(255,255,255,.58); }
 .package-pagination { display:flex; align-items:center; gap:.45rem; margin:0; padding:0; list-style:none; }
@@ -234,9 +234,7 @@
             <tr class="{{ $package->is_used ? 'package-row-locked' : '' }}" data-nofak="{{ $package->Nofak }}" data-meja="{{ $package->Meja }}" data-expired="{{ \Carbon\Carbon::parse($package->Expired)->format('Y-m-d') }}" data-details='@json(json_decode($package->detail_json, true))' data-used="{{ $package->is_used ? '1' : '0' }}">
                 <td>
                     <span class="package-code">{{ $package->Nofak }}</span>
-                    @if($package->is_used)
-                    <div><span class="package-used-badge"><i class="fa-solid fa-lock"></i>Used in</span></div>
-                    @endif
+
                 </td>
                 <td>{{ $package->Meja }}</td>
                 <td>{{ $package->detail_summary }}</td>
