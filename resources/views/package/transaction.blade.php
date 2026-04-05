@@ -75,12 +75,11 @@
 .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
 .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
 .package-grid-wrap { position:relative; border:1px solid rgba(199,165,106,.18); border-radius:22px; background:rgba(255,255,255,.82); overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.8); }
-.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:106px; padding:1rem 1.2rem .7rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
-.package-grid-toolbar-right { position:absolute; top:.95rem; right:1.2rem; left:1.2rem; min-width:0; pointer-events:none; }
+.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:108px; padding:1rem 1.2rem .7rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
 .package-grid-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:1.05rem; font-weight:500; color:#284670; }
 .package-grid-note { margin:.28rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-total { position:absolute; top:0; opacity:1; visibility:visible; text-align:right; }
-.package-grid-add-row { position:absolute; top:.1rem; right:0; margin-top:0; flex-shrink:0; pointer-events:auto; }
+.package-grid-total { position:absolute; top:.85rem; opacity:1; visibility:visible; text-align:right; pointer-events:none; }
+.package-grid-add-row { position:absolute; top:.82rem; right:1.2rem; margin-top:0; flex-shrink:0; pointer-events:auto; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-family:Georgia,"Times New Roman",serif; font-size:1rem; font-weight:600; letter-spacing:0; text-transform:none; color:#6e7f9b; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-family:Georgia,"Times New Roman",serif; font-size:3rem; line-height:1; font-weight:500; color:#c7a56a; letter-spacing:0; }
 .package-grid-total-currency { font-size:1.1em; line-height:1; }
@@ -132,8 +131,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:991.98px){ .package-grid-toolbar-right { left:1.2rem; right:1.2rem; } }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-toolbar-right { position:static; width:100%; pointer-events:auto; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.35rem; text-align:left; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.35rem; text-align:left; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -160,13 +158,11 @@
                         <div>
                             <h3 class="package-grid-title">Package Items</h3>
                         </div>
-                        <div class="package-grid-toolbar-right">
-                            <div class="package-grid-total" id="totalNominalPanel">
-                                <span class="package-grid-total-label">Total Amount</span>
-                                <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
-                            </div>
-                            <button type="button" class="btn package-btn-add package-grid-add-row" id="addRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Row</button>
+                        <div class="package-grid-total" id="totalNominalPanel">
+                            <span class="package-grid-total-label">Total Amount</span>
+                            <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
                         </div>
+                        <button type="button" class="btn package-btn-add package-grid-add-row" id="addRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Row</button>
                     </div>
                     <div class="package-grid-table-wrap">
                         <table class="package-grid-table">
