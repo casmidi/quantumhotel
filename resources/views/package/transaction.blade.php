@@ -158,14 +158,14 @@
     </section>
 
     <section class="package-shell">
-        <div class="package-shell-header"><div><h2 class="package-shell-title">Manual Package Transaction Input</h2><p class="package-shell-subtitle">Build package transactions with a flexible grid instead of a fixed three-line form. The invoice number shown here is a preview, while the final number is reserved safely on save.</p></div><span class="package-shell-badge">Transaction CRUD</span></div>
+        <div class="package-shell-header"><div><h2 class="package-shell-title">Manual Package Transaction Input</h2><p class="package-shell-subtitle">Build package transactions with a flexible grid instead of a fixed three-line form. The transaction number is generated automatically, and the final number is reserved safely on save.</p></div><span class="package-shell-badge">Transaction CRUD</span></div>
         <div class="package-shell-body">
-            <form method="POST" action="/menu-package-transaction" id="formPackageTransaction">
+            <form method="POST" action="/menu-package-transaction" id="formPackageTransaction" autocomplete="off">
                 @csrf
                 <input type="hidden" id="CurrentNofak" value="">
                 <input type="hidden" name="GeneratedNofak" id="GeneratedNofak" value="{{ old('GeneratedNofak', $nextNofak) }}">
                 <div class="form-row">
-                    <div class="form-group col-md-4"><label class="package-label">Package Invoice Preview</label><input type="text" id="DisplayNofak" class="form-control package-input" value="{{ old('GeneratedNofak', $nextNofak) }}" readonly></div>
+                    <div class="form-group col-md-4"><label class="package-label">Transaction Number</label><input type="text" id="DisplayNofak" class="form-control package-input" value="{{ old('GeneratedNofak', $nextNofak) }}" readonly></div>
                     <div class="form-group col-md-4"><label class="package-label" for="Meja">Package Code</label><input type="text" name="Meja" id="Meja" class="form-control package-input" value="{{ old('Meja') }}" required></div>
                     <div class="form-group col-md-4"><label class="package-label" for="ExpiredDisplay">Expired</label><input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', now()->format('Y-m-d')) }}"><input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', now()->format('Y-m-d')))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required></div>
                 </div>
@@ -254,11 +254,12 @@ const totalNominalField=document.getElementById('TotalNominal');
 const addRowButton=document.getElementById('addRowButton');
 const detailGridBody=document.getElementById('detailGridBody');
 const rowTemplate=document.getElementById('detailRowTemplate');
-const packageDirectoryShell=document.getElementById('packageDirectoryShell');
+  const packageDirectoryShell=document.getElementById('packageDirectoryShell');
 const totalNominalPanel=document.getElementById('totalNominalPanel');
   const initialRows=@json($initialRows);
   const minimumRows=2;
   const defaultGeneratedNofak=@json(old('GeneratedNofak', $nextNofak));
+  const resetAfterSuccess=@json(session()->has('success'));
 
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
@@ -371,7 +372,7 @@ setGeneratedNofak(defaultGeneratedNofak);
 expiredDisplayField.value=formatDisplayDate(expiredField.value);
 syncTotalAmountAlignment();
 window.addEventListener('resize', syncTotalAmountAlignment);
-mejaField.focus();
+if(resetAfterSuccess){activateCreateMode();} else {mejaField.focus();}
 </script>
 
 @endsection
