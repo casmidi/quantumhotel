@@ -58,7 +58,7 @@
                 <td>{{ $package->Meja }}</td>
                 <td>{{ $package->detail_summary }}</td>
                 <td>{{ \Carbon\Carbon::parse($package->Expired)->format('d-m-Y') }}</td>
-                <td class="text-right">Rp {{ number_format($package->JumlahRes ?? 0, 0, ',', '.') }}</td>
+                <td class="text-right">Rp. {{ number_format($package->JumlahRes ?? 0, 0, ',', '.') }}</td>
                 <td class="text-center">
                     @if($package->is_used)
                     <span class="package-disabled-action" title="This package transaction is already used." aria-label="Locked"><i class="fa-solid fa-lock"></i></span>

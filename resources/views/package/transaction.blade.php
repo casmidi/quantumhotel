@@ -177,7 +177,7 @@
                         <div class="package-grid-toolbar-right">
                             <div class="package-grid-total">
                                 <span class="package-grid-total-label">Total Amount</span>
-                                <strong class="package-grid-total-value" id="TotalNominal">Rp 0</strong>
+                                <strong class="package-grid-total-value" id="TotalNominal">Rp. 0</strong>
                             </div>
                             <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
                         </div>
@@ -190,7 +190,7 @@
                                     <th width="300">Item Code</th>
                                     <th width="260">Item Name</th>
                                     <th width="120" class="text-right">Qty</th>
-                                    <th width="170" class="text-right">Price</th>
+                                    <th width="140" class="text-right">Price</th>
                                     <th width="170" class="text-right">Amount</th>
                                     <th width="90" class="text-center">Action</th>
                                 </tr>
@@ -224,7 +224,7 @@
         <td><input type="text" class="form-control package-input item-name" readonly></td>
         <td><input type="text" name="Qty[]" class="form-control package-input text-right item-qty" value="1"></td>
         <td><input type="text" name="Price[]" class="form-control package-input text-right item-price" inputmode="numeric"></td>
-        <td class="text-right"><span class="line-total">Rp 0</span></td>
+        <td class="text-right"><span class="line-total">Rp. 0</span></td>
         <td class="text-center"><button type="button" class="package-row-remove" title="Remove line" aria-label="Remove line"><i class="fa-solid fa-trash"></i></button></td>
     </tr>
 </template>
@@ -291,10 +291,10 @@ function createRow(detail={}){
     if(!selected||!selected.value){nameField.value=''; if(priceField.dataset.autofill==='1'){priceField.value='';}}
     const qty=qtyValue(qtyField.value||'1');
     const price=parseFloat(unformat(priceField.value)||'0')||0;
-    lineTotal.textContent='Rp '+formatRibuan(Math.round(qty*price).toString()||'0');
+    lineTotal.textContent='Rp. '+formatRibuan(Math.round(qty*price).toString()||'0');
     return qty*price;
   }
-  function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.textContent='Rp '+formatRibuan(Math.round(total).toString()); renameRows();}
+  function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.textContent='Rp. '+formatRibuan(Math.round(total).toString()); renameRows();}
   function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:(initialRows&&initialRows.length?initialRows.slice(0, minimumRows):[{qty:'1'},{qty:'1'}]); rows.forEach((detail)=>createRow(detail)); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();}
   function setGeneratedNofak(value){const normalized=(value||'').toString().trim(); generatedNofakField.value=normalized; displayNofakField.value=normalized;}
   function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; saveButton.textContent='Save Package Transaction'; resetButton.textContent='Reset Form'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); setGeneratedNofak(defaultGeneratedNofak); mejaField.focus();}
