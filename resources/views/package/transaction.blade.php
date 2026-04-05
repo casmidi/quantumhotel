@@ -78,17 +78,18 @@
 .package-actions-main { display:flex; gap:.75rem; flex-wrap:wrap; }
 .package-btn-primary { border:0; border-radius:999px; padding:.75rem 1.4rem; font-weight:700; background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); box-shadow:0 12px 26px rgba(23,55,97,.2); color:#fff; }
 .package-btn-secondary { border-radius:999px; padding:.75rem 1.3rem; font-weight:700; border:1px solid rgba(16,35,59,.12); background:rgba(255,255,255,.78); color:#173761; }
-.package-btn-add { border-radius:999px; padding:.72rem 1.2rem; font-weight:700; border:1px dashed rgba(23,55,97,.22); background:rgba(23,55,97,.05); color:#173761; }
+.package-btn-add { border-radius:999px; padding:.48rem .9rem; font-size:.82rem; font-weight:700; line-height:1.1; border:1px dashed rgba(23,55,97,.22); background:rgba(23,55,97,.05); color:#173761; }
 .package-btn-add:hover { background:rgba(23,55,97,.1); }
 .package-alert, .package-error { border:0; border-radius:18px; padding:.95rem 1.15rem; box-shadow:0 14px 30px rgba(16,35,59,.08); }
 .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
 .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
 .package-grid-wrap { position:relative; border:1px solid rgba(16,35,59,.08); border-radius:22px; background:rgba(255,255,255,.58); overflow:hidden; }
-.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:92px; padding:1rem 1.15rem 2.35rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
+.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:92px; padding:1rem 1.15rem 2.35rem; padding-right:9.75rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
 .package-grid-title { margin:0; font-size:.98rem; font-weight:700; color:#173761; }
 .package-grid-note { margin:.3rem 0 0; font-size:.84rem; color:#6b7b90; }
 .package-grid-total { position:absolute; top:1rem; text-align:right; pointer-events:none; opacity:0; visibility:hidden; }
 .package-grid-total.is-ready { opacity:1; visibility:visible; }
+.package-grid-add-row { position:absolute; top:.85rem; right:1.15rem; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
 .package-grid-total-currency { font-size:1.15rem; line-height:1; }
@@ -140,7 +141,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-total-value { font-size:1.7rem; } .package-actions { align-items:flex-start; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar { min-height:0; padding-right:1.15rem; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-add-row { position:static; margin-top:.55rem; } .package-grid-total-value { font-size:1.7rem; } .package-actions { align-items:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -172,6 +173,7 @@
                             <h3 class="package-grid-title">Package Line Grid</h3>
                             <p class="package-grid-note">Default starts with 2 rows, and additional lines can be added from the Add Row button.</p>
                         </div>
+                        <button type="button" class="btn package-btn-add package-grid-add-row" id="addRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Row</button>
                         <div class="package-grid-total" id="totalNominalPanel">
                             <span class="package-grid-total-label">Total Amount</span>
                             <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp.</span><span id="TotalNominal">0</span></strong>
@@ -199,7 +201,6 @@
 
                 <div class="package-actions">
                     <div class="package-actions-main"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button><button type="button" class="btn package-btn-secondary" id="resetButton">Reset Form</button></div>
-                    <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
                 </div>
             </form>
         </div>
