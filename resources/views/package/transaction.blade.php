@@ -86,8 +86,8 @@
 .package-grid-toolbar { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.15rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
 .package-grid-title { margin:0; font-size:.98rem; font-weight:700; color:#173761; }
 .package-grid-note { margin:.3rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-toolbar-right { display:flex; align-items:flex-start; gap:1rem; margin-left:auto; }
-.package-grid-total { min-width:220px; text-align:right; }
+.package-grid-toolbar-right { display:grid; grid-template-columns:170px auto; align-items:flex-start; gap:1rem; margin-left:auto; }
+.package-grid-total { width:170px; text-align:right; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
 .package-grid-total-value { display:block; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
 .package-grid-table-wrap { overflow:auto; }
@@ -137,7 +137,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar-right { width:100%; margin-left:0; justify-content:space-between; } .package-grid-total { min-width:0; } .package-grid-total-value { font-size:1.7rem; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-grid-toolbar-right { width:100%; margin-left:0; grid-template-columns:1fr auto; } .package-grid-total { width:auto; } .package-grid-total-value { font-size:1.7rem; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -176,7 +176,7 @@
                         </div>
                         <div class="package-grid-toolbar-right">
                             <div class="package-grid-total">
-                                <span class="package-grid-total-label">Total Nominal</span>
+                                <span class="package-grid-total-label">Total Amount</span>
                                 <strong class="package-grid-total-value" id="TotalNominal">Rp 0</strong>
                             </div>
                             <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-2"></i>Add Row</button>
