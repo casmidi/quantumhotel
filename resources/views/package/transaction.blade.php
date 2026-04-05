@@ -87,7 +87,8 @@
 .package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:92px; padding:1rem 1.15rem 2.35rem; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.03), rgba(16,35,59,.01)); }
 .package-grid-title { margin:0; font-size:.98rem; font-weight:700; color:#173761; }
 .package-grid-note { margin:.3rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-total { position:absolute; top:1rem; text-align:right; pointer-events:none; }
+.package-grid-total { position:absolute; top:1rem; text-align:right; pointer-events:none; opacity:0; visibility:hidden; }
+.package-grid-total.is-ready { opacity:1; visibility:visible; }
 .package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
 .package-grid-total-currency { font-size:1.15rem; line-height:1; }
@@ -264,7 +265,7 @@ const totalNominalPanel=document.getElementById('totalNominalPanel');
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
 function renameRows(){getRows().forEach((row,index)=>{row.querySelector('[data-line-number]').textContent=index+1;});}
-function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); if(!amountHeader||!totalNominalPanel){return;} if(window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; return;} const toolbar=amountHeader.closest('.package-grid-wrap')?.querySelector('.package-grid-toolbar'); if(!toolbar){return;} const toolbarRect=toolbar.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=(headerRect.left-toolbarRect.left)+'px'; totalNominalPanel.style.width=headerRect.width+'px';}
+function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); if(!amountHeader||!totalNominalPanel){return;} if(window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const toolbar=amountHeader.closest('.package-grid-wrap')?.querySelector('.package-grid-toolbar'); if(!toolbar){return;} const toolbarRect=toolbar.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=(headerRect.left-toolbarRect.left)+'px'; totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
 function createRow(detail={}){
     const fragment=rowTemplate.content.cloneNode(true);
     const row=fragment.querySelector('[data-row]');
