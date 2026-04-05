@@ -61,15 +61,7 @@
 .package-shell-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:2.6rem; font-weight:500; color:#233f6b; line-height:1; letter-spacing:.01em; }
 .package-shell-subtitle { margin:.45rem 0 0; font-size:1rem; color:#c19a58; }
 .package-shell-body { padding:1.25rem 1.9rem 1.75rem; }
-.package-form-head { display:flex; align-items:flex-start; gap:1.5rem; margin-bottom:1.15rem; }
-.package-form-fields { flex:1 1 auto; }
-.package-total-card { flex:0 0 320px; padding:.25rem 0 0 1.1rem; }
-.package-total-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
-.package-total-card-head .package-btn-add { margin-top:.15rem; flex-shrink:0; }
-.package-total-card .package-grid-total { margin-left:auto; text-align:right; }
-.package-total-card .package-grid-total-label { font-family:Georgia,"Times New Roman",serif; font-size:1rem; font-weight:600; letter-spacing:0; text-transform:none; color:#6e7f9b; }
-.package-total-card .package-grid-total-value { font-family:Georgia,"Times New Roman",serif; font-size:3rem; font-weight:500; color:#c7a56a; justify-content:flex-end; }
-.package-total-card .package-grid-total-currency { font-size:1.1em; }
+.package-form-head { margin-bottom:1.15rem; }
 .package-label { display:block; font-size:.84rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#5f6f84; margin-bottom:.55rem; }
 .package-input, .package-select { height:calc(2.7rem + 2px); border-radius:14px; border:1px solid rgba(199,165,106,.34); box-shadow:inset 0 1px 2px rgba(16,35,59,.04); background:rgba(255,255,255,.95); color:#10233b; font-weight:600; }
 .package-input:focus, .package-select:focus { border-color:rgba(199,165,106,.88); box-shadow:0 0 0 .2rem rgba(199,165,106,.12); }
@@ -84,13 +76,14 @@
 .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
 .package-grid-wrap { position:relative; border:1px solid rgba(199,165,106,.18); border-radius:22px; background:rgba(255,255,255,.82); overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.8); }
 .package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:auto; padding:1rem 1.2rem .7rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
+.package-grid-toolbar-right { display:flex; align-items:flex-start; justify-content:flex-end; gap:.85rem; margin-left:auto; min-width:340px; }
 .package-grid-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:1.05rem; font-weight:500; color:#284670; }
 .package-grid-note { margin:.28rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-total { opacity:1; visibility:visible; }
-.package-grid-add-row { position:static; margin-top:.15rem; }
-.package-grid-total-label { display:block; margin-bottom:.2rem; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b9ab0; }
-.package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-size:2.1rem; line-height:1; font-weight:800; color:#173761; letter-spacing:.03em; }
-.package-grid-total-currency { font-size:1.15rem; line-height:1; }
+.package-grid-total { opacity:1; visibility:visible; text-align:right; margin-left:auto; }
+.package-grid-add-row { position:static; margin-top:.15rem; flex-shrink:0; }
+.package-grid-total-label { display:block; margin-bottom:.2rem; font-family:Georgia,"Times New Roman",serif; font-size:1rem; font-weight:600; letter-spacing:0; text-transform:none; color:#6e7f9b; }
+.package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-family:Georgia,"Times New Roman",serif; font-size:3rem; line-height:1; font-weight:500; color:#c7a56a; letter-spacing:0; }
+.package-grid-total-currency { font-size:1.1em; line-height:1; }
 .package-grid-table-wrap { overflow:auto; }
 .package-grid-table { width:100%; min-width:980px; border-collapse:separate; border-spacing:0; }
 .package-grid-table thead th { position:sticky; top:0; z-index:1; border:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(245,239,228,.78)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.74rem; font-weight:700; padding:.9rem .85rem; }
@@ -139,8 +132,8 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:991.98px){ .package-form-head { flex-direction:column; } .package-total-card { width:100%; padding-left:0; } .package-total-card-head { flex-wrap:wrap; } .package-total-card .package-grid-total { margin-left:0; text-align:left; } .package-total-card .package-grid-total-value { justify-content:flex-start; } }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.75rem; } .package-grid-add-row { position:static; margin-top:.55rem; } .package-total-card .package-grid-total-value, .package-grid-total-value { font-size:2rem; } .package-actions { align-items:flex-start; } }
+@media (max-width:991.98px){ .package-grid-toolbar-right { min-width:0; width:100%; justify-content:space-between; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-toolbar-right { width:100%; flex-wrap:wrap; gap:.55rem; } .package-grid-total { width:auto !important; pointer-events:auto; margin-top:.35rem; text-align:left; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -155,21 +148,10 @@
                 <input type="hidden" id="CurrentNofak" value="">
                 <input type="hidden" name="GeneratedNofak" id="GeneratedNofak" value="{{ old('GeneratedNofak', $nextNofak) }}">
                 <div class="package-form-head">
-                    <div class="package-form-fields">
-                        <div class="form-row">
-                            <div class="form-group col-lg-4"><label class="package-label">Transaction Number</label><input type="text" id="DisplayNofak" class="form-control package-input" value="{{ old('GeneratedNofak', $nextNofak) }}" readonly></div>
-                            <div class="form-group col-lg-5"><label class="package-label" for="Meja">Package Code</label><input type="text" name="Meja" id="Meja" class="form-control package-input" value="{{ old('Meja') }}" placeholder="Enter Package Code" required></div>
-                            <div class="form-group col-lg-3"><label class="package-label" for="ExpiredDisplay">Expiry Date</label><input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', now()->format('Y-m-d')) }}"><input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', now()->format('Y-m-d')))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required></div>
-                        </div>
-                    </div>
-                    <div class="package-total-card">
-                        <div class="package-total-card-head">
-                            <button type="button" class="btn package-btn-add" id="addRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Row</button>
-                            <div class="package-grid-total" id="totalNominalPanel">
-                                <span class="package-grid-total-label">Total Amount</span>
-                                <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
-                            </div>
-                        </div>
+                    <div class="form-row">
+                        <div class="form-group col-lg-4"><label class="package-label">Transaction Number</label><input type="text" id="DisplayNofak" class="form-control package-input" value="{{ old('GeneratedNofak', $nextNofak) }}" readonly></div>
+                        <div class="form-group col-lg-5"><label class="package-label" for="Meja">Package Code</label><input type="text" name="Meja" id="Meja" class="form-control package-input" value="{{ old('Meja') }}" placeholder="Enter Package Code" required></div>
+                        <div class="form-group col-lg-3"><label class="package-label" for="ExpiredDisplay">Expiry Date</label><input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', now()->format('Y-m-d')) }}"><input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', now()->format('Y-m-d')))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required></div>
                     </div>
                 </div>
 
@@ -177,6 +159,13 @@
                     <div class="package-grid-toolbar">
                         <div>
                             <h3 class="package-grid-title">Package Items</h3>
+                        </div>
+                        <div class="package-grid-toolbar-right">
+                            <div class="package-grid-total" id="totalNominalPanel">
+                                <span class="package-grid-total-label">Total Amount</span>
+                                <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
+                            </div>
+                            <button type="button" class="btn package-btn-add package-grid-add-row" id="addRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Row</button>
                         </div>
                     </div>
                     <div class="package-grid-table-wrap">
@@ -260,7 +249,7 @@ const totalNominalPanel=document.getElementById('totalNominalPanel');
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
 function renameRows(){getRows().forEach((row,index)=>{row.querySelector('[data-line-number]').textContent=index+1;});}
-function syncTotalAmountAlignment(){if(!totalNominalPanel){return;} totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready');}
+function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); if(!totalNominalPanel){return;} if(!amountHeader || window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
 function createRow(detail={}){
     const fragment=rowTemplate.content.cloneNode(true);
     const row=fragment.querySelector('[data-row]');
