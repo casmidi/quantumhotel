@@ -154,7 +154,7 @@
     </section>
 
     <section class="package-shell">
-        <div class="package-shell-header"><div><h2 class="package-shell-title">Manual Package Transaction Input</h2><p class="package-shell-subtitle">Build package transactions with a flexible grid instead of a fixed three-line form. The transaction number is generated automatically, and the final number is reserved safely on save.</p></div><span class="package-shell-badge">Transaction CRUD</span></div>
+        <div class="package-shell-header"><div><h2 class="package-shell-title">Manual Package Transaction Input</h2><p class="package-shell-subtitle">Build package transactions with a flexible grid instead of a fixed three-line form. The transaction number is generated automatically, and the final number is reserved safely on save.</p></div></div>
         <div class="package-shell-body">
             <form method="POST" action="/menu-package-transaction" id="formPackageTransaction" autocomplete="off">
                 @csrf
