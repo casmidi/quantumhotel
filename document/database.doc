@@ -1,0 +1,202 @@
+DOKUMENTASI DATABASE: BGF
+File document: D:\laravel\quantum\document\database.doc
+Database: BGF
+Server: SERVERDEV
+Terakhir diperbarui: 2026-04-05
+
+1. TUJUAN DOKUMENTASI
+Dokumentasi ini mencatat optimasi database yang dilakukan untuk membantu performa modul Package Transactions, khususnya saat:
+- pagination antar halaman
+- sort per kolom
+- cek package yang sudah dipakai
+- load detail package per invoice
+- load item package dari StockPackage
+
+2. TEMUAN SAAT PENGECEKAN
+Tabel yang diperiksa:
+- Package
+- PackageD
+- DATA2
+- STOCKPACKAGE
+
+Hasil pengecekan awal:
+- tabel-tabel di atas belum memiliki index nonclustered yang relevan untuk query Package Transactions
+- jumlah data saat dicek:
+  - DATA2 = 138824
+  - Package = 11340
+  - PackageD = 20675
+  - STOCKPACKAGE = 6379
+
+Struktur kolom penting:
+- Package.Nofak = char(20)
+- Package.Meja = char(50)
+- Package.Expired = datetime
+- Package.JumlahRes = money
+- PackageD.Nofak = char(20)
+- PackageD.KodeBrg = char(20)
+- PackageD.NoUrut = int
+- DATA2.Package = char(50)
+- STOCKPACKAGE.KodeBrg = char(20)
+
+3. INDEX YANG DIBUAT
+A. Package
+1. IX_Package_Expired_Nofak
+- Key columns:
+  - Expired
+  - Nofak
+- Include columns:
+  - Meja
+  - JumlahRes
+
+Fungsi:
+- mempercepat filter package aktif berdasarkan expired
+- membantu sort dan paging invoice
+- mengurangi lookup tambahan saat grid transaction directory dimuat
+
+2. IX_Package_Meja_Expired
+- Key columns:
+  - Meja
+  - Expired
+- Include columns:
+  - Nofak
+  - JumlahRes
+
+Fungsi:
+- membantu pencarian package code
+- membantu validasi duplicate package code + expired
+
+B. PackageD
+1. IX_PackageD_Nofak_NoUrut
+- Key columns:
+  - Nofak
+  - NoUrut
+- Include columns:
+  - KodeBrg
+  - Qty
+  - Harga
+  - Jumlah
+
+Fungsi:
+- mempercepat pengambilan detail item per invoice
+- menjaga urutan detail tetap cepat saat dibaca untuk grid edit
+
+C. DATA2
+1. IX_DATA2_Package
+- Key columns:
+  - Package
+
+Fungsi:
+- mempercepat pengecekan apakah package sudah dipakai di transaksi guest
+- membantu blok update dan delete pada package yang sudah terpakai
+
+D. STOCKPACKAGE
+1. IX_StockPackage_KodeBrg
+- Key columns:
+  - KodeBrg
+- Include columns:
+  - NamaBrg
+  - Hj
+  - Kind
+
+Fungsi:
+- mempercepat lookup item package saat user memilih item
+- mempercepat mapping item saat detail package dibuka kembali
+
+4. QUERY SQL YANG DIGUNAKAN
+Query berikut digunakan untuk membuat index secara aman, hanya jika index belum ada:
+
+```sql
+USE BGF;
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'IX_Package_Expired_Nofak'
+      AND object_id = OBJECT_ID('dbo.Package')
+)
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_Package_Expired_Nofak
+    ON dbo.Package (Expired, Nofak)
+    INCLUDE (Meja, JumlahRes);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'IX_PackageD_Nofak_NoUrut'
+      AND object_id = OBJECT_ID('dbo.PackageD')
+)
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_PackageD_Nofak_NoUrut
+    ON dbo.PackageD (Nofak, NoUrut)
+    INCLUDE (KodeBrg, Qty, Harga, Jumlah);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'IX_DATA2_Package'
+      AND object_id = OBJECT_ID('dbo.DATA2')
+)
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_DATA2_Package
+    ON dbo.DATA2 (Package);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'IX_StockPackage_KodeBrg'
+      AND object_id = OBJECT_ID('dbo.STOCKPACKAGE')
+)
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_StockPackage_KodeBrg
+    ON dbo.STOCKPACKAGE (KodeBrg)
+    INCLUDE (NamaBrg, Kind, Hj);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'IX_Package_Meja_Expired'
+      AND object_id = OBJECT_ID('dbo.Package')
+)
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_Package_Meja_Expired
+    ON dbo.Package (Meja, Expired)
+    INCLUDE (Nofak, JumlahRes);
+END;
+GO
+```
+
+5. QUERY VERIFIKASI INDEX
+Query berikut dipakai untuk memastikan index benar-benar sudah aktif:
+
+```sql
+SELECT
+    t.name AS table_name,
+    i.name AS index_name,
+    i.type_desc
+FROM sys.tables t
+JOIN sys.indexes i ON i.object_id = t.object_id
+WHERE t.name IN ('Package','PackageD','DATA2','STOCKPACKAGE')
+  AND i.index_id > 0
+ORDER BY t.name, i.name;
+```
+
+Hasil verifikasi:
+- DATA2 -> IX_DATA2_Package
+- Package -> IX_Package_Expired_Nofak
+- Package -> IX_Package_Meja_Expired
+- PackageD -> IX_PackageD_Nofak_NoUrut
+- STOCKPACKAGE -> IX_StockPackage_KodeBrg
+
+6. CATATAN TEKNIS
+- Karena banyak kolom lama masih memakai tipe char, beberapa query Laravel masih menggunakan RTRIM saat baca data.
+- Index di atas tetap membantu, tetapi performa bisa lebih baik lagi bila query di masa depan semakin dikurangi ketergantungannya pada RTRIM di kondisi WHERE dan ORDER BY.
+- Untuk saat ini, index yang dibuat sudah cukup aman dan relevan untuk beban modul Package Transactions yang sedang dipakai.
