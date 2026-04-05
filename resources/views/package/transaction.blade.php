@@ -69,7 +69,7 @@
 .package-actions-main { display:flex; gap:.75rem; flex-wrap:wrap; }
 .package-btn-primary { border:0; border-radius:999px; padding:.82rem 1.5rem; font-weight:700; background:linear-gradient(135deg,#cba246 0%,#d8b86a 55%,#b58a36 100%); box-shadow:0 14px 28px rgba(201,164,83,.24); color:#fff; }
 .package-btn-secondary { border-radius:999px; padding:.78rem 1.35rem; font-weight:700; border:1px solid rgba(199,165,106,.52); background:rgba(255,255,255,.9); color:#bb9857; }
-.package-btn-add { border-radius:999px; padding:.42rem .82rem; font-size:.78rem; font-weight:700; line-height:1.1; border:1px dashed rgba(199,165,106,.62); background:rgba(199,165,106,.09); color:#8f6a2d; }
+.package-btn-add { border-radius:999px; padding:.34rem .68rem; font-size:.72rem; font-weight:700; line-height:1.05; border:1px dashed rgba(199,165,106,.62); background:rgba(199,165,106,.09); color:#8f6a2d; }
 .package-btn-add:hover { background:rgba(199,165,106,.16); color:#7e5920; }
 .package-alert, .package-error { border:0; border-radius:18px; padding:.95rem 1.15rem; box-shadow:0 14px 30px rgba(16,35,59,.08); }
 .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
@@ -245,7 +245,7 @@ const totalNominalPanel=document.getElementById('totalNominalPanel');
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
 function renameRows(){getRows().forEach((row,index)=>{row.querySelector('[data-line-number]').textContent=index+1;});}
-function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); const toolbar=totalNominalPanel?.closest('.package-grid-toolbar'); if(!totalNominalPanel){return;} if(!amountHeader || !toolbar || window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const toolbarRect=toolbar.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=(headerRect.left-toolbarRect.left)+'px'; totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
+function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); const toolbar=totalNominalPanel?.closest('.package-grid-toolbar'); if(!totalNominalPanel){return;} if(!amountHeader || !toolbar || window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const toolbarRect=toolbar.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=Math.max(0,(headerRect.left-toolbarRect.left)-26)+'px'; totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
 function createRow(detail={}){
     const fragment=rowTemplate.content.cloneNode(true);
     const row=fragment.querySelector('[data-row]');
