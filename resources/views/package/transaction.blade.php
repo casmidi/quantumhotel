@@ -67,7 +67,7 @@
 .package-shell + .package-shell { margin-top:1.5rem; }
 .package-shell.package-directory-loading { opacity:.72; pointer-events:none; transition:opacity .18s ease; }
 .package-shell-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.35rem 1.5rem 1rem; border-bottom:1px solid rgba(16,35,59,.08); }
-.package-shell-title { margin:0; font-size:1.1rem; font-weight:700; color:#10233b; }
+.package-shell-title { margin:0; font-size:1.28rem; font-weight:700; color:#10233b; line-height:1.2; }
 .package-shell-subtitle { margin:.35rem 0 0; font-size:.9rem; color:#5f6f84; }
 .package-shell-badge { display:inline-flex; align-items:center; gap:.4rem; padding:.55rem .8rem; border-radius:999px; background:rgba(179,138,81,.12); color:#8b6232; font-weight:700; font-size:.82rem; }
 .package-shell-body { padding:1.5rem; }
