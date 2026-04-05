@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class PackageTransactionController extends Controller
@@ -26,83 +27,12 @@ class PackageTransactionController extends Controller
             ->orderBy('KodeBrg')
             ->get();
 
-        $packagesQuery = DB::table('Package')
-            ->selectRaw("RTRIM(Nofak) as Nofak, RTRIM(Meja) as Meja, JumlahRes, Expired")
-            ->whereDate('Expired', '>=', Carbon::today()->format('Y-m-d'));
-
-        if ($searchValue !== '') {
-            $normalizedSearch = strtoupper($searchValue);
-            $normalizedNominal = $this->normalizeMoney($searchValue);
-
-            $packagesQuery->where(function ($query) use ($searchType, $normalizedSearch, $normalizedNominal) {
-                if (in_array($searchType, ['all', 'invoice'], true)) {
-                    $query->orWhereRaw('UPPER(RTRIM(Nofak)) LIKE ?', ['%' . $normalizedSearch . '%']);
-                }
-
-                if (in_array($searchType, ['all', 'package'], true)) {
-                    $query->orWhereRaw('UPPER(RTRIM(Meja)) LIKE ?', ['%' . $normalizedSearch . '%']);
-                }
-
-                if ($normalizedNominal > 0 && in_array($searchType, ['all', 'nominal'], true)) {
-                    $query->orWhere('JumlahRes', '=', $normalizedNominal);
-                }
-            });
-        }
-
-        $packageCollection = $packagesQuery->get();
-
-        $summary = [
-            'total' => $packageCollection->count(),
-            'nominal' => (float) $packageCollection->sum('JumlahRes'),
-        ];
-
-        $packageNofaks = $packageCollection->pluck('Nofak')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
-
-        $details = DB::table('PackageD')
-            ->selectRaw("RTRIM(Nofak) as Nofak, RTRIM(KodeBrg) as KodeBrg, Qty, Harga, Jumlah, NoUrut")
-            ->when(!empty($packageNofaks), fn ($query) => $query->whereIn(DB::raw('RTRIM(Nofak)'), $packageNofaks))
-            ->orderBy('NoUrut')
-            ->get()
-            ->groupBy('Nofak');
-
-        $usedPackages = collect();
-        if (!empty($packageNofaks)) {
-            $usedPackages = DB::table('DATA2')
-                ->selectRaw("RTRIM(Package) as Package")
-                ->whereIn(DB::raw('RTRIM(Package)'), $packageNofaks)
-                ->get()
-                ->pluck('Package')
-                ->map(fn ($value) => trim((string) $value))
-                ->flip();
-        }
-
-        $itemMap = $items->keyBy('KodeBrg');
-        $packageCollection = $packageCollection->map(function ($package) use ($details, $itemMap, $usedPackages) {
-            $detailRows = collect($details->get($package->Nofak, []))->map(function ($detail) use ($itemMap) {
-                $mapped = $itemMap->get($detail->KodeBrg);
-
-                return [
-                    'kode' => $detail->KodeBrg,
-                    'name' => $mapped->NamaBrg ?? $detail->KodeBrg,
-                    'kind' => $mapped->Kind ?? '',
-                    'qty' => (float) $detail->Qty,
-                    'price' => (float) $detail->Harga,
-                    'amount' => (float) $detail->Jumlah,
-                    'sort' => (int) $detail->NoUrut,
-                ];
-            })->values();
-
-            $package->detail_json = $detailRows->toJson();
-            $package->detail_summary = $detailRows->pluck('kode')->implode(', ');
-            $package->is_used = $usedPackages->has(trim((string) $package->Nofak));
-
-            return $package;
-        })->values();
-
-        $packageCollection = $this->sortPackages($packageCollection, $sortBy, $sortDir);
-        $packages = $this->paginateCollection($packageCollection, $perPage, $request);
-
+        [$packages, $summary] = $this->loadPagedPackages($request, $searchType, $searchValue, $sortBy, $sortDir, $perPage);
         $nextNofak = $this->previewPackageNofak();
+
+        if ($request->ajax()) {
+            return view('package.partials.transaction-directory-section', compact('packages', 'summary', 'searchType', 'searchValue', 'sortBy', 'sortDir'))->render();
+        }
 
         return view('package.transaction', compact('items', 'packages', 'summary', 'nextNofak', 'searchType', 'searchValue', 'sortBy', 'sortDir'));
     }
@@ -131,6 +61,185 @@ class PackageTransactionController extends Controller
         });
 
         return redirect('/menu-package-transaction')->with('success', 'Package transaction deleted successfully');
+    }
+
+    private function loadPagedPackages(Request $request, string $searchType, string $searchValue, string $sortBy, string $sortDir, int $perPage): array
+    {
+        $page = max((int) $request->query('page', 1), 1);
+        $offsetStart = (($page - 1) * $perPage) + 1;
+        $offsetEnd = $offsetStart + $perPage - 1;
+
+        $bindings = [];
+        $whereClause = $this->buildPackageWhereClause($searchType, $searchValue, $bindings);
+        $summaryRow = DB::selectOne(
+            "SELECT COUNT(*) AS total, ISNULL(SUM(CAST(P.JumlahRes AS float)), 0) AS nominal FROM Package P WHERE $whereClause",
+            $bindings
+        );
+
+        $summary = [
+            'total' => (int) ($summaryRow->total ?? 0),
+            'nominal' => (float) ($summaryRow->nominal ?? 0),
+        ];
+
+        if ($summary['total'] === 0) {
+            $packages = new LengthAwarePaginator(collect(), 0, $perPage, $page, [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]);
+
+            return [$packages, $summary];
+        }
+
+        $sortExpression = $this->resolvePackageSortExpression($sortBy);
+        $direction = $sortDir === 'asc' ? 'ASC' : 'DESC';
+        $rowSql = "
+            SELECT paged.Nofak, paged.Meja, paged.JumlahRes, paged.Expired
+            FROM (
+                SELECT
+                    ROW_NUMBER() OVER (ORDER BY $sortExpression $direction, RTRIM(P.Nofak) $direction) AS row_num,
+                    RTRIM(P.Nofak) AS Nofak,
+                    RTRIM(P.Meja) AS Meja,
+                    P.JumlahRes,
+                    P.Expired
+                FROM Package P
+                WHERE $whereClause
+            ) AS paged
+            WHERE paged.row_num BETWEEN ? AND ?
+            ORDER BY paged.row_num
+        ";
+
+        $pageRows = collect(DB::select($rowSql, array_merge($bindings, [$offsetStart, $offsetEnd])));
+        $packageNofaks = $pageRows->pluck('Nofak')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
+        $details = $this->loadPackageDetails($packageNofaks);
+        $usedPackages = $this->loadUsedPackages($packageNofaks);
+        $itemMap = $this->loadStockItemMap();
+
+        $pageRows = $pageRows->map(function ($package) use ($details, $itemMap, $usedPackages) {
+            $detailRows = collect($details->get($package->Nofak, []))->map(function ($detail) use ($itemMap) {
+                $mapped = $itemMap->get($detail->KodeBrg);
+
+                return [
+                    'kode' => $detail->KodeBrg,
+                    'name' => $mapped->NamaBrg ?? $detail->KodeBrg,
+                    'kind' => $mapped->Kind ?? '',
+                    'qty' => (float) $detail->Qty,
+                    'price' => (float) $detail->Harga,
+                    'amount' => (float) $detail->Jumlah,
+                    'sort' => (int) $detail->NoUrut,
+                ];
+            })->values();
+
+            $package->detail_json = $detailRows->toJson();
+            $package->detail_summary = $detailRows->pluck('kode')->implode(', ');
+            $package->is_used = $usedPackages->has(trim((string) $package->Nofak));
+
+            return $package;
+        })->values();
+
+        $packages = new LengthAwarePaginator(
+            $pageRows,
+            $summary['total'],
+            $perPage,
+            $page,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+
+        return [$packages, $summary];
+    }
+
+    private function buildPackageWhereClause(string $searchType, string $searchValue, array &$bindings): string
+    {
+        $bindings[] = Carbon::today()->format('Y-m-d');
+        $clauses = ['P.Expired >= ?'];
+
+        if ($searchValue === '') {
+            return implode(' AND ', $clauses);
+        }
+
+        $normalizedSearch = strtoupper(trim($searchValue));
+        $normalizedNominal = $this->normalizeMoney($searchValue);
+
+        if (in_array($searchType, ['all', 'invoice'], true)) {
+            $invoiceClause = 'UPPER(RTRIM(P.Nofak)) LIKE ?';
+        }
+
+        if (in_array($searchType, ['all', 'package'], true)) {
+            $packageClause = 'UPPER(RTRIM(P.Meja)) LIKE ?';
+        }
+
+        $searchClauses = [];
+
+        if (!empty($invoiceClause ?? null)) {
+            $searchClauses[] = $invoiceClause;
+            $bindings[] = '%' . $normalizedSearch . '%';
+        }
+
+        if (!empty($packageClause ?? null)) {
+            $searchClauses[] = $packageClause;
+            $bindings[] = '%' . $normalizedSearch . '%';
+        }
+
+        if ($normalizedNominal > 0 && in_array($searchType, ['all', 'nominal'], true)) {
+            $searchClauses[] = 'P.JumlahRes = ?';
+            $bindings[] = $normalizedNominal;
+        }
+
+        if (!empty($searchClauses)) {
+            $clauses[] = '(' . implode(' OR ', $searchClauses) . ')';
+        }
+
+        return implode(' AND ', $clauses);
+    }
+
+    private function resolvePackageSortExpression(string $sortBy): string
+    {
+        return match ($sortBy) {
+            'package' => 'RTRIM(P.Meja)',
+            'items' => "ISNULL((SELECT TOP 1 RTRIM(PD.KodeBrg) FROM PackageD PD WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) ORDER BY PD.NoUrut ASC, RTRIM(PD.KodeBrg) ASC), '')",
+            'expired' => 'P.Expired',
+            'nominal' => 'P.JumlahRes',
+            default => 'RTRIM(P.Nofak)',
+        };
+    }
+
+    private function loadPackageDetails(array $packageNofaks)
+    {
+        if (empty($packageNofaks)) {
+            return collect();
+        }
+
+        return DB::table('PackageD')
+            ->selectRaw("RTRIM(Nofak) as Nofak, RTRIM(KodeBrg) as KodeBrg, Qty, Harga, Jumlah, NoUrut")
+            ->whereIn(DB::raw('RTRIM(Nofak)'), $packageNofaks)
+            ->orderBy('NoUrut')
+            ->get()
+            ->groupBy('Nofak');
+    }
+
+    private function loadUsedPackages(array $packageNofaks)
+    {
+        if (empty($packageNofaks)) {
+            return collect();
+        }
+
+        return DB::table('DATA2')
+            ->selectRaw("RTRIM(Package) as Package")
+            ->whereIn(DB::raw('RTRIM(Package)'), $packageNofaks)
+            ->get()
+            ->pluck('Package')
+            ->map(fn ($value) => trim((string) $value))
+            ->flip();
+    }
+
+    private function loadStockItemMap()
+    {
+        return DB::table('StockPackage')
+            ->selectRaw("RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Kind) as Kind")
+            ->get()
+            ->keyBy('KodeBrg');
     }
 
     private function savePackage(Request $request, ?string $existingNofak = null)
@@ -364,24 +473,6 @@ class PackageTransactionController extends Controller
     private function getPackageNofakPrefix(): string
     {
         return Carbon::now()->format('Ym') . '9002';
-    }
-
-    private function sortPackages($packages, string $sortBy, string $sortDir)
-    {
-        $collection = collect($packages);
-        $descending = $sortDir === 'desc';
-
-        $sorted = $collection->sortBy(function ($package) use ($sortBy) {
-            return match ($sortBy) {
-                'package' => strtoupper(trim((string) $package->Meja)),
-                'items' => strtoupper(trim((string) $package->detail_summary)),
-                'expired' => trim((string) $package->Expired),
-                'nominal' => (float) ($package->JumlahRes ?? 0),
-                default => strtoupper(trim((string) $package->Nofak)),
-            };
-        }, SORT_NATURAL, $descending);
-
-        return $sorted->values();
     }
 
     private function normalizeMoney($value): float
