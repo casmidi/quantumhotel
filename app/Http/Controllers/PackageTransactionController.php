@@ -208,8 +208,8 @@ class PackageTransactionController extends Controller
         return match ($sortBy) {
             'package' => 'RTRIM(P.Meja)',
             'room' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'ROOM'), 0)",
-            'meals' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'MEALS'), 0)",
-            'others' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'OTHERS'), 0)",
+            'meals' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'RESTAURANT'), 0)",
+            'others' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'OTHER'), 0)",
             'expired' => 'P.Expired',
             'nominal' => 'P.JumlahRes',
             default => 'RTRIM(P.Nofak)',
