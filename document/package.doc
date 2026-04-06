@@ -90,6 +90,7 @@ Flow:
 - User isi package code.
 - User pilih expired.
 - Tanggal expired ditampilkan ke user dengan format Indonesia dd-MM-yyyy, lalu dinormalisasi ke format internal saat submit.
+- Field Expiry Date juga menyediakan tombol kalender yang memanggil date picker sistem agar user bisa memilih tanggal langsung dari calendar bawaan.
 - User pilih item package dari dropdown item global.
 - User isi qty per item, sedangkan harga otomatis mengikuti master StockPackage dan tidak bisa diubah manual.
 - Sistem menghitung total nominal package.

@@ -66,6 +66,11 @@
 .package-label { display:block; font-size:.86rem; font-weight:900; text-transform:uppercase; letter-spacing:.09em; color:#233f6b; margin-bottom:.55rem; }
 .package-input, .package-select { height:calc(2.7rem + 2px); border-radius:14px; border:1px solid rgba(199,165,106,.34); box-shadow:inset 0 1px 2px rgba(16,35,59,.04); background:rgba(255,255,255,.95); color:#10233b; font-weight:600; }
 .package-input:focus, .package-select:focus { border-color:rgba(199,165,106,.88); box-shadow:0 0 0 .2rem rgba(199,165,106,.12); }
+.package-date-group { position:relative; }
+.package-date-group .package-input { padding-right:3.1rem; }
+.package-date-picker { position:absolute; top:50%; right:.45rem; transform:translateY(-50%); width:2.2rem; height:2.2rem; border-radius:12px; border:1px solid rgba(199,165,106,.42); background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(247,239,222,.96)); color:#b38a51; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 8px 16px rgba(179,138,81,.12); }
+.package-date-picker:hover { background:linear-gradient(180deg, rgba(255,255,255,1), rgba(244,232,202,.98)); color:#8f6a2d; }
+.package-date-native { position:absolute; inset:0; opacity:0; pointer-events:none; }
 .package-actions { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:0; flex-wrap:wrap; }
 .package-actions-main { display:flex; gap:.75rem; flex-wrap:wrap; }
 .package-btn-primary { border:0; border-radius:999px; padding:.82rem 1.5rem; font-weight:700; background:linear-gradient(135deg,#cba246 0%,#d8b86a 55%,#b58a36 100%); box-shadow:0 14px 28px rgba(201,164,83,.24); color:#fff; }
@@ -150,7 +155,7 @@
                     <div class="form-row">
                         <div class="form-group col-lg-4"><label class="package-label">Transaction Number</label><input type="text" id="DisplayNofak" class="form-control package-input" value="{{ old('GeneratedNofak', $nextNofak) }}" readonly></div>
                         <div class="form-group col-lg-5"><label class="package-label" for="Meja">Package Code</label><input type="text" name="Meja" id="Meja" class="form-control package-input" value="{{ old('Meja') }}" placeholder="Enter Package Code" required></div>
-                        <div class="form-group col-lg-3"><label class="package-label" for="ExpiredDisplay">Expiry Date</label><input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', now()->format('Y-m-d')) }}"><input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', now()->format('Y-m-d')))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required></div>
+                        <div class="form-group col-lg-3"><label class="package-label" for="ExpiredDisplay">Expiry Date</label><div class="package-date-group"><input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', now()->format('Y-m-d')) }}"><input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', now()->format('Y-m-d')))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required><button type="button" class="package-date-picker" id="expiredPickerButton" aria-label="Open system date picker"><i class="fa-regular fa-calendar"></i></button><input type="date" id="ExpiredNative" class="package-date-native" value="{{ old('Expired', now()->format('Y-m-d')) }}" tabindex="-1" aria-hidden="true"></div></div>
                     </div>
                 </div>
 
@@ -226,6 +231,8 @@ const form=document.getElementById('formPackageTransaction');
 const mejaField=document.getElementById('Meja');
 const expiredField=document.getElementById('Expired');
 const expiredDisplayField=document.getElementById('ExpiredDisplay');
+const expiredNativeField=document.getElementById('ExpiredNative');
+const expiredPickerButton=document.getElementById('expiredPickerButton');
 const totalNominalField=document.getElementById('TotalNominal');
   const currentNofakField=document.getElementById('CurrentNofak');
   const generatedNofakField=document.getElementById('GeneratedNofak');
@@ -283,7 +290,7 @@ function createRow(detail={}){
   function updateTotals(){let total=0; getRows().forEach((row)=>{total+=updateRow(row);}); totalNominalField.textContent=formatRibuan(Math.round(total).toString()); renameRows();}
   function resetGrid(details=[]){detailGridBody.innerHTML=''; const rows=(details&&details.length)?details:(initialRows&&initialRows.length?initialRows.slice(0, minimumRows):[{qty:'1'},{qty:'1'}]); rows.forEach((detail)=>createRow(detail)); while(getRows().length<minimumRows){createRow({qty:'1'});} updateTotals();}
   function setGeneratedNofak(value){const normalized=(value||'').toString().trim(); generatedNofakField.value=normalized; displayNofakField.value=normalized;}
-  function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; saveButton.textContent='Save Package Transaction'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); setGeneratedNofak(defaultGeneratedNofak); mejaField.focus();}
+  function activateCreateMode(){form.reset(); form.action='/menu-package-transaction'; currentNofakField.value=''; saveButton.textContent='Save Package Transaction'; expiredField.value='{{ now()->format('Y-m-d') }}'; expiredNativeField.value=expiredField.value; expiredDisplayField.value=formatDisplayDate(expiredField.value); resetGrid([{kode:'',qty:'1',price:''},{kode:'',qty:'1',price:''}]); setGeneratedNofak(defaultGeneratedNofak); mejaField.focus();}
   function getEnterFlowFields(){return [mejaField, expiredDisplayField, ...getRows().flatMap((row)=>[row.querySelector('.item-code'), row.querySelector('.item-qty')]).filter((field)=>field && !field.disabled)];}
   function focusNextEnterField(currentField){const fields=getEnterFlowFields(); const index=fields.indexOf(currentField); if(index!==-1 && index < fields.length-1){const nextField=fields[index+1]; nextField.focus(); if(typeof nextField.select==='function' && nextField.tagName!=='SELECT'){nextField.select();} return true;} return false;}
   function submitFromEnter(){if(typeof form.requestSubmit==='function'){form.requestSubmit(saveButton);} else {saveButton.click();}}
@@ -321,6 +328,7 @@ packageDirectoryShell.addEventListener('click', function(event){
     mejaField.value=row.dataset.meja||'';
     expiredField.value=row.dataset.expired||'';
     expiredDisplayField.value=formatDisplayDate(row.dataset.expired||'');
+    expiredNativeField.value=row.dataset.expired||'';
     form.action='/menu-package-transaction/'+row.dataset.nofak+'/update';
     saveButton.textContent='Update Package Transaction';
     resetGrid(details);
@@ -342,6 +350,8 @@ form.addEventListener('keydown', function(event){if(event.key!=='Enter'){return;
 form.addEventListener('submit', function(event){mejaField.value=(mejaField.value||'').toString().trim().toUpperCase(); const normalizedExpired=normalizeDisplayDate(expiredDisplayField.value); if(!normalizedExpired){event.preventDefault(); window.showCrudNotice('Expired date must use format dd-MM-yyyy.', 'Invalid Date'); expiredDisplayField.focus(); return;} expiredField.value=normalizedExpired; getRows().forEach((row)=>{const priceField=row.querySelector('.item-price'); if(priceField){priceField.value=unformat(priceField.value);} const qtyField=row.querySelector('.item-qty'); if(qtyField&&qtyField.value.trim()===''){qtyField.value='1';}});});
 
 expiredDisplayField.addEventListener('blur', function(){const normalizedExpired=normalizeDisplayDate(this.value); if(normalizedExpired){expiredField.value=normalizedExpired; this.value=formatDisplayDate(normalizedExpired);}});
+expiredPickerButton.addEventListener('click', function(){if(typeof expiredNativeField.showPicker === 'function'){expiredNativeField.showPicker();} else {expiredNativeField.focus(); expiredNativeField.click();}});
+expiredNativeField.addEventListener('change', function(){if(!this.value){return;} expiredField.value=this.value; expiredDisplayField.value=formatDisplayDate(this.value);});
 
 const successAlert=document.getElementById('successAlert');
 if(successAlert){setTimeout(()=>{successAlert.style.transition='opacity .3s ease, transform .3s ease'; successAlert.style.opacity='0'; successAlert.style.transform='translateY(-8px)'; setTimeout(()=>successAlert.remove(),300);},3000);}
@@ -349,6 +359,7 @@ if(successAlert){setTimeout(()=>{successAlert.style.transition='opacity .3s ease
 resetGrid();
 setGeneratedNofak(defaultGeneratedNofak);
 expiredDisplayField.value=formatDisplayDate(expiredField.value);
+expiredNativeField.value=expiredField.value;
 syncTotalAmountAlignment();
 window.addEventListener('resize', syncTotalAmountAlignment);
 if(resetAfterSuccess){activateCreateMode();} else {mejaField.focus();}
