@@ -63,7 +63,7 @@
 .package-shell-subtitle { margin:.45rem 0 0; font-size:1rem; color:#c19a58; }
 .package-shell-body { padding:1.25rem 1.9rem 1.75rem; }
 .package-form-head { margin-bottom:1.15rem; }
-.package-label { display:block; font-size:.84rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#233f6b; margin-bottom:.55rem; }
+.package-label { display:block; font-size:.86rem; font-weight:900; text-transform:uppercase; letter-spacing:.09em; color:#233f6b; margin-bottom:.55rem; }
 .package-input, .package-select { height:calc(2.7rem + 2px); border-radius:14px; border:1px solid rgba(199,165,106,.34); box-shadow:inset 0 1px 2px rgba(16,35,59,.04); background:rgba(255,255,255,.95); color:#10233b; font-weight:600; }
 .package-input:focus, .package-select:focus { border-color:rgba(199,165,106,.88); box-shadow:0 0 0 .2rem rgba(199,165,106,.12); }
 .package-actions { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:0; flex-wrap:wrap; }
