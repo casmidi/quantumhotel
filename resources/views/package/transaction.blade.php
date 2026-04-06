@@ -99,9 +99,9 @@
 .package-grid-table .line-total { font-weight:700; color:#173761; min-width:130px; display:inline-block; text-align:right; }
 .package-row-remove { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(178,34,34,.12); background:rgba(178,34,34,.08); color:#aa2f2f; text-decoration:none; }
 .package-row-remove:hover { background:#aa2f2f; color:#fff; text-decoration:none; }
-.package-grid-hint { margin-top:.8rem; color:#6b7b90; font-size:.84rem; }
-.package-grid-footer { position:relative; display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:.35rem; min-height:74px; }
-.package-grid-footer .package-grid-total { position:absolute; top:.1rem; pointer-events:auto; }
+.package-grid-meta { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-top:.8rem; min-height:58px; }
+.package-grid-hint { margin:0; color:#6b7b90; font-size:.84rem; }
+.package-grid-meta .package-grid-total { position:absolute; top:-.1rem; pointer-events:auto; }
 .package-search-form { display:flex; align-items:flex-end; gap:.75rem; flex-wrap:wrap; }
 .package-search-group { min-width:180px; flex:1 1 180px; }
 .package-search-actions { display:flex; gap:.65rem; flex-wrap:wrap; }
@@ -133,7 +133,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-header { padding:1rem 1.15rem .75rem; } .package-shell-heading-block { width:100%; padding:.95rem 1rem .9rem; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { width:auto !important; text-align:left; } .package-grid-footer { min-height:0; justify-content:flex-start; } .package-grid-footer .package-grid-total { position:static; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-header { padding:1rem 1.15rem .75rem; } .package-shell-heading-block { width:100%; padding:.95rem 1rem .9rem; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { width:auto !important; text-align:left; } .package-grid-meta { min-height:0; justify-content:flex-start; } .package-grid-meta .package-grid-total { position:static; margin-top:.35rem; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; margin-top:.45rem; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -180,13 +180,15 @@
                     </div>
                 </div>
 
-                <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
+                <div class="package-grid-meta">
+                    <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
+                    <div class="package-grid-total" id="totalNominalPanel">
+                        <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
+                    </div>
+                </div>
                 <div class="package-grid-footer">
                     <div class="package-actions">
                         <div class="package-actions-main"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button></div>
-                    </div>
-                    <div class="package-grid-total" id="totalNominalPanel">
-                        <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
                     </div>
                 </div>
             </form>
@@ -247,7 +249,7 @@ const totalNominalPanel=document.getElementById('totalNominalPanel');
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
 function renameRows(){getRows().forEach((row,index)=>{row.querySelector('[data-line-number]').textContent=index+1;});}
-function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); const footer=totalNominalPanel?.closest('.package-grid-footer'); if(!totalNominalPanel){return;} if(!amountHeader || !footer || window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const footerRect=footer.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=(headerRect.left-footerRect.left)+'px'; totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
+function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); const metaRow=totalNominalPanel?.closest('.package-grid-meta'); if(!totalNominalPanel){return;} if(!amountHeader || !metaRow || window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const metaRect=metaRow.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=(headerRect.left-metaRect.left)+'px'; totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
 function createRow(detail={}){
     const fragment=rowTemplate.content.cloneNode(true);
     const row=fragment.querySelector('[data-row]');
