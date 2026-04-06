@@ -136,6 +136,9 @@ class PackageTransactionController extends Controller
             $package->room_amount = (float) ($packageKindTotals->firstWhere('kind_bucket', 'room')->amount ?? 0);
             $package->meals_amount = (float) ($packageKindTotals->firstWhere('kind_bucket', 'meals')->amount ?? 0);
             $package->others_amount = (float) ($packageKindTotals->firstWhere('kind_bucket', 'others')->amount ?? 0);
+            $package->calculated_nominal = (float) ($package->room_amount + $package->meals_amount + $package->others_amount);
+            $package->nominal_mismatch = abs($package->calculated_nominal - (float) ($package->JumlahRes ?? 0)) > 0.01;
+            $package->display_nominal = $package->calculated_nominal;
             $package->is_used = $usedPackages->has(trim((string) $package->Nofak));
 
             return $package;

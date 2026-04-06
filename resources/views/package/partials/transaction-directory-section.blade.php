@@ -52,7 +52,7 @@
                 <td class="text-right">{{ number_format($package->meals_amount ?? 0, 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($package->others_amount ?? 0, 0, ',', '.') }}</td>
                 <td>{{ \Carbon\Carbon::parse($package->Expired)->format('d-m-Y') }}</td>
-                <td class="text-right">Rp. {{ number_format($package->JumlahRes ?? 0, 0, ',', '.') }}</td>
+                <td class="text-right" title="{{ $package->nominal_mismatch ? 'Stored nominal differs from ROOM + MEALS + OTHERS.' : '' }}">Rp. {{ number_format($package->display_nominal ?? 0, 0, ',', '.') }}</td>
                 <td class="text-center">
                     @if($package->is_used)
                     <span class="package-disabled-action" title="This package transaction is already used." aria-label="Locked"><i class="fa-solid fa-lock"></i></span>
