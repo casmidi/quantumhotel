@@ -20,13 +20,6 @@
     };
 @endphp
 <section class="package-shell" id="packageDirectoryShell">
-        <div class="package-shell-header">
-            <div>
-                <h2 class="package-shell-title">Transaction Directory</h2>
-                <p class="package-shell-subtitle">Click a row to load the transaction into the form and continue in update mode.</p>
-            </div>
-            <span class="package-shell-badge">{{ number_format($summary['total'], 0, ',', '.') }} Records</span>
-        </div>
         <div class="package-shell-body pb-0">
             <form method="GET" action="/menu-package-transaction" class="package-search-form">
                 <div class="package-search-group">
