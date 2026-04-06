@@ -29,11 +29,14 @@
                         <option value="invoice" {{ ($searchType ?? '') === 'invoice' ? 'selected' : '' }}>Invoice</option>
                         <option value="package" {{ ($searchType ?? '') === 'package' ? 'selected' : '' }}>Package Code / Name</option>
                         <option value="nominal" {{ ($searchType ?? '') === 'nominal' ? 'selected' : '' }}>Package Nominal</option>
+                        <option value="room" {{ ($searchType ?? '') === 'room' ? 'selected' : '' }}>Room</option>
+                        <option value="meal" {{ ($searchType ?? '') === 'meal' ? 'selected' : '' }}>Meal</option>
+                        <option value="other" {{ ($searchType ?? '') === 'other' ? 'selected' : '' }}>Other</option>
                     </select>
                 </div>
                 <div class="package-search-group">
                     <label class="package-label" for="search">Search Keyword</label>
-                    <input type="text" name="search" id="search" class="form-control package-input" value="{{ $searchValue ?? '' }}" placeholder="Search invoice, package code, or nominal">
+                    <input type="text" name="search" id="search" class="form-control package-input" value="{{ $searchValue ?? '' }}" placeholder="Search invoice, package code, nominal, room, meal, or other">
                 </div>
                 <div class="package-search-actions">
                     <button type="submit" class="btn package-btn-primary"><i class="fa-solid fa-magnifying-glass mr-2"></i>Search</button>

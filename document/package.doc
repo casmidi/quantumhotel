@@ -102,7 +102,7 @@ Flow:
 - Format nominal pada grid dan total toolbar memakai prefix `Rp`/`Rp.` dalam satu baris yang sama dengan angka. Label Total Amount sengaja disembunyikan agar hemat satu baris, sedangkan nilai total ditempatkan tepat di bawah grid pada baris yang sama dengan tombol aksi utama. Posisi dan lebar total mengikuti kolom Amount agar tetap rata kanan dan sejajar dengan nominal di grid.
 - Navigasi Enter di form manual mengikuti aturan baku project: Enter pindah ke field berikutnya, dan pada grid package alurnya berjalan dari item code ke qty lalu langsung ke item code berikutnya karena field price bersifat read-only.
 - Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama. Tombol reset terpisah sengaja tidak dipakai agar aksi form tidak dobel.
-- Transaction Directory menyediakan search dengan opsi berdasarkan Invoice, Package Code / Name, atau Package Nominal.
+- Transaction Directory menyediakan search dengan opsi berdasarkan Invoice, Package Code / Name, Package Nominal, Room, Meal, atau Other.
 - Grid transaksi memakai pagination standar dengan tombol nomor halaman serta navigasi < dan >.
 - Saat user klik nomor halaman atau header sort, yang direfresh hanya Transaction Directory melalui JavaScript, sehingga form input di atas tidak ikut reset.
 - Query directory sekarang hanya mengambil record untuk halaman aktif saja, bukan memuat semua package lebih dulu, supaya perpindahan halaman terasa lebih ringan.

@@ -178,6 +178,18 @@ class PackageTransactionController extends Controller
             $packageClause = 'UPPER(RTRIM(P.Meja)) LIKE ?';
         }
 
+        if ($searchType === 'room') {
+            $roomClause = "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'ROOM'), 0) = ?";
+        }
+
+        if ($searchType === 'meal') {
+            $mealClause = "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'RESTAURANT'), 0) = ?";
+        }
+
+        if ($searchType === 'other') {
+            $otherClause = "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'OTHER'), 0) = ?";
+        }
+
         $searchClauses = [];
 
         if (!empty($invoiceClause ?? null)) {
@@ -192,6 +204,21 @@ class PackageTransactionController extends Controller
 
         if ($normalizedNominal > 0 && in_array($searchType, ['all', 'nominal'], true)) {
             $searchClauses[] = 'P.JumlahRes = ?';
+            $bindings[] = $normalizedNominal;
+        }
+
+        if ($normalizedNominal > 0 && !empty($roomClause ?? null)) {
+            $searchClauses[] = $roomClause;
+            $bindings[] = $normalizedNominal;
+        }
+
+        if ($normalizedNominal > 0 && !empty($mealClause ?? null)) {
+            $searchClauses[] = $mealClause;
+            $bindings[] = $normalizedNominal;
+        }
+
+        if ($normalizedNominal > 0 && !empty($otherClause ?? null)) {
+            $searchClauses[] = $otherClause;
             $bindings[] = $normalizedNominal;
         }
 
