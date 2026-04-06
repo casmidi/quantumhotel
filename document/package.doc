@@ -41,6 +41,7 @@ Automatic process:
 4. DATA YANG DIBACA DARI DATABASE
 A. Manual transaction membaca:
 - Package: Nofak, Meja, JumlahRes, Expired
+- Transaction Directory juga menampilkan breakdown nominal per kind ke kolom ROOM, MEALS, dan OTHERS berdasarkan join PackageD + StockPackage
 - Hanya package dengan Expired >= tanggal hari ini yang ditampilkan di Transaction Directory
 - Data grid ditampilkan per halaman dengan pagination 10 baris per page
 - PackageD: Nofak, KodeBrg, Qty, Harga, Jumlah, NoUrut
@@ -90,6 +91,7 @@ Flow:
 - User isi package code.
 - User pilih expired.
 - Tanggal expired ditampilkan ke user dengan format Indonesia dd-MM-yyyy, lalu dinormalisasi ke format internal saat submit.
+- Expiry Date tidak boleh lebih kecil dari tanggal hari ini, baik saat dipilih dari date picker sistem maupun saat diketik manual.
 - Field Expiry Date juga menyediakan tombol kalender yang memanggil date picker sistem agar user bisa memilih tanggal langsung dari calendar bawaan.
 - User pilih item package dari dropdown item global.
 - User isi qty per item, sedangkan harga otomatis mengikuti master StockPackage dan tidak bisa diubah manual.
@@ -101,7 +103,10 @@ Flow:
 - Navigasi Enter di form manual mengikuti aturan baku project: Enter pindah ke field berikutnya, dan pada grid package alurnya berjalan dari item code ke qty lalu langsung ke item code berikutnya karena field price bersifat read-only.
 - Tombol New Transaction dipakai untuk memulai input package baru, terutama setelah user selesai atau sedang melihat mode edit dari transaksi lama. Tombol reset terpisah sengaja tidak dipakai agar aksi form tidak dobel.
 - Transaction Directory menyediakan search dengan opsi berdasarkan Invoice, Package Code / Name, atau Package Nominal.
-- Grid transaksi memakai pagination standar dengan tombol nomor halaman serta navigasi < dan >.`r`n- Saat user klik nomor halaman atau header sort, yang direfresh hanya Transaction Directory melalui JavaScript, sehingga form input di atas tidak ikut reset.`r`n- Query directory sekarang hanya mengambil record untuk halaman aktif saja, bukan memuat semua package lebih dulu, supaya perpindahan halaman terasa lebih ringan.`r`n- Header pada Transaction Directory bisa diklik untuk mengurutkan data berdasarkan Invoice, Package Code, Items, Expired, atau Nominal, baik ascending maupun descending.
+- Grid transaksi memakai pagination standar dengan tombol nomor halaman serta navigasi < dan >.
+- Saat user klik nomor halaman atau header sort, yang direfresh hanya Transaction Directory melalui JavaScript, sehingga form input di atas tidak ikut reset.
+- Query directory sekarang hanya mengambil record untuk halaman aktif saja, bukan memuat semua package lebih dulu, supaya perpindahan halaman terasa lebih ringan.
+- Header pada Transaction Directory bisa diklik untuk mengurutkan data berdasarkan Invoice, Package Code, ROOM, MEALS, OTHERS, Expired, atau Nominal, baik ascending maupun descending.
 - Field Transaction Number menampilkan nomor transaksi otomatis berikutnya saat halaman dibuka atau saat tombol New Transaction ditekan.
 - Setelah save berhasil, form kembali ke kondisi awal: seluruh isian dikosongkan kecuali Transaction Number yang tetap menampilkan generator nomor berikutnya.
 - Preview nofak tetap mengikuti pola prefix aktif dan sequence 4 digit, tetapi nofak final untuk transaksi baru baru benar-benar direserve saat proses save.
@@ -118,6 +123,7 @@ Logika penting:
 - Jika nofak package sudah dipakai di tabel DATA2 pada field PACKAGE, package tidak boleh diupdate walaupun directory tidak lagi menampilkan badge khusus.
 - Klik row tabel memuat transaksi ke form edit.
 - Transaction Directory hanya menampilkan package yang belum expired.
+- Kolom directory memecah nilai nominal detail per kind: ROOM masuk ke kolom ROOM, MEALS masuk ke kolom MEALS, dan OTHERS masuk ke kolom OTHERS.
 - Hasil search tetap hanya mengambil package dengan Expired >= hari ini.
 - Delete akan menghapus detail PackageD lebih dulu, lalu header Package.
 - Delete akan ditolak bila nofak package sudah dipakai di tabel DATA2 pada field PACKAGE.

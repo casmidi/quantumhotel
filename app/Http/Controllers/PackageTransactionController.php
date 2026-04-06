@@ -16,7 +16,7 @@ class PackageTransactionController extends Controller
         $sortBy = trim((string) $request->query('sort_by', 'invoice'));
         $sortDir = strtolower(trim((string) $request->query('sort_dir', 'desc'))) === 'asc' ? 'asc' : 'desc';
         $perPage = 10;
-        $allowedSorts = ['invoice', 'package', 'items', 'expired', 'nominal'];
+        $allowedSorts = ['invoice', 'package', 'room', 'meals', 'others', 'expired', 'nominal'];
 
         if (!in_array($sortBy, $allowedSorts, true)) {
             $sortBy = 'invoice';
@@ -131,6 +131,15 @@ class PackageTransactionController extends Controller
 
             $package->detail_json = $detailRows->toJson();
             $package->detail_summary = $detailRows->pluck('kode')->implode(', ');
+            $package->room_amount = (float) $detailRows
+                ->filter(fn ($detail) => strtoupper(trim((string) ($detail['kind'] ?? ''))) === 'ROOM')
+                ->sum('amount');
+            $package->meals_amount = (float) $detailRows
+                ->filter(fn ($detail) => strtoupper(trim((string) ($detail['kind'] ?? ''))) === 'MEALS')
+                ->sum('amount');
+            $package->others_amount = (float) $detailRows
+                ->filter(fn ($detail) => strtoupper(trim((string) ($detail['kind'] ?? ''))) === 'OTHERS')
+                ->sum('amount');
             $package->is_used = $usedPackages->has(trim((string) $package->Nofak));
 
             return $package;
@@ -198,7 +207,9 @@ class PackageTransactionController extends Controller
     {
         return match ($sortBy) {
             'package' => 'RTRIM(P.Meja)',
-            'items' => "ISNULL((SELECT TOP 1 RTRIM(PD.KodeBrg) FROM PackageD PD WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) ORDER BY PD.NoUrut ASC, RTRIM(PD.KodeBrg) ASC), '')",
+            'room' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'ROOM'), 0)",
+            'meals' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'MEALS'), 0)",
+            'others' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'OTHERS'), 0)",
             'expired' => 'P.Expired',
             'nominal' => 'P.JumlahRes',
             default => 'RTRIM(P.Nofak)',

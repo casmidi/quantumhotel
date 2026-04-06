@@ -41,15 +41,16 @@
                 </div>
             </form>
         </div>
-        <div class="package-table-wrap"><div class="table-responsive"><table class="table package-table" id="tablePackageTransaction"><thead><tr><th><a href="{{ $sortUrl('invoice') }}" class="package-sort-link {{ $sortBy === 'invoice' ? 'is-active' : '' }}">Invoice <i class="{{ $sortIcon('invoice') }}"></i></a></th><th><a href="{{ $sortUrl('package') }}" class="package-sort-link {{ $sortBy === 'package' ? 'is-active' : '' }}">Package Code <i class="{{ $sortIcon('package') }}"></i></a></th><th><a href="{{ $sortUrl('items') }}" class="package-sort-link {{ $sortBy === 'items' ? 'is-active' : '' }}">Items <i class="{{ $sortIcon('items') }}"></i></a></th><th><a href="{{ $sortUrl('expired') }}" class="package-sort-link {{ $sortBy === 'expired' ? 'is-active' : '' }}">Expired <i class="{{ $sortIcon('expired') }}"></i></a></th><th class="text-right"><a href="{{ $sortUrl('nominal') }}" class="package-sort-link {{ $sortBy === 'nominal' ? 'is-active' : '' }}">Nominal <i class="{{ $sortIcon('nominal') }}"></i></a></th><th class="text-center" width="90">Action</th></tr></thead><tbody>
+        <div class="package-table-wrap"><div class="table-responsive"><table class="table package-table" id="tablePackageTransaction"><thead><tr><th><a href="{{ $sortUrl('invoice') }}" class="package-sort-link {{ $sortBy === 'invoice' ? 'is-active' : '' }}">Invoice <i class="{{ $sortIcon('invoice') }}"></i></a></th><th><a href="{{ $sortUrl('package') }}" class="package-sort-link {{ $sortBy === 'package' ? 'is-active' : '' }}">Package Code <i class="{{ $sortIcon('package') }}"></i></a></th><th class="text-right"><a href="{{ $sortUrl('room') }}" class="package-sort-link {{ $sortBy === 'room' ? 'is-active' : '' }}">Room <i class="{{ $sortIcon('room') }}"></i></a></th><th class="text-right"><a href="{{ $sortUrl('meals') }}" class="package-sort-link {{ $sortBy === 'meals' ? 'is-active' : '' }}">Meals <i class="{{ $sortIcon('meals') }}"></i></a></th><th class="text-right"><a href="{{ $sortUrl('others') }}" class="package-sort-link {{ $sortBy === 'others' ? 'is-active' : '' }}">Others <i class="{{ $sortIcon('others') }}"></i></a></th><th><a href="{{ $sortUrl('expired') }}" class="package-sort-link {{ $sortBy === 'expired' ? 'is-active' : '' }}">Expired <i class="{{ $sortIcon('expired') }}"></i></a></th><th class="text-right"><a href="{{ $sortUrl('nominal') }}" class="package-sort-link {{ $sortBy === 'nominal' ? 'is-active' : '' }}">Nominal <i class="{{ $sortIcon('nominal') }}"></i></a></th><th class="text-center" width="90">Action</th></tr></thead><tbody>
             @forelse($packages as $package)
             <tr class="{{ $package->is_used ? 'package-row-locked' : '' }}" data-nofak="{{ $package->Nofak }}" data-meja="{{ $package->Meja }}" data-expired="{{ \Carbon\Carbon::parse($package->Expired)->format('Y-m-d') }}" data-details='@json(json_decode($package->detail_json, true))' data-used="{{ $package->is_used ? '1' : '0' }}">
                 <td>
                     <span class="package-code">{{ $package->Nofak }}</span>
-
                 </td>
                 <td>{{ $package->Meja }}</td>
-                <td>{{ $package->detail_summary }}</td>
+                <td class="text-right">{{ number_format($package->room_amount ?? 0, 0, ',', '.') }}</td>
+                <td class="text-right">{{ number_format($package->meals_amount ?? 0, 0, ',', '.') }}</td>
+                <td class="text-right">{{ number_format($package->others_amount ?? 0, 0, ',', '.') }}</td>
                 <td>{{ \Carbon\Carbon::parse($package->Expired)->format('d-m-Y') }}</td>
                 <td class="text-right">Rp. {{ number_format($package->JumlahRes ?? 0, 0, ',', '.') }}</td>
                 <td class="text-center">
@@ -61,7 +62,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="package-empty">No package transactions found for the current filter.</td></tr>
+            <tr><td colspan="8" class="package-empty">No package transactions found for the current filter.</td></tr>
             @endforelse
         </tbody></table></div></div>
         @if($packages->hasPages())
