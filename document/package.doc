@@ -123,7 +123,7 @@ Logika penting:
 - Jika nofak package sudah dipakai di tabel DATA2 pada field PACKAGE, package tidak boleh diupdate walaupun directory tidak lagi menampilkan badge khusus.
 - Klik row tabel memuat transaksi ke form edit.
 - Transaction Directory hanya menampilkan package yang belum expired.
-- Kolom directory memecah nilai nominal detail per kind: Kind ROOM masuk ke kolom ROOM, Kind RESTAURANT masuk ke kolom MEALS, dan Kind OTHER masuk ke kolom OTHERS.
+- Kolom directory memecah nilai nominal detail per kind: Kind ROOM masuk ke kolom ROOM, Kind RESTAURANT masuk ke kolom MEALS, dan Kind OTHER masuk ke kolom OTHERS. Perhitungan ini diambil dari query agregasi PackageD + StockPackage yang dikelompokkan per Nofak dan Kind.
 - Hasil search tetap hanya mengambil package dengan Expired >= hari ini.
 - Delete akan menghapus detail PackageD lebih dulu, lalu header Package.
 - Delete akan ditolak bila nofak package sudah dipakai di tabel DATA2 pada field PACKAGE.

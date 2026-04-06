@@ -131,15 +131,10 @@ class PackageTransactionController extends Controller
 
             $package->detail_json = $detailRows->toJson();
             $package->detail_summary = $detailRows->pluck('kode')->implode(', ');
-            $package->room_amount = (float) $detailRows
-                ->filter(fn ($detail) => strtoupper(trim((string) ($detail['kind'] ?? ''))) === 'ROOM')
-                ->sum('amount');
-            $package->meals_amount = (float) $detailRows
-                ->filter(fn ($detail) => strtoupper(trim((string) ($detail['kind'] ?? ''))) === 'MEALS')
-                ->sum('amount');
-            $package->others_amount = (float) $detailRows
-                ->filter(fn ($detail) => strtoupper(trim((string) ($detail['kind'] ?? ''))) === 'OTHERS')
-                ->sum('amount');
+            $packageKindTotals = collect($kindTotals->get($package->Nofak, []));
+            $package->room_amount = (float) ($packageKindTotals->firstWhere('kind_bucket', 'room')->amount ?? 0);
+            $package->meals_amount = (float) ($packageKindTotals->firstWhere('kind_bucket', 'meals')->amount ?? 0);
+            $package->others_amount = (float) ($packageKindTotals->firstWhere('kind_bucket', 'others')->amount ?? 0);
             $package->is_used = $usedPackages->has(trim((string) $package->Nofak));
 
             return $package;
@@ -227,6 +222,48 @@ class PackageTransactionController extends Controller
             ->whereIn(DB::raw('RTRIM(Nofak)'), $packageNofaks)
             ->orderBy('NoUrut')
             ->get()
+            ->groupBy('Nofak');
+    }
+
+    private function loadPackageKindTotals(array $packageNofaks)
+    {
+        if (empty($packageNofaks)) {
+            return collect();
+        }
+
+        return DB::table('PackageD as PD')
+            ->join('StockPackage as SP', function ($join) {
+                $join->on(DB::raw('RTRIM(SP.KodeBrg)'), '=', DB::raw('RTRIM(PD.KodeBrg)'));
+            })
+            ->selectRaw("
+                RTRIM(PD.Nofak) as Nofak,
+                UPPER(RTRIM(SP.Kind)) as Kind,
+                SUM(CAST(PD.Qty as float)) as TotalQty,
+                SUM(CAST(PD.Qty * PD.Harga AS float)) as Jumlah
+            ")
+            ->whereIn(DB::raw('RTRIM(PD.Nofak)'), $packageNofaks)
+            ->groupBy(DB::raw('RTRIM(PD.Nofak)'), DB::raw('UPPER(RTRIM(SP.Kind))'))
+            ->orderBy(DB::raw('RTRIM(PD.Nofak)'))
+            ->orderBy(DB::raw('UPPER(RTRIM(SP.Kind))'))
+            ->get()
+            ->map(function ($row) {
+                $kind = strtoupper(trim((string) ($row->Kind ?? '')));
+                $kindBucket = match ($kind) {
+                    'ROOM' => 'room',
+                    'RESTAURANT' => 'meals',
+                    'OTHER' => 'others',
+                    default => null,
+                };
+
+                return (object) [
+                    'Nofak' => trim((string) $row->Nofak),
+                    'kind' => $kind,
+                    'kind_bucket' => $kindBucket,
+                    'qty' => (float) ($row->TotalQty ?? 0),
+                    'amount' => (float) ($row->Jumlah ?? 0),
+                ];
+            })
+            ->filter(fn ($row) => !empty($row->kind_bucket))
             ->groupBy('Nofak');
     }
 
