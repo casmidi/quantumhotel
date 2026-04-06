@@ -66,7 +66,7 @@
 .package-label { display:block; font-size:.84rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#5f6f84; margin-bottom:.55rem; }
 .package-input, .package-select { height:calc(2.7rem + 2px); border-radius:14px; border:1px solid rgba(199,165,106,.34); box-shadow:inset 0 1px 2px rgba(16,35,59,.04); background:rgba(255,255,255,.95); color:#10233b; font-weight:600; }
 .package-input:focus, .package-select:focus { border-color:rgba(199,165,106,.88); box-shadow:0 0 0 .2rem rgba(199,165,106,.12); }
-.package-actions { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:.95rem; flex-wrap:wrap; }
+.package-actions { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:0; flex-wrap:wrap; }
 .package-actions-main { display:flex; gap:.75rem; flex-wrap:wrap; }
 .package-btn-primary { border:0; border-radius:999px; padding:.82rem 1.5rem; font-weight:700; background:linear-gradient(135deg,#cba246 0%,#d8b86a 55%,#b58a36 100%); box-shadow:0 14px 28px rgba(201,164,83,.24); color:#fff; }
 .package-btn-secondary { border-radius:999px; padding:.78rem 1.35rem; font-weight:700; border:1px solid rgba(199,165,106,.52); background:rgba(255,255,255,.9); color:#bb9857; }
@@ -100,8 +100,8 @@
 .package-row-remove { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(178,34,34,.12); background:rgba(178,34,34,.08); color:#aa2f2f; text-decoration:none; }
 .package-row-remove:hover { background:#aa2f2f; color:#fff; text-decoration:none; }
 .package-grid-hint { margin-top:.8rem; color:#6b7b90; font-size:.84rem; }
-.package-grid-footer { display:flex; justify-content:flex-end; margin-top:.2rem; }
-.package-grid-footer .package-grid-total { position:static; pointer-events:auto; }
+.package-grid-footer { position:relative; display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:.35rem; min-height:74px; }
+.package-grid-footer .package-grid-total { position:absolute; top:.1rem; pointer-events:auto; }
 .package-search-form { display:flex; align-items:flex-end; gap:.75rem; flex-wrap:wrap; }
 .package-search-group { min-width:180px; flex:1 1 180px; }
 .package-search-actions { display:flex; gap:.65rem; flex-wrap:wrap; }
@@ -133,7 +133,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-header { padding:1rem 1.15rem .75rem; } .package-shell-heading-block { width:100%; padding:.95rem 1rem .9rem; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { width:auto !important; text-align:left; } .package-grid-footer { justify-content:flex-start; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-header { padding:1rem 1.15rem .75rem; } .package-shell-heading-block { width:100%; padding:.95rem 1rem .9rem; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { width:auto !important; text-align:left; } .package-grid-footer { min-height:0; justify-content:flex-start; } .package-grid-footer .package-grid-total { position:static; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -182,13 +182,12 @@
 
                 <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
                 <div class="package-grid-footer">
+                    <div class="package-actions">
+                        <div class="package-actions-main"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button></div>
+                    </div>
                     <div class="package-grid-total" id="totalNominalPanel">
                         <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
                     </div>
-                </div>
-
-                <div class="package-actions">
-                    <div class="package-actions-main"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button></div>
                 </div>
             </form>
         </div>
@@ -248,7 +247,7 @@ const totalNominalPanel=document.getElementById('totalNominalPanel');
 function getRows(){return Array.from(detailGridBody.querySelectorAll('[data-row]'));}
 function rowHasMeaningfulData(row){if(!row){return false;}const code=row.querySelector('.item-code')?.value?.trim()||'';const qty=row.querySelector('.item-qty')?.value?.trim()||'';const price=row.querySelector('.item-price')?.value?.trim()||'';return code!==''||qty!==''&&qty!=='1'||price!=='';}
 function renameRows(){getRows().forEach((row,index)=>{row.querySelector('[data-line-number]').textContent=index+1;});}
-function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); const toolbar=totalNominalPanel?.closest('.package-grid-toolbar'); if(!totalNominalPanel){return;} if(!amountHeader || !toolbar || window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const toolbarRect=toolbar.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=Math.max(0,(headerRect.left-toolbarRect.left)-26)+'px'; totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
+function syncTotalAmountAlignment(){const amountHeader=document.querySelector('[data-amount-header]'); const footer=totalNominalPanel?.closest('.package-grid-footer'); if(!totalNominalPanel){return;} if(!amountHeader || !footer || window.matchMedia('(max-width: 767.98px)').matches){totalNominalPanel.style.left=''; totalNominalPanel.style.width=''; totalNominalPanel.classList.add('is-ready'); return;} const footerRect=footer.getBoundingClientRect(); const headerRect=amountHeader.getBoundingClientRect(); totalNominalPanel.style.left=(headerRect.left-footerRect.left)+'px'; totalNominalPanel.style.width=headerRect.width+'px'; totalNominalPanel.classList.add('is-ready');}
 function createRow(detail={}){
     const fragment=rowTemplate.content.cloneNode(true);
     const row=fragment.querySelector('[data-row]');
