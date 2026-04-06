@@ -76,11 +76,11 @@
 .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
 .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
 .package-grid-wrap { position:relative; border:1px solid rgba(199,165,106,.18); border-radius:22px; background:rgba(255,255,255,.82); overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.8); }
-.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:108px; padding:1rem 1.2rem .7rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
+.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:88px; padding:.7rem 1.2rem .45rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
 .package-grid-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:1.05rem; font-weight:500; color:#284670; }
 .package-grid-note { margin:.28rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-total { position:absolute; top:.85rem; opacity:1; visibility:visible; text-align:right; pointer-events:none; }
-.package-grid-add-row { position:absolute; top:.82rem; right:1.2rem; margin-top:0; flex-shrink:0; pointer-events:auto; }
+.package-grid-total { position:absolute; top:.35rem; opacity:1; visibility:visible; text-align:right; pointer-events:none; }
+.package-grid-add-row { position:absolute; top:.32rem; right:1.2rem; margin-top:0; flex-shrink:0; pointer-events:auto; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-family:Georgia,"Times New Roman",serif; font-size:2.55rem; line-height:1; font-weight:500; color:#c7a56a; letter-spacing:0; margin-top:-.05rem; }
 .package-grid-total-currency { font-size:1.1em; line-height:1; }
 .package-grid-table-wrap { overflow:auto; }
