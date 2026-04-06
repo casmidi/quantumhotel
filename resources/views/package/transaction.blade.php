@@ -76,10 +76,10 @@
 .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
 .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
 .package-grid-wrap { position:relative; border:1px solid rgba(199,165,106,.18); border-radius:22px; background:rgba(255,255,255,.82); overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.8); }
-.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:88px; padding:.7rem 1.2rem .45rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
+.package-grid-toolbar { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; min-height:auto; padding:.7rem 1.2rem .45rem; border-bottom:1px solid rgba(199,165,106,.34); background:linear-gradient(180deg, rgba(199,165,106,.03), rgba(255,255,255,.02)); }
 .package-grid-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:1.05rem; font-weight:500; color:#284670; }
 .package-grid-note { margin:.28rem 0 0; font-size:.84rem; color:#6b7b90; }
-.package-grid-total { position:absolute; top:.35rem; opacity:1; visibility:visible; text-align:right; pointer-events:none; }
+.package-grid-total { opacity:1; visibility:visible; text-align:right; }
 .package-grid-add-row { position:absolute; top:.32rem; right:1.2rem; margin-top:0; flex-shrink:0; pointer-events:auto; }
 .package-grid-total-value { display:inline-flex; align-items:baseline; justify-content:flex-end; gap:.35rem; width:100%; white-space:nowrap; font-family:Georgia,"Times New Roman",serif; font-size:2.55rem; line-height:1; font-weight:500; color:#c7a56a; letter-spacing:0; margin-top:-.05rem; }
 .package-grid-total-currency { font-size:1.1em; line-height:1; }
@@ -100,6 +100,8 @@
 .package-row-remove { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(178,34,34,.12); background:rgba(178,34,34,.08); color:#aa2f2f; text-decoration:none; }
 .package-row-remove:hover { background:#aa2f2f; color:#fff; text-decoration:none; }
 .package-grid-hint { margin-top:.8rem; color:#6b7b90; font-size:.84rem; }
+.package-grid-footer { display:flex; justify-content:flex-end; margin-top:.2rem; }
+.package-grid-footer .package-grid-total { position:static; pointer-events:auto; }
 .package-search-form { display:flex; align-items:flex-end; gap:.75rem; flex-wrap:wrap; }
 .package-search-group { min-width:180px; flex:1 1 180px; }
 .package-search-actions { display:flex; gap:.65rem; flex-wrap:wrap; }
@@ -131,7 +133,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-header { padding:1rem 1.15rem .75rem; } .package-shell-heading-block { width:100%; padding:.95rem 1rem .9rem; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.35rem; text-align:left; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-header { padding:1rem 1.15rem .75rem; } .package-shell-heading-block { width:100%; padding:.95rem 1rem .9rem; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { width:auto !important; text-align:left; } .package-grid-footer { justify-content:flex-start; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -158,9 +160,6 @@
                         <div>
                             <h3 class="package-grid-title">Package Items</h3>
                         </div>
-                        <div class="package-grid-total" id="totalNominalPanel">
-                            <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
-                        </div>
                         <button type="button" class="btn package-btn-add package-grid-add-row" id="addRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Row</button>
                     </div>
                     <div class="package-grid-table-wrap">
@@ -182,6 +181,11 @@
                 </div>
 
                 <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
+                <div class="package-grid-footer">
+                    <div class="package-grid-total" id="totalNominalPanel">
+                        <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
+                    </div>
+                </div>
 
                 <div class="package-actions">
                     <div class="package-actions-main"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button></div>
