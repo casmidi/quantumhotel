@@ -100,7 +100,6 @@
 .package-row-remove { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(178,34,34,.12); background:rgba(178,34,34,.08); color:#aa2f2f; text-decoration:none; }
 .package-row-remove:hover { background:#aa2f2f; color:#fff; text-decoration:none; }
 .package-grid-meta { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-top:.8rem; min-height:58px; }
-.package-grid-hint { margin:0; color:#6b7b90; font-size:.84rem; }
 .package-grid-meta .package-grid-total { position:absolute; top:-.1rem; pointer-events:auto; }
 .package-search-form { display:flex; align-items:flex-end; gap:.75rem; flex-wrap:wrap; }
 .package-search-group { min-width:180px; flex:1 1 180px; }
@@ -181,12 +180,9 @@
                 </div>
 
                 <div class="package-grid-meta">
-                    <p class="package-grid-hint">Use Add Row whenever you need another line, and totals update automatically while you type.</p>
                     <div class="package-grid-total" id="totalNominalPanel">
                         <strong class="package-grid-total-value"><span class="package-grid-total-currency">Rp</span><span id="TotalNominal">0</span></strong>
                     </div>
-                </div>
-                <div class="package-grid-footer">
                     <div class="package-actions">
                         <div class="package-actions-main"><button class="btn package-btn-primary" id="saveButton">Save Package Transaction</button><button type="button" class="btn package-btn-secondary" id="newTransactionButton">New Transaction</button></div>
                     </div>
