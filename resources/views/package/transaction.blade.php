@@ -57,7 +57,8 @@
 .package-shell { background:linear-gradient(180deg, rgba(255,252,246,.98), rgba(255,255,255,.96)); border:1px solid rgba(199,165,106,.58); box-shadow:0 24px 60px rgba(125,96,42,.1), inset 0 1px 0 rgba(255,255,255,.7); border-radius:28px; overflow:hidden; }
 .package-shell + .package-shell { margin-top:1.5rem; }
 .package-shell.package-directory-loading { opacity:.72; pointer-events:none; transition:opacity .18s ease; }
-.package-shell-header { display:flex; align-items:center; justify-content:center; text-align:center; gap:1rem; padding:1.7rem 1.9rem .85rem; }
+.package-shell-header { display:flex; align-items:flex-start; justify-content:flex-start; text-align:left; gap:1rem; padding:1.4rem 1.9rem .8rem; background:linear-gradient(180deg, rgba(232,215,174,.24), rgba(255,251,244,.72)); border-bottom:1px solid rgba(199,165,106,.22); }
+.package-shell-heading-block { display:inline-block; padding:1rem 1.35rem .95rem; border-radius:22px; background:linear-gradient(180deg, rgba(233,213,162,.34), rgba(255,248,235,.96)); border:1px solid rgba(199,165,106,.42); box-shadow:0 16px 34px rgba(182,148,79,.12), inset 0 1px 0 rgba(255,255,255,.7); }
 .package-shell-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:2.6rem; font-weight:500; color:#233f6b; line-height:1; letter-spacing:.01em; }
 .package-shell-subtitle { margin:.45rem 0 0; font-size:1rem; color:#c19a58; }
 .package-shell-body { padding:1.25rem 1.9rem 1.75rem; }
@@ -131,7 +132,7 @@
 .package-page-link:hover { background:rgba(23,55,97,.08); color:#173761; text-decoration:none; }
 .package-page-item.active .package-page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); color:#fff; border-color:transparent; box-shadow:0 10px 22px rgba(23,55,97,.16); }
 .package-page-item.disabled .package-page-link { opacity:.45; pointer-events:none; }
-@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.35rem; text-align:left; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
+@media (max-width:767.98px){ .package-shell-header, .package-grid-toolbar { flex-direction:column; align-items:flex-start; } .package-shell-header { padding:1rem 1.15rem .75rem; } .package-shell-heading-block { width:100%; padding:.95rem 1rem .9rem; } .package-shell-title { font-size:2rem; } .package-shell-body { padding:1rem 1.15rem 1.35rem; } .package-grid-toolbar { min-height:0; padding-bottom:1rem; } .package-grid-total { position:static; width:auto !important; pointer-events:auto; margin-top:.35rem; text-align:left; } .package-grid-add-row { position:static; margin-top:.25rem; } .package-grid-total-value { font-size:2rem; justify-content:flex-start; } .package-actions { align-items:flex-start; } }
 </style>
 
 <div class="container-fluid package-page">
@@ -139,7 +140,7 @@
     @if(session('error'))<div class="alert package-error mb-4">{{ session('error') }}</div>@endif
 
     <section class="package-shell">
-        <div class="package-shell-header"><div><h2 class="package-shell-title">Package Transaction</h2><p class="package-shell-subtitle">Manual Input &bull; Secure &amp; Elegant</p></div></div>
+        <div class="package-shell-header"><div class="package-shell-heading-block"><h2 class="package-shell-title">Package Transaction</h2><p class="package-shell-subtitle">Manual Input &bull; Secure &amp; Elegant</p></div></div>
         <div class="package-shell-body">
             <form method="POST" action="/menu-package-transaction" id="formPackageTransaction" autocomplete="off">
                 @csrf

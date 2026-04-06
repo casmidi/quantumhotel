@@ -83,6 +83,7 @@ Tujuan:
 - Form manual sekarang memakai grid fleksibel seperti spreadsheet ringan, bukan lagi form fixed tiga baris.
 - Hero manual transaction disederhanakan agar fokus ke input operasional, tanpa kartu summary total package/nominal/rata-rata, dan halaman manual transaction memakai satu judul utama saja agar tidak terasa berulang.
 - Tampilan manual transaction saat ini diarahkan ke gaya luxe: judul besar di tengah, subtitle singkat, blok Total Amount terpisah di kanan atas, dan area grid menggunakan bingkai putih-gold yang lebih elegan.
+- Header judul manual transaction memakai panel gold tersendiri dengan alignment kiri, agar judul punya fokus visual yang jelas dan tetap berbeda dari background form utama.
 - Modul ini juga mengikuti standar CRUD project: Add, Edit, Delete, dan Search.
 
 Flow:
