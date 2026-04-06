@@ -111,10 +111,11 @@ class PackageTransactionController extends Controller
         $pageRows = collect(DB::select($rowSql, array_merge($bindings, [$offsetStart, $offsetEnd])));
         $packageNofaks = $pageRows->pluck('Nofak')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
         $details = $this->loadPackageDetails($packageNofaks);
+        $kindTotals = $this->loadPackageKindTotals($packageNofaks);
         $usedPackages = $this->loadUsedPackages($packageNofaks);
         $itemMap = $this->loadStockItemMap();
 
-        $pageRows = $pageRows->map(function ($package) use ($details, $itemMap, $usedPackages) {
+        $pageRows = $pageRows->map(function ($package) use ($details, $kindTotals, $itemMap, $usedPackages) {
             $detailRows = collect($details->get($package->Nofak, []))->map(function ($detail) use ($itemMap) {
                 $mapped = $itemMap->get($detail->KodeBrg);
 
