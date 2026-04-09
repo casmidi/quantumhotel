@@ -1,0 +1,3 @@
+31:            $packagesQuery->where(function ($query) use ($searchType, $normalizedSearch, $normalizedNominal) {
+46:        $summary = [
+51:        $packages = $packagesQuery->paginate($perPage)->appends($request->query());

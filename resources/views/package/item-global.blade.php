@@ -1,77 +1,75 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
-@section('title', 'Package Items')
+@section('title', '')
 
 @section('content')
 
-@php
-    $avgSellingPrice = $summary['avgSellingPrice'] ?? 0;
-@endphp
+@include('partials.crud-package-theme')
 
 <style>
-    .content-wrapper { background: radial-gradient(circle at top right, rgba(183,148,92,.12), transparent 22%), radial-gradient(circle at left top, rgba(17,24,39,.08), transparent 28%), linear-gradient(180deg, #f8f4ec 0%, #eef1f6 45%, #e7edf5 100%); min-height: 100vh; }
-    .content-wrapper > h3 { display:none; }
-    .package-page { padding:0 0 2rem; color:#10233b; }
-    .package-hero { position:relative; overflow:hidden; background:linear-gradient(135deg,#10233b 0%,#19395f 55%,#b38a51 140%); border-radius:24px; color:#fff; padding:2rem; margin-bottom:1.5rem; box-shadow:0 24px 60px rgba(16,35,59,.2); }
-    .package-hero::after { content:''; position:absolute; top:-80px; right:-20px; width:240px; height:240px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,0)); }
-    .package-kicker { display:inline-flex; align-items:center; gap:.55rem; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); padding:.45rem .85rem; border-radius:999px; font-size:.76rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; margin-bottom:1rem; }
-    .package-hero h1 { font-size:2.2rem; font-weight:700; line-height:1.1; margin:0 0 .75rem; }
-    .package-hero p { max-width:760px; margin:0; color:rgba(255,255,255,.82); font-size:1rem; }
-    .package-summary { margin-top:1.5rem; }
-    .package-stat { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15); border-radius:18px; padding:1rem 1.1rem; backdrop-filter:blur(12px); min-height:100%; }
-    .package-stat-label { display:block; font-size:.78rem; text-transform:uppercase; letter-spacing:.12em; color:rgba(255,255,255,.72); margin-bottom:.5rem; }
-    .package-stat-value { display:block; font-size:1.35rem; font-weight:700; color:#fff; }
-    .package-shell { background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.6); box-shadow:0 18px 50px rgba(16,35,59,.1); backdrop-filter:blur(16px); border-radius:24px; overflow:hidden; }
-    .package-shell + .package-shell { margin-top:1.5rem; }
-    .package-shell-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.35rem 1.5rem 1rem; border-bottom:1px solid rgba(16,35,59,.08); }
-    .package-shell-title { margin:0; font-size:1.1rem; font-weight:700; color:#10233b; }
-    .package-shell-subtitle { margin:.35rem 0 0; font-size:.9rem; color:#5f6f84; }
-    .package-shell-badge { display:inline-flex; align-items:center; gap:.4rem; padding:.55rem .8rem; border-radius:999px; background:rgba(179,138,81,.12); color:#8b6232; font-weight:700; font-size:.82rem; }
-    .package-shell-body { padding:1.5rem; }
-    .package-label { display:block; font-size:.84rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#5f6f84; margin-bottom:.55rem; }
-    .package-input, .package-select { height:calc(2.6rem + 2px); border-radius:14px; border:1px solid rgba(16,35,59,.12); box-shadow:inset 0 1px 2px rgba(16,35,59,.04); background:rgba(255,255,255,.92); color:#10233b; font-weight:600; }
-    .package-input:focus, .package-select:focus { border-color:rgba(179,138,81,.78); box-shadow:0 0 0 .2rem rgba(179,138,81,.14); }
-    .package-actions { display:flex; gap:.75rem; margin-top:.5rem; flex-wrap:wrap; }
-    .package-btn-primary { border:0; border-radius:999px; padding:.75rem 1.4rem; font-weight:700; background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); box-shadow:0 12px 26px rgba(23,55,97,.2); color:#fff; }
-    .package-btn-secondary { border-radius:999px; padding:.75rem 1.3rem; font-weight:700; border:1px solid rgba(16,35,59,.12); background:rgba(255,255,255,.78); color:#173761; }
-    .package-alert, .package-error { border:0; border-radius:18px; padding:.95rem 1.15rem; box-shadow:0 14px 30px rgba(16,35,59,.08); }
-    .package-alert { background:linear-gradient(135deg, rgba(33,150,83,.16), rgba(33,150,83,.08)); color:#1c6b40; }
-    .package-error { background:linear-gradient(135deg, rgba(179,52,70,.16), rgba(179,52,70,.08)); color:#8f2435; }
-    .package-table-wrap { border-radius:0 0 24px 24px; overflow:hidden; }
-    .package-table { margin-bottom:0; }
-    .package-table thead th { border-top:0; border-bottom:1px solid rgba(16,35,59,.08); background:linear-gradient(180deg, rgba(16,35,59,.02), rgba(16,35,59,.06)); color:#53657d; text-transform:uppercase; letter-spacing:.08em; font-size:.76rem; font-weight:700; padding:1rem 1.2rem; }
-    .package-table tbody tr { transition:transform .18s ease, box-shadow .18s ease, background-color .18s ease; cursor:pointer; }
-    .package-table tbody tr:nth-child(odd) { background:rgba(16,35,59,.045); }
-    .package-table tbody tr:nth-child(even) { background:rgba(255,255,255,.96); }
-    .package-table tbody tr:hover { background:rgba(179,138,81,.06); transform:translateY(-1px); box-shadow:inset 4px 0 0 #b38a51; }
-    .package-table tbody td { border-top:1px solid rgba(16,35,59,.06); padding:1rem 1.2rem; vertical-align:middle; color:#10233b; }
-    .package-code { display:inline-flex; align-items:center; min-width:88px; justify-content:center; padding:.45rem .7rem; border-radius:999px; background:rgba(23,55,97,.08); color:#173761; font-weight:700; letter-spacing:.06em; }
-    .kind-pill { display:inline-flex; padding:.42rem .7rem; border-radius:999px; font-size:.78rem; font-weight:700; }
-    .kind-room { background:rgba(30,140,88,.12); color:#126b45; }
-    .kind-restaurant { background:rgba(196,134,27,.14); color:#9b6616; }
-    .package-delete { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:rgba(178,34,34,.08); color:#aa2f2f; border:1px solid rgba(178,34,34,.12); text-decoration:none; font-size:1rem; transition:all .18s ease; }
-    .package-delete:hover { background:#aa2f2f; color:#fff; text-decoration:none; transform:translateY(-1px); }
-    .package-empty { text-align:center; padding:2.2rem 1rem; color:#6b7b90; }
-    .package-pagination-wrap { display:flex; justify-content:flex-end; padding:1rem 1.5rem 1.35rem; border-top:1px solid rgba(16,35,59,.08); background:rgba(255,255,255,.58); }
-    .package-pagination-wrap .pagination { margin-bottom:0; justify-content:flex-end; }
-    .package-pagination-wrap .page-link { border-radius:12px; margin:0 .2rem; border:1px solid rgba(16,35,59,.12); color:#173761; font-weight:700; box-shadow:none; }
-    .package-pagination-wrap .page-item.active .page-link { background:linear-gradient(135deg,#173761 0%,#1e4b80 55%,#b38a51 150%); border-color:transparent; color:#fff; }
+.kind-pill {
+    display: inline-flex;
+    padding: 0.42rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.kind-room {
+    background: rgba(30, 140, 88, 0.12);
+    color: #126b45;
+}
+
+.kind-restaurant {
+    background: rgba(196, 134, 27, 0.14);
+    color: #9b6616;
+}
+
+.package-code {
+    display: inline-flex;
+    align-items: center;
+    min-width: 88px;
+    justify-content: center;
+    padding: 0.45rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(23, 55, 97, 0.08);
+    color: #173761;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.package-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(178, 34, 34, 0.08);
+    color: #aa2f2f;
+    border: 1px solid rgba(178, 34, 34, 0.12);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.18s ease;
+}
+
+.package-delete:hover {
+    background: #aa2f2f;
+    color: #fff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.package-empty {
+    text-align: center;
+    padding: 2.2rem 1rem;
+    color: #6b7b90;
+}
 </style>
 
 <div class="container-fluid package-page">
     @if(session('success'))<div class="alert package-alert mb-4" id="successAlert">{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert package-error mb-4">{{ session('error') }}</div>@endif
-
-    <section class="package-hero">
-        <div class="package-kicker"><span>Quantum Hotel</span><span>Package Items</span></div>
-        <h1>Package Items</h1>
-        <p>Manage the global package items stored in the StockPackage table. This is the master source used by manual package transactions and the automatic package builder.</p>
-        <div class="row package-summary">
-            <div class="col-md-4 mb-3 mb-md-0"><div class="package-stat"><span class="package-stat-label">Total Items</span><span class="package-stat-value">{{ number_format($summary['total'], 0, ',', '.') }}</span></div></div>
-            <div class="col-md-4 mb-3 mb-md-0"><div class="package-stat"><span class="package-stat-label">Room Items</span><span class="package-stat-value">{{ number_format($summary['room'], 0, ',', '.') }}</span></div></div>
-            <div class="col-md-4"><div class="package-stat"><span class="package-stat-label">Average Selling Price</span><span class="package-stat-value">Rp {{ number_format($avgSellingPrice, 0, ',', '.') }}</span></div></div>
-        </div>
-    </section>
 
     <section class="package-shell">
         <div class="package-shell-header"><div><h2 class="package-shell-title">Stock Package Input</h2><p class="package-shell-subtitle">Manual CRUD for the global package item master.</p></div><span class="package-shell-badge">Master CRUD</span></div>
@@ -131,3 +129,6 @@ const successAlert=document.getElementById('successAlert'); if(successAlert){set
 </script>
 
 @endsection
+
+
+

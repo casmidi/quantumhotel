@@ -1,356 +1,61 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
-@section('title', 'Room Class')
+@section('title', '')
 
 @section('content')
 
-@php
-    $totalKelas = $summary['total'] ?? $kelas->total();
-    $avgRate = $summary['avgRate'] ?? 0;
-    $avgDepo = $summary['avgDepo'] ?? 0;
-@endphp
+@include('partials.crud-package-theme')
 
 <style>
-    .content-wrapper {
-        background:
-            radial-gradient(circle at top right, rgba(183, 148, 92, 0.12), transparent 22%),
-            radial-gradient(circle at left top, rgba(17, 24, 39, 0.08), transparent 28%),
-            linear-gradient(180deg, #f8f4ec 0%, #eef1f6 45%, #e7edf5 100%);
-        min-height: calc(100vh - 57px);
-    }
+.kelas-code {
+    display: inline-flex;
+    align-items: center;
+    min-width: 68px;
+    justify-content: center;
+    padding: 0.45rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(23, 55, 97, 0.08);
+    color: #173761;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
 
-    .content-wrapper > h3 {
-        display: none;
-    }
+.kelas-name {
+    font-weight: 700;
+}
 
-    .kelas-page {
-        padding: 1.25rem 0 2rem;
-        color: #10233b;
-    }
+.kelas-money {
+    font-weight: 700;
+    color: #173761;
+}
 
-    .kelas-hero {
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(135deg, #10233b 0%, #19395f 55%, #b38a51 140%);
-        border-radius: 24px;
-        color: #fff;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 24px 60px rgba(16, 35, 59, 0.2);
-    }
+.kelas-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(178, 34, 34, 0.08);
+    color: #aa2f2f;
+    border: 1px solid rgba(178, 34, 34, 0.12);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.18s ease;
+}
 
-    .kelas-hero::after {
-        content: '';
-        position: absolute;
-        top: -80px;
-        right: -20px;
-        width: 240px;
-        height: 240px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
-    }
+.kelas-delete:hover {
+    background: #aa2f2f;
+    color: #fff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
 
-    .kelas-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.55rem;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        padding: 0.45rem 0.85rem;
-        border-radius: 999px;
-        font-size: 0.76rem;
-        font-weight: 700;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-    }
-
-    .kelas-hero h1 {
-        font-size: 2.2rem;
-        font-weight: 700;
-        line-height: 1.1;
-        margin: 0 0 0.75rem;
-    }
-
-    .kelas-hero p {
-        max-width: 680px;
-        margin: 0;
-        color: rgba(255, 255, 255, 0.82);
-        font-size: 1rem;
-    }
-
-    .kelas-summary {
-        margin-top: 1.5rem;
-    }
-
-    .kelas-stat {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 18px;
-        padding: 1rem 1.1rem;
-        backdrop-filter: blur(12px);
-        min-height: 100%;
-    }
-
-    .kelas-stat-label {
-        display: block;
-        font-size: 0.78rem;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: rgba(255, 255, 255, 0.72);
-        margin-bottom: 0.5rem;
-    }
-
-    .kelas-stat-value {
-        display: block;
-        font-size: 1.35rem;
-        font-weight: 700;
-        color: #fff;
-    }
-
-    .kelas-shell {
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        box-shadow: 0 18px 50px rgba(16, 35, 59, 0.1);
-        backdrop-filter: blur(16px);
-        border-radius: 24px;
-    }
-
-    .kelas-shell + .kelas-shell {
-        margin-top: 1.5rem;
-    }
-
-    .kelas-shell-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        padding: 1.35rem 1.5rem 1rem;
-        border-bottom: 1px solid rgba(16, 35, 59, 0.08);
-    }
-
-    .kelas-shell-title {
-        margin: 0;
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #10233b;
-    }
-
-    .kelas-shell-subtitle {
-        margin: 0.35rem 0 0;
-        font-size: 0.9rem;
-        color: #5f6f84;
-    }
-
-    .kelas-shell-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        padding: 0.55rem 0.8rem;
-        border-radius: 999px;
-        background: rgba(179, 138, 81, 0.12);
-        color: #8b6232;
-        font-weight: 700;
-        font-size: 0.82rem;
-    }
-
-    .kelas-shell-body {
-        padding: 1.5rem;
-    }
-
-    .kelas-label {
-        display: block;
-        font-size: 0.84rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #5f6f84;
-        margin-bottom: 0.55rem;
-    }
-
-    .kelas-input {
-        height: calc(2.6rem + 2px);
-        border-radius: 14px;
-        border: 1px solid rgba(16, 35, 59, 0.12);
-        box-shadow: inset 0 1px 2px rgba(16, 35, 59, 0.04);
-        background: rgba(255, 255, 255, 0.92);
-        color: #10233b;
-        font-weight: 600;
-    }
-
-    .kelas-input:focus {
-        border-color: rgba(179, 138, 81, 0.78);
-        box-shadow: 0 0 0 0.2rem rgba(179, 138, 81, 0.14);
-    }
-
-    .kelas-actions {
-        display: flex;
-        gap: 0.75rem;
-        margin-top: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    .kelas-btn-primary {
-        border: 0;
-        border-radius: 999px;
-        padding: 0.75rem 1.4rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #173761 0%, #1e4b80 55%, #b38a51 150%);
-        box-shadow: 0 12px 26px rgba(23, 55, 97, 0.2);
-    }
-
-    .kelas-btn-secondary {
-        border-radius: 999px;
-        padding: 0.75rem 1.3rem;
-        font-weight: 700;
-        border: 1px solid rgba(16, 35, 59, 0.12);
-        background: rgba(255, 255, 255, 0.78);
-        color: #173761;
-    }
-
-    .kelas-alert {
-        border: 0;
-        border-radius: 18px;
-        padding: 0.95rem 1.15rem;
-        background: linear-gradient(135deg, rgba(33, 150, 83, 0.16), rgba(33, 150, 83, 0.08));
-        color: #1c6b40;
-        box-shadow: 0 14px 30px rgba(28, 107, 64, 0.1);
-    }
-
-    .kelas-table-wrap {
-        border-radius: 0 0 24px 24px;
-        overflow: hidden;
-    }
-
-    .kelas-table {
-        margin-bottom: 0;
-    }
-
-    .kelas-table thead th {
-        border-top: 0;
-        border-bottom: 1px solid rgba(16, 35, 59, 0.08);
-        background: linear-gradient(180deg, rgba(16, 35, 59, 0.02), rgba(16, 35, 59, 0.06));
-        color: #53657d;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-size: 0.76rem;
-        font-weight: 700;
-        padding: 1rem 1.2rem;
-    }
-
-    .kelas-table tbody tr {
-        transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
-        cursor: pointer;
-    }
-
-    .kelas-table tbody tr:nth-child(odd) {
-        background: rgba(16, 35, 59, 0.045);
-    }
-
-    .kelas-table tbody tr:nth-child(even) {
-        background: rgba(255, 255, 255, 0.96);
-    }
-
-    .kelas-table tbody tr:hover {
-        background: rgba(179, 138, 81, 0.06);
-        transform: translateY(-1px);
-        box-shadow: inset 4px 0 0 #b38a51;
-    }
-
-    .kelas-table tbody td {
-        border-top: 1px solid rgba(16, 35, 59, 0.06);
-        padding: 1rem 1.2rem;
-        vertical-align: middle;
-        color: #10233b;
-    }
-
-    .kelas-code {
-        display: inline-flex;
-        align-items: center;
-        min-width: 68px;
-        justify-content: center;
-        padding: 0.45rem 0.7rem;
-        border-radius: 999px;
-        background: rgba(23, 55, 97, 0.08);
-        color: #173761;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-    }
-
-    .kelas-name {
-        font-weight: 700;
-    }
-
-    .kelas-money {
-        font-weight: 700;
-        color: #173761;
-    }
-
-    .kelas-delete {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: rgba(178, 34, 34, 0.08);
-        color: #aa2f2f;
-        border: 1px solid rgba(178, 34, 34, 0.12);
-        text-decoration: none;
-        font-size: 1rem;
-        transition: all 0.18s ease;
-    }
-
-    .kelas-delete:hover {
-        background: #aa2f2f;
-        color: #fff;
-        text-decoration: none;
-        transform: translateY(-1px);
-    }
-
-    .kelas-empty {
-        text-align: center;
-        padding: 2.2rem 1rem;
-        color: #6b7b90;
-    }
-
-    .kelas-pagination-wrap {
-        display: flex;
-        justify-content: flex-end;
-        padding: 1rem 1.5rem 1.35rem;
-        border-top: 1px solid rgba(16, 35, 59, 0.08);
-        background: rgba(255, 255, 255, 0.58);
-    }
-
-    .kelas-pagination-wrap .pagination {
-        margin-bottom: 0;
-        justify-content: flex-end;
-    }
-
-    .kelas-pagination-wrap .page-link {
-        border-radius: 12px;
-        margin: 0 0.2rem;
-        border: 1px solid rgba(16, 35, 59, 0.12);
-        color: #173761;
-        font-weight: 700;
-        box-shadow: none;
-    }
-
-    .kelas-pagination-wrap .page-item.active .page-link {
-        background: linear-gradient(135deg, #173761 0%, #1e4b80 55%, #b38a51 150%);
-        border-color: transparent;
-        color: #fff;
-    }
-
-    @media (max-width: 991.98px) {
-        .kelas-hero {
-            padding: 1.5rem;
-        }
-
-        .kelas-hero h1 {
-            font-size: 1.8rem;
-        }
-    }
+.kelas-empty {
+    text-align: center;
+    padding: 2.2rem 1rem;
+    color: #6b7b90;
+}
 </style>
 
 <div class="container-fluid kelas-page">
@@ -359,36 +64,6 @@
         {{ session('success') }}
     </div>
     @endif
-
-    <section class="kelas-hero">
-        <div class="kelas-kicker">
-            <span>Quantum Hotel</span>
-            <span>Master Data</span>
-        </div>
-        <h1>Room Class Management</h1>
-        <p>Manage room classes with a more elegant interface, faster operator flow, and a polished CRUD foundation for the next hotel system modules.</p>
-
-        <div class="row kelas-summary">
-            <div class="col-md-4 mb-3 mb-md-0">
-                <div class="kelas-stat">
-                    <span class="kelas-stat-label">Total Class</span>
-                    <span class="kelas-stat-value">{{ number_format($totalKelas, 0, ',', '.') }}</span>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3 mb-md-0">
-                <div class="kelas-stat">
-                    <span class="kelas-stat-label">Average Rate</span>
-                    <span class="kelas-stat-value">Rp {{ number_format($avgRate, 0, ',', '.') }}</span>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="kelas-stat">
-                    <span class="kelas-stat-label">Average Deposit</span>
-                    <span class="kelas-stat-value">Rp {{ number_format($avgDepo, 0, ',', '.') }}</span>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <section class="kelas-shell">
         <div class="kelas-shell-header">
@@ -440,7 +115,7 @@
                 <h2 class="kelas-shell-title">Class Directory</h2>
                 <p class="kelas-shell-subtitle">Click any row to load its data into the form and switch directly into edit mode.</p>
             </div>
-            <span class="kelas-shell-badge">{{ number_format($totalKelas, 0, ',', '.') }} Records</span>
+            <span class="kelas-shell-badge">{{ number_format($kelas->total(), 0, ',', '.') }} Records</span>
         </div>
 
         <div class="kelas-table-wrap">
@@ -643,4 +318,10 @@ kodeField.focus();
 </script>
 
 @endsection
+
+
+
+
+
+
 

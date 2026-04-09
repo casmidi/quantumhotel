@@ -1,0 +1,337 @@
+D:\laravel\quantum\app\Http\Controllers\AuthController.php:        ", [$request->username]);
+D:\laravel\quantum\app\Http\Controllers\AuthController.php:            if (trim($user->Passw) == trim($request->password)) {
+D:\laravel\quantum\app\Http\Controllers\AuthController.php:                    'user' => trim($user->Kode),
+D:\laravel\quantum\app\Http\Controllers\AuthController.php:                    'role' => trim($user->Nama)
+D:\laravel\quantum\app\Http\Controllers\AuthController.php:        return back()->with('error', 'Login failed');
+D:\laravel\quantum\app\Http\Controllers\AuthController.php:        session()->flush();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $nominal = $this->normalizeMoney($request->Nominal);
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $expired = $request->Expired ? Carbon::parse($request->Expired)->startOfDay() : null;
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $formula = trim((string) ($request->Formula ?: 'GROUP'));
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $packageCode = trim((string) $request->PackageCode);
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $packageCode = $packageCode !== '' ? strtoupper($packageCode) : $this->defaultPackageCode($nominal);
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            return redirect('/automatic-package')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->with('error', 'Nominal package is not valid.')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            return redirect('/automatic-package')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->with('error', 'Expired date is required.')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        if ($expired->lt(Carbon::today())) {
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            return redirect('/automatic-package')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->with('error', 'Expired date must be greater than or equal to today.')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        if ($this->hasDuplicatePackageCode($packageCode, $expired)) {
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            return redirect('/automatic-package')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->with('error', 'The same package code and expired date already exist.')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->join('PackageD as pd', 'p.Nofak', '=', 'pd.Nofak')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->where('p.JumlahRes', $nominal)
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->whereDate('p.Expired', $expired->format('Y-m-d'))
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->exists();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            return redirect('/automatic-package')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->with('error', 'A package with the same nominal and expired date already exists.')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        [$roomAmount, $restaurantAmount] = $this->splitPackageAmounts($formula, $nominal);
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            return redirect('/automatic-package')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->with('error', $restaurantAmount)
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $roomCode = $this->generateUniqueStockCode('R', $packageCode);
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $restaurantCode = $restaurantAmount > 0 ? $this->generateUniqueStockCode('M', $packageCode) : null;
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $nofak = $this->generatePackageNofak();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            DB::table('StockPackage')->insert([
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                DB::table('StockPackage')->insert([
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            DB::table('Package')->insert([
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                'strTgl' => $now->format('YmdHis'),
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                'Tgl' => $now->format('Y-m-d'),
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                'Jam' => $now->format('H:i:s'),
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                'Expired' => $expired->format('Y-m-d'),
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            DB::table('PackageD')->insert([
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                DB::table('PackageD')->insert([
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        return redirect('/automatic-package')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->with('success', 'Package automation completed successfully')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->with('process_result', [
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                'expired' => $expired->format('Y-m-d'),
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                return [$nominal - 100000, 100000];
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                return [$nominal - 200000, 200000];
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $base = strtoupper(preg_replace('/[^A-Z0-9]/', '', $packageCode));
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $base = $base !== '' ? $base : Carbon::now()->format('Ymd');
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->whereRaw('RTRIM(KodeBrg) = ?', [$candidate])
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:                ->exists();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        return $prefix . Carbon::now()->format('ymdHis');
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        $prefix = Carbon::now()->format('Ym') . '9002';
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->selectRaw('MAX(RTRIM(Nofak)) as latest_nofak')
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->whereRaw('RTRIM(Nofak) like ?', [$prefix . '%'])
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->value('latest_nofak');
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            $sequence = ((int) substr(trim((string) $latest), -4)) + 1;
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->whereRaw('RTRIM(Meja) = ?', [$packageCode])
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->whereDate('Expired', $expired->format('Y-m-d'))
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:            ->exists();
+D:\laravel\quantum\app\Http\Controllers\AutomaticPackageController.php:        return 'P- ' . number_format($nominal, 0, ',', '.');
+D:\laravel\quantum\app\Http\Controllers\Controller.php:        $collection = $items instanceof Collection ? $items->values() : collect($items)->values();
+D:\laravel\quantum\app\Http\Controllers\Controller.php:        $page = max((int) $request->query('page', 1), 1);
+D:\laravel\quantum\app\Http\Controllers\Controller.php:        $results = $collection->slice(($page - 1) * $perPage, $perPage)->values();
+D:\laravel\quantum\app\Http\Controllers\Controller.php:            $collection->count(),
+D:\laravel\quantum\app\Http\Controllers\Controller.php:                'path' => $request->url(),
+D:\laravel\quantum\app\Http\Controllers\Controller.php:                'query' => $request->query(),
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->select([
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->where('ROOM.Kode', '<>', '999');
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->select([
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->where('Pst', '=', ' ')
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->where('DATA2.Kode', '<>', '999');
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->fromSub($roomSubquery, 'MasROOM')
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->leftJoinSub($guestSubquery, 'MasDATA2', function ($join) {
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:                $join->on('MasROOM.Kode', '=', 'MasDATA2.Kode');
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->selectRaw("MasROOM.Kode, MasROOM.StatusKamar, MasROOM.Status2, MasDATA2.Payment, MasDATA2.TglIn, {$statusExpression} as Status")
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->orderBy('MasROOM.Urut')
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            ->get();
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            $status = trim((string) $room->Status);
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            $rawStatus = trim((string) $room->StatusKamar);
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            $payment = strtoupper(trim((string) $room->Payment));
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            $status2 = trim((string) $room->Status2);
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            $kode = trim((string) $room->Kode);
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:            if (!empty($room->TglIn) && $room->TglIn !== '2000-01-01') {
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:                $daysStayed = Carbon::parse($room->TglIn)->startOfDay()->diffInDays($today);
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:        $totalRooms = $roomStatuses->count();
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:        $operationalBase = $totalRooms - $counts['check_out'] - $counts['renovated'] - $counts['out_of_order'] - $counts['complimentary'];
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:        $complimentaryOnly = max($counts['complimentary'] - $counts['owner_unit'], 0);
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:                'tone' => 'owner-unit',
+D:\laravel\quantum\app\Http\Controllers\DashboardController.php:                'tone' => 'out-of-order',
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:        if ($request->q) {
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            $search = trim((string) $request->q);
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            $query->where(function ($builder) use ($search) {
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                $builder->where('Kode', 'like', '%' . $search . '%')
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                    ->orWhere('Nama', 'like', '%' . $search . '%');
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            ->orderBy('Kode')
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            ->get();
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:        $kelas = $this->paginateCollection($kelasCollection, 10, $request);
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            'total' => $kelasCollection->count(),
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            'avgRate' => (float) ($kelasCollection->avg('Rate1') ?? 0),
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            'avgDepo' => (float) ($kelasCollection->avg('Depo1') ?? 0),
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:        $kode = trim((string) $request->Kode);
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            ->whereRaw('RTRIM(Kode) = ?', [$kode])
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            ->first();
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                ->whereRaw('RTRIM(Kode) = ?', [$kode])
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                ->update([
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                    'Nama' => $request->Nama,
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                    'Rate1' => is_numeric($request->Rate1) ? $request->Rate1 : 0,
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                    'Depo1' => is_numeric($request->Depo1) ? $request->Depo1 : 0,
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            return redirect('/kelas')->with('success', 'Existing room class updated successfully');
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:        DB::table('KELAS')->insert([
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            'Nama' => $request->Nama,
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            'Rate1' => is_numeric($request->Rate1) ? $request->Rate1 : 0,
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            'Depo1' => is_numeric($request->Depo1) ? $request->Depo1 : 0,
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:        return redirect('/kelas')->with('success', 'Data saved successfully');
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            ->where('Kode', $kode)
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            ->update([
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                'Nama' => $request->Nama,
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                'Rate1' => is_numeric($request->Rate1) ? $request->Rate1 : 0,
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:                'Depo1' => is_numeric($request->Depo1) ? $request->Depo1 : 0,
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:        return redirect('/kelas')->with('success', 'Data updated successfully');
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:        DB::table('KELAS')->where('Kode', $kode)->delete();
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:        return redirect('/kelas')->with('success', 'Data deleted successfully');
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:        return response()->json(
+D:\laravel\quantum\app\Http\Controllers\KelasController.php:            DB::table('KELAS')->orderBy('Kode')->get()
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $searchType = trim((string) $request->query('search_type', 'all'));
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $searchValue = trim((string) $request->query('search', ''));
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->selectRaw("RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Kind) as Kind, Hj")
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->orderBy('KodeBrg')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->get();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->selectRaw("RTRIM(Nofak) as Nofak, RTRIM(Meja) as Meja, JumlahRes, Expired")
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->whereDate('Expired', '>=', Carbon::today()->format('Y-m-d'))
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->orderByDesc('Nofak');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            $normalizedNominal = $this->normalizeMoney($searchValue);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            $packagesQuery->where(function ($query) use ($searchType, $normalizedSearch, $normalizedNominal) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    $query->orWhereRaw('UPPER(RTRIM(Nofak)) LIKE ?', ['%' . $normalizedSearch . '%']);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    $query->orWhereRaw('UPPER(RTRIM(Meja)) LIKE ?', ['%' . $normalizedSearch . '%']);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    $query->orWhere('JumlahRes', '=', $normalizedNominal);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $packageCollection = $packagesQuery->get();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            'total' => $packageCollection->count(),
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            'nominal' => (float) $packageCollection->sum('JumlahRes'),
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $packages = $this->paginateCollection($packageCollection, $perPage, $request);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $packageNofaks = $packages->getCollection()->pluck('Nofak')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->selectRaw("RTRIM(Nofak) as Nofak, RTRIM(KodeBrg) as KodeBrg, Qty, Harga, Jumlah, NoUrut")
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->when(!empty($packageNofaks), fn ($query) => $query->whereIn(DB::raw('RTRIM(Nofak)'), $packageNofaks))
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->orderBy('NoUrut')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->get()
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->groupBy('Nofak');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->selectRaw("RTRIM(Package) as Package")
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->whereIn(DB::raw('RTRIM(Package)'), $packageNofaks)
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->get()
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->pluck('Package')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->map(fn ($value) => trim((string) $value))
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->flip();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $itemMap = $items->keyBy('KodeBrg');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $packages->setCollection(
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            $packages->getCollection()->map(function ($package) use ($details, $itemMap, $usedPackages) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                $detailRows = collect($details->get($package->Nofak, []))->map(function ($detail) use ($itemMap) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    $mapped = $itemMap->get($detail->KodeBrg);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                        'kode' => $detail->KodeBrg,
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                        'name' => $mapped->NamaBrg ?? $detail->KodeBrg,
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                        'kind' => $mapped->Kind ?? '',
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                        'qty' => (float) $detail->Qty,
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                        'price' => (float) $detail->Harga,
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                        'amount' => (float) $detail->Jumlah,
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                        'sort' => (int) $detail->NoUrut,
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                })->values();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                $package->detail_json = $detailRows->toJson();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                $package->detail_summary = $detailRows->pluck('kode')->implode(', ');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                $package->is_used = $usedPackages->has(trim((string) $package->Nofak));
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $nextNofak = $this->previewPackageNofak();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        return $this->savePackage($request);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        return $this->savePackage($request, trim((string) $nofak));
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        if ($this->packageIsUsed($normalized)) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')->with('error', 'This package transaction is already used in guest transactions and cannot be deleted.');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            DB::table('PackageD')->whereRaw('RTRIM(Nofak) = ?', [$normalized])->delete();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            DB::table('Package')->whereRaw('RTRIM(Nofak) = ?', [$normalized])->delete();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        return redirect('/menu-package-transaction')->with('success', 'Package transaction deleted successfully');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $packageCode = strtoupper(trim((string) $request->Meja));
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $expired = $request->Expired ? Carbon::parse($request->Expired)->startOfDay() : null;
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $details = $this->extractDetails($request);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $duplicateItemCodes = $this->findDuplicateItemCodes($request);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')->with('error', 'Package code is required.')->withInput();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')->with('error', 'Expired date is required.')->withInput();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        if ($expired->lt(Carbon::today())) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')->with('error', 'Expired date must be greater than or equal to today.')->withInput();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->with('error', 'Duplicate item codes are not allowed in one package transaction: ' . implode(', ', $duplicateItemCodes) . '.')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')->with('error', 'At least one package item is required.')->withInput();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        if ($existingNofak && !$this->packageExists($existingNofak)) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')->with('error', 'Package transaction was not found.');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        if ($existingNofak && $this->packageIsUsed($existingNofak)) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')->with('error', 'This package transaction is already used in guest transactions and cannot be updated.');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        if ($this->hasDuplicatePackageCode($packageCode, $expired, $existingNofak)) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->with('error', 'The same package code and expired date already exist.')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $nominal = collect($details)->sum('amount');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            $nofak = $existingNofak ?: $this->reservePackageNofak();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                DB::table('PackageD')->whereRaw('RTRIM(Nofak) = ?', [$nofak])->delete();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    ->whereRaw('RTRIM(Nofak) = ?', [$nofak])
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    ->update([
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                        'Expired' => $expired->format('Y-m-d'),
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                DB::table('Package')->insert([
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    'strTgl' => $now->format('YmdHis'),
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    'Tgl' => $now->format('Y-m-d'),
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    'Jam' => $now->format('H:i:s'),
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                    'Expired' => $expired->format('Y-m-d'),
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:                DB::table('PackageD')->insert([
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            return redirect('/menu-package-transaction')->with('success', 'Package transaction updated successfully');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        return redirect('/menu-package-transaction')->with('success', 'Package transaction saved successfully. Invoice: ' . $savedNofak);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $codes = $request->input('ItemCode', []);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $qtys = $request->input('Qty', []);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $prices = $request->input('Price', []);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->selectRaw('RTRIM(KodeBrg) as KodeBrg')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->pluck('KodeBrg')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->map(fn ($code) => strtoupper(trim((string) $code)))
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->flip();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            if (!$existingItemCodes->has($normalizedCode)) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            $price = $this->normalizeMoney($prices[$index] ?? 0);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        foreach ($request->input('ItemCode', []) as $code) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->whereRaw('RTRIM(Nofak) = ?', [trim($nofak)])
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->exists();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->whereRaw('RTRIM(Package) = ?', [trim($nofak)])
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->exists();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->whereRaw('RTRIM(Meja) = ?', [$packageCode])
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->whereDate('Expired', $expired->format('Y-m-d'));
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            $query->whereRaw('RTRIM(Nofak) <> ?', [trim($existingNofak)]);
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        return $query->exists();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $prefix = $this->getPackageNofakPrefix();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->selectRaw('MAX(RTRIM(Nofak)) as latest_nofak')
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->whereRaw('RTRIM(Nofak) like ?', [$prefix . '%'])
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            ->value('latest_nofak');
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            $sequence = ((int) substr(trim((string) $latest), -4)) + 1;
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        $prefix = $this->getPackageNofakPrefix();
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        if ($latest && !empty($latest->Nofak)) {
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:            $sequence = ((int) substr(trim((string) $latest->Nofak), -4)) + 1;
+D:\laravel\quantum\app\Http\Controllers\PackageTransactionController.php:        return Carbon::now()->format('Ym') . '9002';
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->selectRaw("RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, RTRIM(Fasilitas) as Fasilitas, RTRIM(ExtNo) as ExtNo, RTRIM(KUNCI) as KUNCI, Rate1, Rate2")
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->whereRaw("RTRIM(Kode) <> '999'");
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->orderBy('Kode')
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->get();
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            'total' => $roomCollection->count(),
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            'avgRate' => (float) ($roomCollection->avg('Rate1') ?? 0),
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            'avgBasicRate' => (float) ($roomCollection->avg('Rate2') ?? 0),
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $rooms = $this->paginateCollection($roomCollection, 10);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->selectRaw("RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1")
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->orderBy('Kode')
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->get();
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $kode = strtoupper(trim((string) $request->Kode));
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $classCode = strtoupper(trim((string) $request->Nama));
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $facility = trim((string) $request->Fasilitas);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $rateWithTax = $this->normalizeMoney($request->Rate1);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $basicRate = $this->normalizeMoney($request->Rate2);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $extNo = trim((string) $request->ExtNo);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $roomKey = trim((string) $request->KUNCI);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->whereRaw('RTRIM(Kode) = ?', [$kode])
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->first();
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:                ->whereRaw('RTRIM(Kode) = ?', [$kode])
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:                ->update($payload);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            return redirect('/room')->with('success', 'Existing room updated successfully');
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        DB::table('ROOM')->insert(array_merge($payload, [
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        return redirect('/room')->with('success', 'Data saved successfully');
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $rateWithTax = $this->normalizeMoney($request->Rate1);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $basicRate = $this->normalizeMoney($request->Rate2);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        $roomKey = trim((string) $request->KUNCI);
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->whereRaw('RTRIM(Kode) = ?', [$normalizedKode])
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->update([
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:                'Nama' => strtoupper(trim((string) $request->Nama)),
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:                'Fasilitas' => trim((string) $request->Fasilitas),
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:                'ExtNo' => trim((string) $request->ExtNo),
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        return redirect('/room')->with('success', 'Data updated successfully');
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->whereRaw('RTRIM(Kode) = ?', [strtoupper(trim((string) $kode))])
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:            ->delete();
+D:\laravel\quantum\app\Http\Controllers\RoomController.php:        return redirect('/room')->with('success', 'Data deleted successfully');
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->selectRaw("RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Satuan) as Satuan, RTRIM(Kind) as Kind, Hj");
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->orderBy('KodeBrg')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->get();
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            'total' => $itemCollection->count(),
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            'room' => $itemCollection->where('Kind', 'ROOM')->count(),
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            'restaurant' => $itemCollection->where('Kind', 'RESTAURANT')->count(),
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            'avgSellingPrice' => (float) ($itemCollection->avg('Hj') ?? 0),
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $items = $this->paginateCollection($itemCollection, 10);
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        return view('package.item-global', compact('items', 'summary'));
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $kodeBrg = $this->normalizeCode($request->KodeBrg);
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $namaBrg = strtoupper(trim((string) $request->NamaBrg));
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $satuan = strtoupper(trim((string) ($request->Satuan ?: 'PAX')));
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $kind = $this->normalizeKind($request->Kind);
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $hj = $this->normalizeMoney($request->Hj);
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            return redirect('/item-package-global')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->with('error', 'Item code, item name, and selling price must be valid.')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        if (!$this->isAllowedKind($kind)) {
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            return redirect('/item-package-global')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->with('error', 'Category must be ROOM or RESTAURANT.')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->whereRaw('RTRIM(KodeBrg) = ?', [$kodeBrg])
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->first();
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->whereRaw('RTRIM(KodeBrg) = ?', [$kodeBrg])
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->update($payload);
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            return redirect('/item-package-global')->with('success', 'Existing package item updated successfully');
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        DB::table('StockPackage')->insert(array_merge($payload, [
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        return redirect('/item-package-global')->with('success', 'Data saved successfully');
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $kodeBrg = $this->normalizeCode($kode);
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $namaBrg = strtoupper(trim((string) $request->NamaBrg));
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $satuan = strtoupper(trim((string) ($request->Satuan ?: 'PAX')));
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $kind = $this->normalizeKind($request->Kind);
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $hj = $this->normalizeMoney($request->Hj);
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            return redirect('/item-package-global')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->with('error', 'Item code, item name, and selling price must be valid.')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        if (!$this->isAllowedKind($kind)) {
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            return redirect('/item-package-global')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->with('error', 'Category must be ROOM or RESTAURANT.')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->withInput();
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->whereRaw('RTRIM(KodeBrg) = ?', [$kodeBrg])
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->exists();
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            return redirect('/item-package-global')->with('error', 'Package item was not found.');
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->whereRaw('RTRIM(KodeBrg) = ?', [$kodeBrg])
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->update([
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        return redirect('/item-package-global')->with('success', 'Data updated successfully');
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        $normalizedCode = $this->normalizeCode($kode);
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->whereRaw('RTRIM(KodeBrg) = ?', [$normalizedCode])
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->exists();
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            return redirect('/item-package-global')
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:                ->with('error', 'This package item is already used in package transactions and cannot be deleted.');
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->whereRaw('RTRIM(KodeBrg) = ?', [$normalizedCode])
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:            ->delete();
+D:\laravel\quantum\app\Http\Controllers\StockPackageController.php:        return redirect('/item-package-global')->with('success', 'Data deleted successfully');

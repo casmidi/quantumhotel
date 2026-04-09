@@ -28,10 +28,10 @@
                         <option value="all" {{ ($searchType ?? 'all') === 'all' ? 'selected' : '' }}>All</option>
                         <option value="invoice" {{ ($searchType ?? '') === 'invoice' ? 'selected' : '' }}>Invoice</option>
                         <option value="package" {{ ($searchType ?? '') === 'package' ? 'selected' : '' }}>Package Code / Name</option>
-                        <option value="nominal" {{ ($searchType ?? '') === 'nominal' ? 'selected' : '' }}>Package Nominal</option>
                         <option value="room" {{ ($searchType ?? '') === 'room' ? 'selected' : '' }}>Room</option>
                         <option value="meal" {{ ($searchType ?? '') === 'meal' ? 'selected' : '' }}>Meal</option>
                         <option value="other" {{ ($searchType ?? '') === 'other' ? 'selected' : '' }}>Other</option>
+                        <option value="nominal" {{ ($searchType ?? '') === 'nominal' ? 'selected' : '' }}>Package Nominal</option>
                     </select>
                 </div>
                 <div class="package-search-group">

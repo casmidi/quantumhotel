@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Stock Package')
 
@@ -553,9 +553,9 @@
             <div class="package-shell-header">
                 <div>
                     <h2 class="package-shell-title">Automatic Package Process</h2>
-                    <p class="package-shell-subtitle">Converted from the legacy VB6 formula flow to split package value and create the related package records automatically.</p>
+                    <p class="package-shell-subtitle">Automatic formula flow to split package value and create the related package records with a consistent process.</p>
                 </div>
-                <span class="package-shell-badge">VB6 Logic</span>
+                <span class="package-shell-badge">Auto Formula</span>
             </div>
             <div class="package-shell-body">
                 <div class="package-preview">
@@ -643,8 +643,13 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label class="package-label" for="Expired">Expired</label>
-                            <input type="date" name="Expired" id="Expired" class="form-control package-input" value="{{ old('Expired', $process['expired']) }}" required>
+                            <label class="package-label" for="ExpiredDisplay">Expired</label>
+                            <div class="package-date-group">
+                                <input type="hidden" name="Expired" id="Expired" value="{{ old('Expired', $process['expired']) }}">
+                                <input type="text" id="ExpiredDisplay" class="form-control package-input" value="{{ \Carbon\Carbon::parse(old('Expired', $process['expired']))->format('d-m-Y') }}" placeholder="dd-MM-yyyy" inputmode="numeric" required>
+                                <button type="button" class="package-date-picker" id="expiredPickerButton" aria-label="Open system date picker"><i class="fa-regular fa-calendar"></i></button>
+                                <input type="date" id="ExpiredNative" class="package-date-native" value="{{ old('Expired', $process['expired']) }}" min="{{ now()->format('Y-m-d') }}" tabindex="-1" aria-hidden="true">
+                            </div>
                         </div>
                         <div class="form-group col-md-6">
                             <label class="package-label">Generated Package Invoice</label>
@@ -758,6 +763,55 @@ function unformat(value) {
     return (value || '').toString().replace(/\./g, '');
 }
 
+function formatDisplayDate(value) {
+    if (!value) {
+        return '';
+    }
+
+    const normalized = value.toString().trim().replace(/\//g, '-');
+    const parts = normalized.split('-');
+
+    if (parts.length === 3 && parts[0].length === 4) {
+        return [parts[2], parts[1], parts[0]].join('-');
+    }
+
+    if (parts.length === 3 && parts[2].length === 4) {
+        return [parts[0].padStart(2, '0'), parts[1].padStart(2, '0'), parts[2]].join('-');
+    }
+
+    return value;
+}
+
+function normalizeDisplayDate(value) {
+    const normalized = (value || '').toString().trim().replace(/\//g, '-');
+    const parts = normalized.split('-');
+
+    if (parts.length !== 3) {
+        return '';
+    }
+
+    const day = parts[0].padStart(2, '0');
+    const month = parts[1].padStart(2, '0');
+    const year = parts[2];
+
+    if (year.length !== 4) {
+        return '';
+    }
+
+    const iso = year + '-' + month + '-' + day;
+    const testDate = new Date(iso + 'T00:00:00');
+
+    if (Number.isNaN(testDate.getTime())) {
+        return '';
+    }
+
+    return testDate.getFullYear().toString() === year
+        && (testDate.getMonth() + 1).toString().padStart(2, '0') === month
+        && testDate.getDate().toString().padStart(2, '0') === day
+        ? iso
+        : '';
+}
+
 function normalizeCode(value) {
     return (value || '').toString().trim().toUpperCase();
 }
@@ -784,7 +838,13 @@ const stockRows = Array.from(document.querySelectorAll('#tableStockPackage tbody
 
 const nominalField = document.getElementById('Nominal');
 const packageCodeField = document.getElementById('PackageCode');
+const processForm = document.getElementById('formProcessPackage');
 const processButton = document.getElementById('processButton');
+const expiredField = document.getElementById('Expired');
+const expiredDisplayField = document.getElementById('ExpiredDisplay');
+const expiredNativeField = document.getElementById('ExpiredNative');
+const expiredPickerButton = document.getElementById('expiredPickerButton');
+const todayIso = '{{ now()->format('Y-m-d') }}';
 
 function findExistingStockRowByCode(kode) {
     const normalizedCode = normalizeCode(kode);
@@ -894,7 +954,90 @@ if (nominalField.value) {
     nominalField.value = formatRibuan(nominalField.value);
 }
 
-processButton.addEventListener('click', function () {
+expiredDisplayField.value = formatDisplayDate(expiredField.value);
+expiredNativeField.value = expiredField.value;
+
+function showDateNotice(message) {
+    if (typeof window.showCrudNotice === 'function') {
+        window.showCrudNotice(message, 'Invalid Date');
+        return;
+    }
+
+    window.alert(message);
+}
+
+function isNotPastDate(value) {
+    return value && value >= todayIso;
+}
+
+expiredDisplayField.addEventListener('blur', function () {
+    if (!this.value) {
+        return;
+    }
+
+    const normalizedExpired = normalizeDisplayDate(this.value);
+
+    if (!normalizedExpired) {
+        showDateNotice('Expired date must use format dd-MM-yyyy.');
+        this.focus();
+        return;
+    }
+
+    if (!isNotPastDate(normalizedExpired)) {
+        showDateNotice('Expired date must be greater than or equal to today.');
+        this.value = formatDisplayDate(expiredField.value || todayIso);
+        this.focus();
+        return;
+    }
+
+    expiredField.value = normalizedExpired;
+    expiredNativeField.value = normalizedExpired;
+    this.value = formatDisplayDate(normalizedExpired);
+});
+
+expiredPickerButton.addEventListener('click', function () {
+    if (typeof expiredNativeField.showPicker === 'function') {
+        expiredNativeField.showPicker();
+    } else {
+        expiredNativeField.focus();
+        expiredNativeField.click();
+    }
+});
+
+expiredNativeField.addEventListener('change', function () {
+    if (!this.value) {
+        return;
+    }
+
+    if (!isNotPastDate(this.value)) {
+        showDateNotice('Expired date must be greater than or equal to today.');
+        this.value = expiredField.value || todayIso;
+        expiredDisplayField.value = formatDisplayDate(this.value);
+        return;
+    }
+
+    expiredField.value = this.value;
+    expiredDisplayField.value = formatDisplayDate(this.value);
+});
+
+processForm.addEventListener('submit', function (event) {
+    const normalizedExpired = normalizeDisplayDate(expiredDisplayField.value);
+
+    if (!normalizedExpired) {
+        event.preventDefault();
+        showDateNotice('Expired date must use format dd-MM-yyyy.');
+        expiredDisplayField.focus();
+        return;
+    }
+
+    if (!isNotPastDate(normalizedExpired)) {
+        event.preventDefault();
+        showDateNotice('Expired date must be greater than or equal to today.');
+        expiredDisplayField.focus();
+        return;
+    }
+
+    expiredField.value = normalizedExpired;
     nominalField.value = unformat(nominalField.value);
     packageCodeField.value = packageCodeField.value.trim().toUpperCase();
 });
@@ -913,3 +1056,5 @@ kodeBrgField.focus();
 </script>
 
 @endsection
+
+

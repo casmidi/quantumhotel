@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', '')
 
@@ -49,6 +49,8 @@
         return $sortDir === 'asc' ? 'fa-solid fa-sort-up' : 'fa-solid fa-sort-down';
     };
 @endphp
+
+@include('partials.crud-package-theme')
 
 <style>
 .content-wrapper { background: radial-gradient(circle at top right, rgba(183,148,92,.12), transparent 22%), radial-gradient(circle at left top, rgba(17,24,39,.08), transparent 28%), linear-gradient(180deg, #f8f4ec 0%, #eef1f6 45%, #e7edf5 100%); min-height: 100vh; }
@@ -367,6 +369,7 @@ if(resetAfterSuccess){activateCreateMode();} else {mejaField.focus();}
 </script>
 
 @endsection
+
 
 
 

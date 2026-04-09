@@ -1,4 +1,4 @@
-# AGENTS.md - Migrasi VB6 ke Laravel (quantum.or.id)
+﻿# AGENTS.md - Migrasi VB6 ke Laravel (quantum.or.id)
 
 Kamu adalah Senior Fullstack Laravel Engineer spesialis migrasi Visual Basic 6 ke Laravel untuk project hotel system ini.
 
@@ -72,6 +72,7 @@ Kamu adalah Senior Fullstack Laravel Engineer spesialis migrasi Visual Basic 6 k
 - Tampilan harus terlihat profesional, premium, enterprise, dan cocok untuk hotel system.
 - Jika user meminta look premium / hotel bintang 5, pertahankan gaya visual yang elegan dan konsisten dengan modul yang sudah ada.
 - Default user-facing messages, labels, alerts, confirmation, dan empty states harus menggunakan bahasa Inggris, kecuali user secara eksplisit minta bahasa lain.
+- Istilah VB6 dan Visual Basic tidak boleh muncul pada UI web, termasuk title, subtitle, badge, label, helper text, alert, empty state, atau copy lain yang terlihat user.
 - Delete action harus memiliki confirmation dialog dalam bahasa Inggris.
 - Untuk CRUD standar, aksi minimum yang harus tersedia adalah Add, Edit, Delete, dan Search.
 - Untuk grid / directory / list CRUD, gunakan pagination standar. Jangan tampilkan seluruh data dalam satu halaman.
@@ -156,3 +157,4 @@ Patuhi semua aturan di atas secara konsisten saat melanjutkan project quantum.or
 - Jangan lakukan multiple command read atau verify berturut-turut dalam satu respons jika ada alternatif lain.
 - Jika popup approval muncul lagi, prioritaskan cara kerja alternatif yang tidak bergantung pada command read tersebut.
 - Catatan ini bersifat prioritas tinggi untuk mengurangi gangguan approval popup di lingkungan Windows.
+

@@ -1,15 +1,12 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', '')
 
 @section('content')
 <style>
     .content-wrapper {
-        background:
-            radial-gradient(circle at top right, rgba(179, 138, 81, 0.14), transparent 24%),
-            radial-gradient(circle at left top, rgba(23, 55, 97, 0.1), transparent 28%),
-            linear-gradient(180deg, #f8f4ec 0%, #edf2f8 52%, #e6edf6 100%);
-        min-height: calc(100vh - 57px);
+        background: radial-gradient(circle at top right, rgba(183,148,92,.12), transparent 22%), radial-gradient(circle at left top, rgba(17,24,39,.08), transparent 28%), linear-gradient(180deg, #f8f4ec 0%, #eef1f6 45%, #e7edf5 100%);
+        min-height: 100vh;
     }
 
     .content-wrapper > h3 {
@@ -17,88 +14,79 @@
     }
 
     .dashboard-page {
-        padding: 1.2rem 0 2rem;
-        color: #10233b;
+        padding: 1rem 0 2rem;
+        color: #1c2937;
     }
 
     .dashboard-hero {
-        background: linear-gradient(135deg, #10233b 0%, #173761 55%, #b38a51 150%);
-        border-radius: 28px;
-        padding: 2rem;
-        color: #fff;
-        box-shadow: 0 24px 60px rgba(16, 35, 59, 0.2);
-        margin-bottom: 1.5rem;
-        overflow: hidden;
-        position: relative;
+        margin-bottom: 1.25rem;
+        color: #1c2937;
     }
 
-    .dashboard-hero::after {
-        content: '';
-        position: absolute;
-        width: 280px;
-        height: 280px;
-        border-radius: 50%;
-        top: -120px;
-        right: -70px;
-        background: radial-gradient(circle, rgba(255,255,255,0.2), rgba(255,255,255,0));
-    }
-
-    .dashboard-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.45rem 0.85rem;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,0.18);
-        background: rgba(255,255,255,0.1);
-        font-size: 0.78rem;
-        letter-spacing: 0.16em;
-        font-weight: 700;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-    }
 
     .dashboard-hero h1 {
-        margin: 0 0 0.7rem;
-        font-size: 2.35rem;
-        font-weight: 700;
-        line-height: 1.05;
-    }
-
-    .dashboard-hero p {
         margin: 0;
-        max-width: 760px;
-        color: rgba(255,255,255,0.8);
-        line-height: 1.7;
+        font-size: 2.7rem;
+        font-weight: 700;
+        line-height: 1.04;
+        color: #162536;
+        letter-spacing: -0.03em;
     }
 
-    .dashboard-totals {
-        margin-top: 1.6rem;
+    .dashboard-summary-card {
+        background: linear-gradient(180deg, #133a9c 0%, #1653c9 58%, #1d68e2 100%);
+        box-shadow: 0 22px 48px rgba(6, 24, 72, 0.34);
+        border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .dashboard-summary-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+        pointer-events: none;
+    }
+
+    .dashboard-summary-card::after {
+        width: 170px;
+        height: 170px;
+        right: -34px;
+        bottom: -58px;
+        background: radial-gradient(circle, rgba(50, 180, 255, 0.92) 0%, rgba(50, 180, 255, 0.82) 48%, rgba(50, 180, 255, 0) 100%);
+    }
+
+    .dashboard-summary-stack {
         display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-
-    .dashboard-total {
-        display: inline-flex;
         flex-direction: column;
-        gap: 0.2rem;
-        padding: 1rem 1.15rem;
-        border-radius: 18px;
-        background: rgba(255,255,255,0.11);
-        border: 1px solid rgba(255,255,255,0.12);
-        min-width: 180px;
+        height: 100%;
+        justify-content: space-between;
+        position: relative;
+        z-index: 1;
     }
 
-    .dashboard-total-label {
-        font-size: 0.78rem;
+    .dashboard-summary-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+    }
+
+    .dashboard-summary-block + .dashboard-summary-block {
+        margin-top: 1.35rem;
+        padding-top: 1.35rem;
+        border-top: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .dashboard-summary-label {
+        font-size: 0.74rem;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
-        letter-spacing: 0.12em;
         color: rgba(255,255,255,0.72);
+        font-weight: 700;
     }
 
-    .dashboard-total-value {
-        font-size: 1.9rem;
+    .dashboard-summary-value {
+        font-size: 2.45rem;
+        line-height: 1;
         font-weight: 700;
         color: #fff;
     }
@@ -107,11 +95,12 @@
         border-radius: 24px;
         padding: 1.5rem;
         color: #fff;
-        box-shadow: 0 22px 48px rgba(16, 35, 59, 0.12);
+        box-shadow: 0 22px 48px rgba(6, 12, 20, 0.3);
         position: relative;
         overflow: hidden;
         min-height: 220px;
         height: 100%;
+        border: 1px solid rgba(255,255,255,0.05);
     }
 
     .metric-card::after {
@@ -125,14 +114,11 @@
         background: rgba(255,255,255,0.12);
     }
 
-    .metric-card.occupied { background: linear-gradient(135deg, #6f1f24, #b93a42 58%, #e07177 140%); }
     .metric-card.dirty { background: linear-gradient(135deg, #9b6a1a, #d8a23f 58%, #f4d47b 145%); }
     .metric-card.ready { background: linear-gradient(135deg, #0d6f4b, #25b37f 58%, #79e3ba 145%); }
     .metric-card.clean { background: linear-gradient(135deg, #17634f, #2aa078 58%, #65cfaa 140%); }
     .metric-card.renovated { background: linear-gradient(135deg, #5c3a7d, #8f63ba 58%, #c3a4ef 145%); }
     .metric-card.out-of-order { background: linear-gradient(135deg, #3f3072, #654db5 58%, #9d89ee 145%); }
-    .metric-card.owner-unit { background: linear-gradient(135deg, #7e2830, #c85a63 58%, #ef9da4 145%); }
-    .metric-card.complimentary { background: linear-gradient(135deg, #92404a, #d97b84 58%, #f5b6bc 145%); }
 
     .metric-label {
         position: relative;
@@ -208,12 +194,132 @@
         font-size: 0.92rem;
     }
 
+    .dashboard-group-card--occupied {
+        background: linear-gradient(145deg, #8b0f2b 0%, #ff1f2f 52%, #ff6d7a 100%);
+    }
+
+    .dashboard-group-card--vacant {
+        background: linear-gradient(145deg, #148360 0%, #2fc18d 52%, #73dbb3 100%);
+    }
+
+    .dashboard-group-card--restricted {
+        background: linear-gradient(145deg, #694296 0%, #8d65ba 52%, #b08add 100%);
+    }
+
+    .dashboard-group-card--vacant .dashboard-group-item {
+        border-radius: 18px;
+        padding: 0.18rem 0.45rem 0.35rem;
+    }
+
+    .dashboard-group-card--vacant .dashboard-group-item + .dashboard-group-item {
+        margin-top: 0.18rem;
+        padding-top: 0.58rem;
+        border-top: 0;
+    }
+
+    .dashboard-group-card--vacant .dashboard-group-item--vacant_ready {
+        background: linear-gradient(135deg, rgba(9, 109, 76, 0.96) 0%, rgba(21, 159, 110, 0.92) 58%, rgba(77, 215, 159, 0.88) 100%);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .dashboard-group-card--vacant .dashboard-group-item--vacant_clean {
+        background: linear-gradient(135deg, rgba(30, 145, 114, 0.76) 0%, rgba(73, 191, 151, 0.72) 58%, rgba(139, 230, 196, 0.68) 100%);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
+
+    .dashboard-group-card--vacant .dashboard-group-item--vacant_dirty {
+        background: linear-gradient(135deg, rgba(176, 132, 38, 0.88) 0%, rgba(223, 176, 73, 0.82) 58%, rgba(245, 212, 128, 0.76) 100%);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
+
+    .dashboard-group-stack {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        gap: 0.4rem;
+    }
+
+    .dashboard-group-item {
+        padding: 0;
+    }
+
+    .dashboard-group-item + .dashboard-group-item {
+        padding-top: 0.5rem;
+        border-top: 1px solid rgba(255,255,255,0.28);
+    }
+
+    .dashboard-group-card--occupied .dashboard-group-item {
+        border-radius: 18px;
+        padding: 0.18rem 0.45rem 0.35rem;
+    }
+
+    .dashboard-group-card--occupied .dashboard-group-item + .dashboard-group-item {
+        margin-top: 0.18rem;
+        padding-top: 0.58rem;
+        border-top: 0;
+    }
+
+    .dashboard-group-card--occupied .dashboard-group-item--occupied {
+        background: linear-gradient(135deg, rgba(101, 4, 24, 0.98) 0%, rgba(175, 11, 41, 0.94) 58%, rgba(235, 53, 80, 0.90) 100%);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .dashboard-group-card--occupied .dashboard-group-item--owner_unit {
+        background: linear-gradient(135deg, rgba(134, 17, 40, 0.86) 0%, rgba(208, 48, 72, 0.82) 58%, rgba(247, 110, 132, 0.78) 100%);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
+
+    .dashboard-group-card--occupied .dashboard-group-item--complimentary {
+        background: linear-gradient(135deg, rgba(175, 53, 79, 0.74) 0%, rgba(233, 101, 124, 0.70) 58%, rgba(255, 159, 176, 0.66) 100%);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    .dashboard-group-item .metric-label {
+        margin-bottom: 0;
+        padding: 0.32rem 0.62rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+    }
+
+    .dashboard-group-item .metric-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 0.72rem;
+        border-radius: 6px;
+    }
+
+    .dashboard-group-stats {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 0.65rem;
+        margin-top: 0.42rem;
+    }
+
+    .dashboard-group-item .metric-value {
+        margin-top: 0;
+        font-size: 1.9rem;
+        line-height: 0.95;
+    }
+
+    .dashboard-group-item .metric-percent {
+        margin-top: 0;
+        flex-shrink: 0;
+        font-size: 0.7rem;
+        line-height: 1;
+        padding-bottom: 0.16rem;
+    }
+
+    .dashboard-group-item .metric-progress {
+        margin-top: 0.45rem;
+        height: 7px;
+    }
+
     .dashboard-shell {
-        border: 1px solid rgba(255,255,255,0.55);
-        border-radius: 24px;
-        background: rgba(255,255,255,0.78);
-        backdrop-filter: blur(18px);
-        box-shadow: 0 18px 42px rgba(16, 35, 59, 0.08);
+        border: 1px solid rgba(199,165,106,.58);
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(255,255,255,.96));
+        box-shadow: 0 24px 60px rgba(125,96,42,.10), inset 0 1px 0 rgba(255,255,255,.7);
         overflow: hidden;
         margin-top: 1.5rem;
     }
@@ -224,19 +330,20 @@
         justify-content: space-between;
         gap: 1rem;
         padding: 1.35rem 1.5rem 1rem;
-        border-bottom: 1px solid rgba(16, 35, 59, 0.08);
+        border-bottom: 1px solid rgba(199,165,106,.22);
+        background: linear-gradient(180deg, rgba(232,215,174,.24), rgba(255,251,244,.72));
     }
 
     .dashboard-shell-title {
         margin: 0;
         font-size: 1.1rem;
         font-weight: 700;
-        color: #10233b;
+        color: #284670;
     }
 
     .dashboard-shell-subtitle {
         margin: 0.3rem 0 0;
-        color: #66768d;
+        color: #6b7b90;
         font-size: 0.92rem;
     }
 
@@ -245,10 +352,11 @@
         align-items: center;
         border-radius: 999px;
         padding: 0.5rem 0.8rem;
-        background: rgba(179, 138, 81, 0.12);
-        color: #8d6635;
+        background: rgba(199,165,106,.09);
+        color: #8f6a2d;
         font-weight: 700;
         font-size: 0.82rem;
+        border: 1px dashed rgba(199,165,106,.45);
     }
 
     .breakdown-item {
@@ -257,7 +365,12 @@
         justify-content: space-between;
         gap: 1rem;
         padding: 1rem 1.5rem;
-        border-top: 1px solid rgba(16, 35, 59, 0.06);
+        border-top: 1px solid rgba(16,35,59,.06);
+        background: rgba(255,255,255,.72);
+    }
+
+    .breakdown-item:nth-child(odd) {
+        background: rgba(16,35,59,.03);
     }
 
     .breakdown-item:first-child {
@@ -278,7 +391,7 @@
         justify-content: center;
         border-radius: 12px;
         font-size: 1.1rem;
-        background: rgba(16, 35, 59, 0.08);
+        background: rgba(16,35,59,.08);
         flex-shrink: 0;
     }
 
@@ -308,7 +421,7 @@
         min-width: 48px;
         padding: 0.35rem 0.55rem;
         border-radius: 999px;
-        background: rgba(16, 35, 59, 0.08);
+        background: rgba(23,55,97,.08);
         color: #173761;
         font-size: 0.82rem;
         font-weight: 700;
@@ -333,8 +446,6 @@
         transform: translateY(-1px);
     }
 
-
-
     .breakdown-right {
         text-align: right;
         min-width: 120px;
@@ -352,8 +463,9 @@
     }
 
     @media (max-width: 991.98px) {
-        .dashboard-hero h1 { font-size: 1.9rem; }
+        .dashboard-hero h1 { font-size: 2rem; }
         .metric-value { font-size: 2.7rem; }
+        .dashboard-group-item .metric-value { font-size: 1.75rem; }
     }
 </style>
 
@@ -368,27 +480,95 @@
         'owner_unit' => '&#128081;',
         'complimentary' => '&#127873;',
     ];
+
+    $metricGroups = [
+        [
+            'card_class' => 'dashboard-group-card--occupied',
+            'keys' => ['occupied', 'owner_unit', 'complimentary'],
+        ],
+        [
+            'card_class' => 'dashboard-group-card--vacant',
+            'keys' => ['vacant_ready', 'vacant_clean', 'vacant_dirty'],
+        ],
+        [
+            'card_class' => 'dashboard-group-card--restricted',
+            'keys' => ['renovated', 'out_of_order'],
+        ],
+    ];
+
+    $groupedMetricKeys = collect($metricGroups)
+        ->flatMap(fn ($group) => $group['keys'])
+        ->values()
+        ->all();
+
+    $dashboardGroups = collect($metricGroups)
+        ->map(function ($group) use ($metrics) {
+            $metricOrder = array_flip($group['keys']);
+
+            $items = collect($metrics)
+                ->filter(fn ($metric) => in_array($metric['key'], $group['keys'], true))
+                ->sortBy(fn ($metric) => $metricOrder[$metric['key']] ?? 99)
+                ->values();
+
+            return [
+                'card_class' => $group['card_class'],
+                'items' => $items,
+            ];
+        })
+        ->filter(fn ($group) => $group['items']->isNotEmpty())
+        ->values();
+
+    $regularMetrics = collect($metrics)
+        ->reject(fn ($metric) => in_array($metric['key'], $groupedMetricKeys, true))
+        ->values();
 @endphp
 
 <div class="container-fluid dashboard-page">
     <section class="dashboard-hero">
-        <div class="dashboard-kicker">Quantum Hotel Dashboard</div>
-        <h1>Room Status Overview</h1>
-        <p>This dashboard follows the full room-status logic from the legacy Visual Basic application, including occupied-clean and occupied-dirty behavior before and after two days of stay, while keeping the output focused on count and percentage only.</p>
-        <div class="dashboard-totals">
-            <div class="dashboard-total">
-                <span class="dashboard-total-label">Total Active Rooms</span>
-                <span class="dashboard-total-value">{{ number_format($totalRooms, 0, ',', '.') }}</span>
-            </div>
-            <div class="dashboard-total">
-                <span class="dashboard-total-label">Operational Base</span>
-                <span class="dashboard-total-value">{{ number_format($operationalBase, 0, ',', '.') }}</span>
-            </div>
-        </div>
+        <h1>DASHBOARD</h1>
     </section>
 
     <section class="row">
-        @foreach($metrics as $metric)
+        <div class="col-xl col-md-6 mb-4">
+            <div class="metric-card dashboard-summary-card">
+                <div class="dashboard-summary-stack">
+                    <div class="dashboard-summary-block">
+                        <span class="dashboard-summary-label">Total Active Rooms</span>
+                        <span class="dashboard-summary-value">{{ number_format($totalRooms, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="dashboard-summary-block">
+                        <span class="dashboard-summary-label">Operational Base</span>
+                        <span class="dashboard-summary-value">{{ number_format($operationalBase, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @foreach($dashboardGroups as $group)
+        <div class="col-xl col-md-6 mb-4">
+            <div class="metric-card {{ $group['card_class'] }}">
+                <div class="dashboard-group-stack">
+                    @foreach($group['items'] as $metric)
+                    <article class="dashboard-group-item dashboard-group-item--{{ $metric['key'] }}">
+                        <span class="metric-label">
+                            <span class="metric-icon">{!! $metricIcons[$metric['key']] ?? '&#9632;' !!}</span>
+                            <span>{{ $metric['label'] }}</span>
+                        </span>
+                        <div class="dashboard-group-stats">
+                            <div class="metric-value">{{ number_format($metric['count'], 0, ',', '.') }}</div>
+                            <div class="metric-percent">{{ number_format($metric['percentage'], 2) }}%</div>
+                        </div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar" style="width: {{ min($metric['percentage'], 100) }}%;"></div>
+                        </div>
+                    </article>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endforeach
+
+        @foreach($regularMetrics as $metric)
         <div class="col-xl col-md-6 mb-4">
             <div class="metric-card {{ $metric['tone'] }}">
                 <span class="metric-label">
@@ -412,7 +592,7 @@
         <div class="dashboard-shell-header">
             <div>
                 <h2 class="dashboard-shell-title">Occupied Breakdown</h2>
-                <p class="dashboard-shell-subtitle">Converted from the VB6 logic that splits occupied rooms into clean/dirty and stay-length based groups.</p>
+                <p class="dashboard-shell-subtitle">Grouped by room condition and stay-length rules for easier monitoring.</p>
             </div>
             <span class="dashboard-badge">Count + Percentage</span>
         </div>
@@ -466,3 +646,22 @@ document.querySelectorAll('[data-breakdown-toggle]').forEach(function(button){
 });
 </script>
 @endsection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
