@@ -158,3 +158,90 @@ Patuhi semua aturan di atas secara konsisten saat melanjutkan project quantum.or
 - Jika popup approval muncul lagi, prioritaskan cara kerja alternatif yang tidak bergantung pada command read tersebut.
 - Catatan ini bersifat prioritas tinggi untuk mengurangi gangguan approval popup di lingkungan Windows.
 
+# Frontend UI Rules - Laravel Dashboard (Responsive & Mobile-First)
+
+## 🎯 Tujuan
+Panduan ini memastikan semua perubahan UI:
+- Responsive di mobile, tablet, dan desktop
+- Konsisten dengan desain dashboard yang sudah ada
+- Tidak merusak struktur Blade dan logic Laravel
+
+---
+
+## 📱 Responsive Design (WAJIB)
+- Gunakan pendekatan **mobile-first**
+- Semua layout harus optimal di:
+  - Mobile (≤576px)
+  - Tablet (≤768px)
+  - Desktop (>768px)
+- Hindari horizontal scroll di mobile
+
+---
+
+## 🧱 Bootstrap Rules
+- Gunakan grid lengkap:
+  - `col-12` → mobile
+  - `col-md-6` → tablet
+  - `col-xl-*` → desktop
+- Jangan gunakan `col-*` tanpa `col-12`
+
+Contoh:
+```html
+<div class="col-12 col-md-6 col-xl-4">
+```
+
+---
+
+## 🎨 CSS Rules
+- Hindari ukuran tetap:
+  - ❌ width: 500px
+  - ❌ height: 300px
+- Gunakan:
+  - max-width
+  - flexbox
+  - CSS grid
+
+---
+
+## 🔤 Typography
+- Gunakan ukuran font adaptif:
+  - Desktop: besar
+  - Mobile: lebih kecil
+- Gunakan media query untuk penyesuaian
+
+---
+
+## 📦 Card & Layout
+- Card tidak boleh terlalu tinggi di mobile
+- Padding harus lebih kecil di mobile
+- Gunakan:
+  - flex-wrap
+  - responsive spacing
+
+---
+
+## ⚠️ Larangan
+- Jangan redesign total UI
+- Jangan ubah struktur Blade utama
+- Jangan hapus variable Laravel
+- Jangan ubah logic backend
+
+---
+
+## 🧪 Testing
+- Cek di Chrome DevTools (mobile mode)
+- Pastikan tidak ada overflow
+- Pastikan semua elemen tetap rapi
+
+---
+
+## 🔧 Prioritas Perbaikan
+1. Layout mobile rusak
+2. Overflow / elemen keluar
+3. Font terlalu besar
+4. Grid tidak rapi
+
+---
+
+## 🎯 Prinsip Utama
+"Perbaiki tanpa merusak, dan utamakan mobile usability"
