@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', '')
 
@@ -11,6 +11,32 @@
     $checkOutIso = old('EstimationOut', $tomorrowIso);
     $birthIso = old('BirthDate', '');
     $expiredIso = old('ExpiredDate', '');
+    $firstRoomCode = old('RoomCodeList.0', '');
+    $firstPackageCode = old('PackageCodeList.0', '');
+    $firstNominal = old('NominalList.0', '');
+    $firstBreakfast = old('BreakfastList.0', 2);
+    $firstDetailKey = old('DetailKeyList.0', '');
+    $oldAdditionalRoomRows = [];
+    $oldRoomCodes = old('RoomCodeList', []);
+    $oldPackageCodes = old('PackageCodeList', []);
+    $oldNominalList = old('NominalList', []);
+    $oldBreakfastList = old('BreakfastList', []);
+    $oldDetailKeys = old('DetailKeyList', []);
+
+    for ($index = 1; $index < count($oldRoomCodes); $index++) {
+        $roomCode = trim((string) ($oldRoomCodes[$index] ?? ''));
+        if ($roomCode === '') {
+            continue;
+        }
+
+        $oldAdditionalRoomRows[] = [
+            'detailKey' => trim((string) ($oldDetailKeys[$index] ?? '')),
+            'roomCode' => $roomCode,
+            'packageCode' => trim((string) ($oldPackageCodes[$index] ?? '')),
+            'nominal' => trim((string) ($oldNominalList[$index] ?? '')),
+            'breakfast' => (int) ($oldBreakfastList[$index] ?? 0),
+        ];
+    }
 @endphp
 
 @include('partials.crud-package-theme')
@@ -73,7 +99,19 @@
     line-height: 1.1;
 }
 
+.checkin-regno .package-input {
+    min-width: 240px;
+    margin-top: 0.45rem;
+}
+
 .checkin-room-note,
+.checkin-package-note {
+    min-width: 220px;
+    padding: 0.78rem 0.95rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(199, 165, 106, 0.2);
+}
 .checkin-package-note {
     min-width: 220px;
     padding: 0.78rem 0.95rem;
@@ -297,15 +335,15 @@
         <div class="package-shell-body">
             <form method="POST" action="/checkin" id="checkinForm" autocomplete="off">
                 @csrf
-                <input type="hidden" name="GeneratedRegNo" id="GeneratedRegNo" value="{{ old('GeneratedRegNo', $nextRegNo) }}">
-                <input type="hidden" id="CurrentRegNo" value="">
+                <input type="hidden" id="CurrentDetailKey" value="">
 
                 <div class="checkin-toolbar">
                     <div class="checkin-badge-row">
                         <div class="checkin-regno">
                             <div>
                                 <small>Reg. Number</small>
-                                <strong id="DisplayRegNo">{{ old('GeneratedRegNo', $nextRegNo) }}</strong>
+                                <strong>Header transaksi</strong>
+                                <input type="text" name="GeneratedRegNo" id="GeneratedRegNo" class="form-control package-input" value="{{ old('GeneratedRegNo', $nextRegNo) }}" data-flow>
                             </div>
                         </div>
                         <div class="checkin-room-note" id="roomHelper">
@@ -413,7 +451,7 @@
                         </div>
                         <div class="checkin-row">
                             <label class="checkin-row-label" for="NominalDisplay">Nominal Rp</label>
-                            <input type="text" id="NominalDisplay" name="Nominal" class="form-control package-input text-right" value="{{ old('Nominal') ? number_format((float) preg_replace('/[^\d]/', '', (string) old('Nominal')), 0, ',', '.') : '' }}" inputmode="numeric" data-flow>
+                            <input type="text" id="NominalDisplay" name="NominalList[]" class="form-control package-input text-right" value="{{ $firstNominal ? number_format((float) preg_replace('/[^\d]/', '', (string) $firstNominal), 0, ',', '.') : '' }}" inputmode="numeric" data-flow>
                             <span class="checkin-row-note">Auto</span>
                         </div>
                     </div>
@@ -518,7 +556,7 @@
                         </div>
                         <div class="checkin-row">
                             <label class="checkin-row-label" for="Breakfast">Breakfast</label>
-                            <input type="number" name="Breakfast" id="Breakfast" class="form-control package-input text-right" value="{{ old('Breakfast', 2) }}" min="0" max="20" data-flow>
+                            <input type="number" name="BreakfastList[]" id="Breakfast" class="form-control package-input text-right" value="{{ $firstBreakfast }}" min="0" max="20" data-flow>
                             <span class="checkin-row-note">Pax</span>
                         </div>
                         <div class="checkin-row">
@@ -538,8 +576,35 @@
                         </div>
                         <div class="checkin-row">
                             <label class="checkin-row-label" for="RoomCode">Room</label>
-                            <input type="text" name="RoomCode" id="RoomCode" class="form-control package-input" value="{{ old('RoomCode') }}" list="roomCodeOptions" data-flow required>
+                            <input type="hidden" name="DetailKeyList[]" id="PrimaryDetailKey" value="{{ $firstDetailKey }}"><input type="text" name="RoomCodeList[]" id="RoomCode" class="form-control package-input" value="{{ $firstRoomCode }}" list="roomCodeOptions" data-flow required>
                             <span class="checkin-row-note">Lookup</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkin-detail-section mb-4">
+                    <div class="package-grid-wrap">
+                        <div class="package-grid-toolbar">
+                            <div>
+                                <h3 class="package-grid-title">Room Details</h3>
+                                <p class="package-grid-note mb-0">Room utama diisi dari field pertama. Tambahkan kamar lain di bawah bila satu RegNo memuat beberapa room.</p>
+                            </div>
+                            <button type="button" class="btn package-btn-add" id="addRoomRowButton"><i class="fa-solid fa-plus mr-1"></i>Add Room</button>
+                        </div>
+                        <div class="package-grid-table-wrap">
+                            <table class="package-grid-table checkin-room-grid mb-0">
+                                <thead>
+                                    <tr>
+                                        <th width="70">Line</th>
+                                        <th width="180">Room</th>
+                                        <th width="220">Package Code</th>
+                                        <th width="160" class="text-right">Nominal</th>
+                                        <th width="120" class="text-right">Breakfast</th>
+                                        <th width="90" class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="additionalRoomBody"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -599,7 +664,7 @@
                     </thead>
                     <tbody>
                         @forelse($checkins as $record)
-                            <tr class="checkin-record-row" data-record="{{ e($record->record_json) }}" data-regno="{{ $record->RegNo }}">
+                            <tr class="checkin-record-row" data-record="{{ e($record->record_json) }}" data-detail-key="{{ $record->RegNo2 }}">
                                 <td><span class="package-code">{{ $record->RegNo }}</span></td>
                                 <td><span class="room-pill">{{ $record->Kode }}</span></td>
                                 <td>
@@ -613,7 +678,7 @@
                                 <td>{{ $record->Package ?: '-' }}</td>
                                 <td class="text-right nominal-cell">Rp {{ $record->nominal_display }}</td>
                                 <td class="text-center">
-                                    <a href="/checkin/{{ urlencode($record->RegNo) }}/delete" class="checkin-delete-link" onclick="event.stopPropagation(); return confirm('Hapus data check in ini?');" title="Delete record"><i class="fa-solid fa-trash"></i></a>
+                                    <a href="/checkin/{{ urlencode($record->RegNo2) }}/delete" class="checkin-delete-link" onclick="event.stopPropagation(); return confirm('Hapus data check in ini?');" title="Delete record"><i class="fa-solid fa-trash"></i></a>
                                 </td>
                             </tr>
                         @empty
@@ -657,6 +722,20 @@
     </datalist>
 </div>
 
+<template id="additionalRoomRowTemplate">
+    <tr class="additional-room-row" data-room-row>
+        <td class="package-row-index" data-room-line>2</td>
+        <td>
+            <input type="hidden" name="DetailKeyList[]" class="detail-key-input" value="">
+            <input type="text" name="RoomCodeList[]" class="form-control package-input room-code-input" list="roomCodeOptions" autocomplete="off">
+        </td>
+        <td><input type="text" name="PackageCodeList[]" class="form-control package-input package-code-input" list="packageCodeOptions" autocomplete="off"></td>
+        <td><input type="text" name="NominalList[]" class="form-control package-input text-right nominal-input" inputmode="numeric"></td>
+        <td><input type="number" name="BreakfastList[]" class="form-control package-input text-right breakfast-input" min="0" max="20" value="0"></td>
+        <td class="text-center"><button type="button" class="package-row-remove room-row-remove" title="Remove room"><i class="fa-solid fa-trash"></i></button></td>
+    </tr>
+</template>
+
 <script>
 function normalizeNumber(value){return (value||'').toString().replace(/[^\d]/g,'');}
 function formatRibuan(value){const normalized=normalizeNumber(value); return normalized ? normalized.replace(/\B(?=(\d{3})+(?!\d))/g,'.') : '';}
@@ -667,41 +746,56 @@ function findOptionByValue(listId, value){const normalized=(value||'').toString(
 
 const form=document.getElementById('checkinForm');
 const generatedRegNoField=document.getElementById('GeneratedRegNo');
-const currentRegNoField=document.getElementById('CurrentRegNo');
-const displayRegNo=document.getElementById('DisplayRegNo');
+const currentDetailKeyField=document.getElementById('CurrentDetailKey');
+const primaryDetailKeyField=document.getElementById('PrimaryDetailKey');
 const saveButton=document.getElementById('saveButton');
 const newEntryButton=document.getElementById('newEntryButton');
 const focusSearchButton=document.getElementById('focusSearchButton');
+const addRoomRowButton=document.getElementById('addRoomRowButton');
+const additionalRoomBody=document.getElementById('additionalRoomBody');
+const additionalRoomRowTemplate=document.getElementById('additionalRoomRowTemplate');
 const searchKeyword=document.getElementById('searchKeyword');
 const roomCodeField=document.getElementById('RoomCode');
 const packageCodeField=document.getElementById('PackageCode');
 const nominalField=document.getElementById('NominalDisplay');
+const breakfastField=document.getElementById('Breakfast');
 const roomHelper=document.getElementById('roomHelper');
 const packageHelper=document.getElementById('packageHelper');
 const defaultRegNo=@json(old('GeneratedRegNo', $nextRegNo));
 const defaultCheckIn=@json($checkInIso);
 const defaultCheckOut=@json($checkOutIso);
+const oldAdditionalRoomRows=@json($oldAdditionalRoomRows);
+const initialHasOld=@json((bool) (old('GuestName') || old('RoomCodeList.0')));
 
-function bindDateGroup(group){const hidden=group.querySelector('input[type="hidden"]'); const display=group.querySelector('input[type="text"]'); const native=group.querySelector('[data-date-native]'); const button=group.querySelector('[data-date-button]'); if(!hidden||!display||!native){return;} display.addEventListener('blur', function(){if(!this.value.trim()){hidden.value=''; native.value=''; return;} const iso=normalizeDisplayDate(this.value); if(!iso){showCrudAlert('Tanggal harus memakai format dd-MM-yyyy.'); this.focus(); return;} hidden.value=iso; native.value=iso; this.value=formatDisplayDate(iso);}); native.addEventListener('change', function(){hidden.value=this.value||''; display.value=formatDisplayDate(this.value);}); if(button){button.addEventListener('click', function(){if(typeof native.showPicker==='function'){native.showPicker();} else {native.focus(); native.click();}});} display.value=formatDisplayDate(hidden.value); native.value=hidden.value;}
-function updateRoomHelper(){const option=findOptionByValue('roomCodeOptions', roomCodeField.value); if(!option){roomHelper.querySelector('strong').textContent='Pilih room yang masih tersedia'; return;} const kelas=option.dataset.kelas || '-'; const status=option.dataset.status || '-'; const available=option.dataset.available === '1'; roomHelper.querySelector('strong').textContent = roomCodeField.value.toUpperCase()+' • '+kelas+' • '+status+(available ? '' : ' • tidak tersedia');}
-function updatePackageHelper(){const option=findOptionByValue('packageCodeOptions', packageCodeField.value); if(!option){packageHelper.querySelector('strong').textContent='Nominal akan terisi otomatis bila package ditemukan'; return;} const nominal=Number(option.dataset.nominal || 0); const expired=option.dataset.expired || '-'; if(!normalizeNumber(nominalField.value)){nominalField.value=formatRibuan(String(nominal));} packageHelper.querySelector('strong').textContent=(option.dataset.name || 'Package')+' • Exp '+expired+' • Rp '+formatRibuan(String(nominal));}
-function setFormModeCreate(){form.action='/checkin'; currentRegNoField.value=''; generatedRegNoField.value=defaultRegNo; displayRegNo.textContent=defaultRegNo; saveButton.textContent='Save Check In'; Array.from(document.querySelectorAll('.checkin-record-row')).forEach(row => row.classList.remove('is-active'));}
-function applyRecord(record){setFormModeCreate(); currentRegNoField.value=record.RegNo || ''; generatedRegNoField.value=record.RegNo || defaultRegNo; displayRegNo.textContent=record.RegNo || defaultRegNo; form.action='/checkin/'+encodeURIComponent(record.RegNo)+'/update'; saveButton.textContent='Update Check In'; const mappings=['ReservationNumber','GuestName','GuestName2','Address','Kelurahan','Kecamatan','KabCity','ProvinceCountry','TypeOfId','IdNumber','GroupPosition','PackageCode','TypeOfCheckIn','PlaceOfBirth','Religion','Nationality','NumberOfPerson','PaymentMethod','Company','CreditCardNumber','Segment','Phone','Email','Breakfast','Remarks','Member','Sales','RoomCode']; mappings.forEach(function(id){const field=document.getElementById(id); if(field){field.value=record[id] ?? '';}}); document.getElementById('CheckDeposit').checked=String(record.CheckDeposit || '0') === '1'; document.getElementById('CheckInDate').value=record.CheckInDate || ''; document.getElementById('CheckInDateDisplay').value=formatDisplayDate(record.CheckInDate || ''); document.querySelector('#CheckInDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=record.CheckInDate || ''; document.getElementById('BirthDate').value=record.BirthDate || ''; document.getElementById('BirthDateDisplay').value=formatDisplayDate(record.BirthDate || ''); document.querySelector('#BirthDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=record.BirthDate || ''; document.getElementById('ExpiredDate').value=record.ExpiredDate || ''; document.getElementById('ExpiredDateDisplay').value=formatDisplayDate(record.ExpiredDate || ''); document.querySelector('#ExpiredDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=record.ExpiredDate || ''; document.getElementById('EstimationOut').value=record.EstimationOut || ''; document.getElementById('EstimationOutDisplay').value=formatDisplayDate(record.EstimationOut || ''); document.querySelector('#EstimationOutDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=record.EstimationOut || ''; document.getElementById('CheckInTime').value=record.CheckInTime || ''; nominalField.value=formatRibuan(String(record.Nominal || '')); updateRoomHelper(); updatePackageHelper();}
-function resetForm(){form.reset(); setFormModeCreate(); document.getElementById('CheckInDate').value=defaultCheckIn; document.getElementById('CheckInDateDisplay').value=formatDisplayDate(defaultCheckIn); document.querySelector('#CheckInDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=defaultCheckIn; document.getElementById('EstimationOut').value=defaultCheckOut; document.getElementById('EstimationOutDisplay').value=formatDisplayDate(defaultCheckOut); document.querySelector('#EstimationOutDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=defaultCheckOut; document.getElementById('BirthDate').value=''; document.getElementById('BirthDateDisplay').value=''; document.querySelector('#BirthDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=''; document.getElementById('ExpiredDate').value=''; document.getElementById('ExpiredDateDisplay').value=''; document.querySelector('#ExpiredDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=''; roomHelper.querySelector('strong').textContent='Pilih room yang masih tersedia'; packageHelper.querySelector('strong').textContent='Nominal akan terisi otomatis bila package ditemukan'; nominalField.value=''; document.getElementById('CheckInTime').value='{{ now()->format('H:i') }}'; document.getElementById('TypeOfCheckIn').value='GROUP RESERVATION'; document.getElementById('PaymentMethod').value='OTA'; document.getElementById('Segment').value='TRAVEL'; document.getElementById('Nationality').value='INA'; document.getElementById('NumberOfPerson').value='2'; document.getElementById('Breakfast').value='2'; document.getElementById('GuestName').focus();}
+function bindDateGroup(group){const hidden=group.querySelector('input[type="hidden"]'); const display=group.querySelector('input[type="text"]'); const native=group.querySelector('[data-date-native]'); const button=group.querySelector('[data-date-button]'); if(!hidden||!display||!native){return;} display.addEventListener('blur', function(){if(!this.value.trim()){hidden.value=''; native.value=''; return;} const iso=normalizeDisplayDate(this.value); if(!iso){showCrudAlert('Tanggal harus memakai format dd-MM-yyyy.'); this.focus(); return;} hidden.value=iso; native.value=iso; this.value=formatDisplayDate(iso);}); native.addEventListener('change', function(){hidden.value=this.value||''; display.value=formatDisplayDate(this.value);}); if(button){button.addEventListener('click', function(){if(typeof native.showPicker === 'function'){native.showPicker();} else {native.focus(); native.click();}});} display.value=formatDisplayDate(hidden.value); native.value=hidden.value;}
+function updateRoomHelper(){const option=findOptionByValue('roomCodeOptions', roomCodeField.value); if(!option){roomHelper.querySelector('strong').textContent='Pilih room yang masih tersedia'; return;} const kelas=option.dataset.kelas || '-'; const status=option.dataset.status || '-'; const available=option.dataset.available === '1'; roomHelper.querySelector('strong').textContent=roomCodeField.value.toUpperCase()+' | '+kelas+' | '+status+(available ? '' : ' | tidak tersedia');}
+function updatePackageHelper(){const option=findOptionByValue('packageCodeOptions', packageCodeField.value); if(!option){packageHelper.querySelector('strong').textContent='Nominal akan terisi otomatis bila package ditemukan'; return;} const nominal=Number(option.dataset.nominal || 0); const expired=option.dataset.expired || '-'; if(!normalizeNumber(nominalField.value)){nominalField.value=formatRibuan(String(nominal));} packageHelper.querySelector('strong').textContent=(option.dataset.name || 'Package')+' | Exp '+expired+' | Rp '+formatRibuan(String(nominal));}
+function renumberAdditionalRows(){Array.from(additionalRoomBody.querySelectorAll('[data-room-row]')).forEach((row,index)=>{const line=row.querySelector('[data-room-line]'); if(line){line.textContent=index+2;}});}
+function bindAdditionalRow(row){const roomInput=row.querySelector('.room-code-input'); const packageInput=row.querySelector('.package-code-input'); const nominalInput=row.querySelector('.nominal-input'); const removeButton=row.querySelector('.room-row-remove'); if(packageInput){packageInput.addEventListener('input', function(){const option=findOptionByValue('packageCodeOptions', this.value); if(option && !normalizeNumber(nominalInput.value)){nominalInput.value=formatRibuan(String(option.dataset.nominal || '0'));}});} if(nominalInput){nominalInput.addEventListener('input', function(){this.value=formatRibuan(this.value);});} if(roomInput){roomInput.addEventListener('input', function(){this.value=this.value.toUpperCase();});} if(removeButton){removeButton.addEventListener('click', function(){row.remove(); renumberAdditionalRows();});}}
+function addAdditionalRoomRow(detail={}){const fragment=additionalRoomRowTemplate.content.cloneNode(true); const row=fragment.querySelector('[data-room-row]'); row.querySelector('.detail-key-input').value=detail.detailKey || ''; row.querySelector('.room-code-input').value=detail.roomCode || ''; row.querySelector('.package-code-input').value=detail.packageCode || ''; row.querySelector('.nominal-input').value=detail.nominal ? formatRibuan(String(detail.nominal)) : ''; row.querySelector('.breakfast-input').value=detail.breakfast ?? 0; bindAdditionalRow(row); additionalRoomBody.appendChild(fragment); renumberAdditionalRows();}
+function resetAdditionalRoomRows(){additionalRoomBody.innerHTML='';}
+function setFormModeCreate(regNo = defaultRegNo){form.action='/checkin'; currentDetailKeyField.value=''; primaryDetailKeyField.value=''; generatedRegNoField.value=regNo || defaultRegNo; saveButton.textContent='Save Check In'; Array.from(document.querySelectorAll('.checkin-record-row')).forEach(row => row.classList.remove('is-active'));}
+function applyRecord(record){setFormModeCreate(record.RegNo || defaultRegNo); currentDetailKeyField.value=record.DetailKey || ''; primaryDetailKeyField.value=record.DetailKey || ''; form.action='/checkin/'+encodeURIComponent(record.DetailKey)+'/update'; saveButton.textContent='Update Check In'; const mappings=['ReservationNumber','GuestName','GuestName2','Address','Kelurahan','Kecamatan','KabCity','ProvinceCountry','TypeOfId','IdNumber','GroupPosition','TypeOfCheckIn','PlaceOfBirth','Religion','Nationality','NumberOfPerson','PaymentMethod','Company','CreditCardNumber','Segment','Phone','Email','Remarks','Member','Sales']; mappings.forEach(function(id){const field=document.getElementById(id); if(field){field.value=record[id] ?? '';}}); document.getElementById('CheckDeposit').checked=String(record.CheckDeposit || '0') === '1'; document.getElementById('CheckInDate').value=record.CheckInDate || ''; document.getElementById('CheckInDateDisplay').value=formatDisplayDate(record.CheckInDate || ''); document.querySelector('#CheckInDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=record.CheckInDate || ''; document.getElementById('BirthDate').value=record.BirthDate || ''; document.getElementById('BirthDateDisplay').value=formatDisplayDate(record.BirthDate || ''); document.querySelector('#BirthDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=record.BirthDate || ''; document.getElementById('ExpiredDate').value=record.ExpiredDate || ''; document.getElementById('ExpiredDateDisplay').value=formatDisplayDate(record.ExpiredDate || ''); document.querySelector('#ExpiredDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=record.ExpiredDate || ''; document.getElementById('EstimationOut').value=record.EstimationOut || ''; document.getElementById('EstimationOutDisplay').value=formatDisplayDate(record.EstimationOut || ''); document.querySelector('#EstimationOutDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=record.EstimationOut || ''; document.getElementById('CheckInTime').value=record.CheckInTime || ''; roomCodeField.value=record.RoomCode || ''; packageCodeField.value=record.PackageCode || ''; nominalField.value=formatRibuan(String(record.Nominal || '')); breakfastField.value=record.Breakfast || 0; resetAdditionalRoomRows(); updateRoomHelper(); updatePackageHelper();}
+function resetForm(){const preservedRegNo=(generatedRegNoField.value || defaultRegNo).trim().toUpperCase(); form.reset(); setFormModeCreate(preservedRegNo); resetAdditionalRoomRows(); document.getElementById('CheckInDate').value=defaultCheckIn; document.getElementById('CheckInDateDisplay').value=formatDisplayDate(defaultCheckIn); document.querySelector('#CheckInDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=defaultCheckIn; document.getElementById('EstimationOut').value=defaultCheckOut; document.getElementById('EstimationOutDisplay').value=formatDisplayDate(defaultCheckOut); document.querySelector('#EstimationOutDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=defaultCheckOut; document.getElementById('BirthDate').value=''; document.getElementById('BirthDateDisplay').value=''; document.querySelector('#BirthDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=''; document.getElementById('ExpiredDate').value=''; document.getElementById('ExpiredDateDisplay').value=''; document.querySelector('#ExpiredDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]').value=''; roomHelper.querySelector('strong').textContent='Pilih room yang masih tersedia'; packageHelper.querySelector('strong').textContent='Nominal akan terisi otomatis bila package ditemukan'; nominalField.value=''; packageCodeField.value=''; roomCodeField.value=''; breakfastField.value='2'; document.getElementById('CheckInTime').value='{{ now()->format('H:i') }}'; document.getElementById('TypeOfCheckIn').value='GROUP RESERVATION'; document.getElementById('PaymentMethod').value='OTA'; document.getElementById('Segment').value='TRAVEL'; document.getElementById('Nationality').value='INA'; document.getElementById('NumberOfPerson').value='2'; document.getElementById('GuestName').focus();}
 
 Array.from(document.querySelectorAll('[data-date-field]')).forEach(bindDateGroup);
-roomCodeField.addEventListener('input', updateRoomHelper);
+roomCodeField.addEventListener('input', function(){this.value=this.value.toUpperCase(); updateRoomHelper();});
 packageCodeField.addEventListener('input', updatePackageHelper);
 nominalField.addEventListener('input', function(){this.value=formatRibuan(this.value);});
+addRoomRowButton.addEventListener('click', function(){addAdditionalRoomRow();});
 newEntryButton.addEventListener('click', resetForm);
 focusSearchButton.addEventListener('click', function(){document.getElementById('checkinDirectoryShell').scrollIntoView({behavior:'smooth', block:'start'}); setTimeout(() => searchKeyword.focus(), 250);});
-form.addEventListener('submit', function(event){const dateDisplays=['CheckInDateDisplay','BirthDateDisplay','ExpiredDateDisplay','EstimationOutDisplay']; for(const id of dateDisplays){const display=document.getElementById(id); if(!display){continue;} const group=display.closest('[data-date-field]'); const hidden=group.querySelector('input[type="hidden"]'); if(display.value.trim()===''){hidden.value=''; continue;} const iso=normalizeDisplayDate(display.value); if(!iso){event.preventDefault(); showCrudAlert('Tanggal harus memakai format dd-MM-yyyy.'); display.focus(); return;} hidden.value=iso; group.querySelector('[data-date-native]').value=iso; display.value=formatDisplayDate(iso);} if(document.getElementById('EstimationOut').value < document.getElementById('CheckInDate').value){event.preventDefault(); showCrudAlert('Estimation Out tidak boleh lebih kecil dari Check In.'); document.getElementById('EstimationOutDisplay').focus(); return;} roomCodeField.value=roomCodeField.value.trim().toUpperCase(); packageCodeField.value=packageCodeField.value.trim().toUpperCase(); nominalField.value=normalizeNumber(nominalField.value);});
+form.addEventListener('submit', function(event){generatedRegNoField.value=generatedRegNoField.value.trim().toUpperCase(); const dateDisplays=['CheckInDateDisplay','BirthDateDisplay','ExpiredDateDisplay','EstimationOutDisplay']; for(const id of dateDisplays){const display=document.getElementById(id); if(!display){continue;} const group=display.closest('[data-date-field]'); const hidden=group.querySelector('input[type="hidden"]'); if(display.value.trim()===''){hidden.value=''; continue;} const iso=normalizeDisplayDate(display.value); if(!iso){event.preventDefault(); showCrudAlert('Tanggal harus memakai format dd-MM-yyyy.'); display.focus(); return;} hidden.value=iso; group.querySelector('[data-date-native]').value=iso; display.value=formatDisplayDate(iso);} if(document.getElementById('EstimationOut').value < document.getElementById('CheckInDate').value){event.preventDefault(); showCrudAlert('Estimation Out tidak boleh lebih kecil dari Check In.'); document.getElementById('EstimationOutDisplay').focus(); return;} roomCodeField.value=roomCodeField.value.trim().toUpperCase(); packageCodeField.value=packageCodeField.value.trim().toUpperCase(); nominalField.value=normalizeNumber(nominalField.value); Array.from(additionalRoomBody.querySelectorAll('.room-code-input')).forEach(input => input.value=input.value.trim().toUpperCase()); Array.from(additionalRoomBody.querySelectorAll('.package-code-input')).forEach(input => input.value=input.value.trim().toUpperCase()); Array.from(additionalRoomBody.querySelectorAll('.nominal-input')).forEach(input => input.value=normalizeNumber(input.value));});
 Array.from(document.querySelectorAll('.checkin-record-row')).forEach(function(row){row.addEventListener('click', function(event){if(event.target.closest('.checkin-delete-link')){return;} Array.from(document.querySelectorAll('.checkin-record-row')).forEach(item => item.classList.remove('is-active')); row.classList.add('is-active'); try {applyRecord(JSON.parse(row.dataset.record)); window.scrollTo({top:0, behavior:'smooth'});} catch(error){showCrudAlert('Data baris tidak bisa dimuat ke form.');}});});
 form.addEventListener('keydown', function(event){if(event.key !== 'Enter' || event.target.tagName === 'TEXTAREA'){return;} const fields=Array.from(form.querySelectorAll('input[data-flow], select[data-flow], textarea[data-flow]')).filter(field => !field.disabled && field.offsetParent !== null); const index=fields.indexOf(event.target); if(index >= 0 && index < fields.length - 1){event.preventDefault(); fields[index + 1].focus(); fields[index + 1].select?.();}});
+if(oldAdditionalRoomRows.length){oldAdditionalRoomRows.forEach(detail => addAdditionalRoomRow(detail));}
 updateRoomHelper();
 updatePackageHelper();
-if({{ old('GuestName') || old('RoomCode') ? 'true' : 'false' }}){document.getElementById('GuestName').focus();} else {resetForm();}
+if(initialHasOld){document.getElementById('GuestName').focus();} else {resetForm();}
 const successAlert=document.getElementById('successAlert'); if(successAlert){setTimeout(()=>{successAlert.style.transition='opacity .3s ease, transform .3s ease'; successAlert.style.opacity='0'; successAlert.style.transform='translateY(-8px)'; setTimeout(()=>successAlert.remove(),300);},3000);}
 </script>
 
 @endsection
+
+
+

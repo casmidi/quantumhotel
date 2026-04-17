@@ -1,0 +1,17 @@
+﻿CHECKIN MODULE
+
+1. Header transaksi disimpan di tabel DATA dengan key RegNo.
+2. Detail kamar disimpan di tabel DATA2 dengan key RegNo2 = RegNo + Kode kamar.
+3. Satu RegNo dapat memiliki lebih dari satu record DATA2 bila guest mengambil lebih dari satu kamar.
+4. Saat simpan detail baru:
+   - upsert DATA per RegNo
+   - insert DATA2 per RegNo2
+   - insert DataMove per RegNo2
+   - insert Deposit per RegNo + Kode kamar
+   - update ROOM.Status2 menjadi Occupied Clean
+5. Saat detail dihapus:
+   - delete DATA2, DataMove, dan Deposit untuk detail tersebut
+   - jika tidak ada detail lain dengan RegNo yang sama, header DATA ikut dihapus
+6. Form web mengikuti shell Package Transaction, tetapi layout input dibuat padat agar alur input cepat.
+7. Semua tanggal user-facing memakai format dd-MM-yyyy.
+8. Istilah lama desktop tidak ditampilkan pada UI web.

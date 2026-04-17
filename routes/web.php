@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -9,6 +9,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StockPackageController;
 use App\Http\Controllers\PackageTransactionController;
 use App\Http\Controllers\AutomaticPackageController;
+use App\Http\Controllers\CheckinController;
 
 /*
 |--------------------------------------------------------------------------
@@ -155,7 +156,22 @@ Route::post('/automatic-package/process', function () {
 */
 Route::get('/checkin', function () {
     if (!session('user')) return redirect('/');
-    return "Check-In Page";
+    return app(CheckinController::class)->index(request());
+});
+
+Route::post('/checkin', function () {
+    if (!session('user')) return redirect('/');
+    return app(CheckinController::class)->store(request());
+});
+
+Route::post('/checkin/{regNo2}/update', function ($regNo2) {
+    if (!session('user')) return redirect('/');
+    return app(CheckinController::class)->update(request(), $regNo2);
+});
+
+Route::get('/checkin/{regNo2}/delete', function ($regNo2) {
+    if (!session('user')) return redirect('/');
+    return app(CheckinController::class)->destroy($regNo2);
 });
 
 Route::get('/checkout', function () {
