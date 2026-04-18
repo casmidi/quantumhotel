@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>Login - Quantum Hotel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -211,7 +214,7 @@
             font-weight: 600;
         }
 
-        .field-group + .field-group {
+        .field-group+.field-group {
             margin-top: 1rem;
         }
 
@@ -324,7 +327,8 @@
                 <div class="brand-kicker">Quantum Hotel System</div>
                 <h1 class="brand-title">Luxury Operations. Refined Control.</h1>
                 <p class="brand-copy">
-                    A premium hospitality platform crafted for five-star service flow, elegant front-office operations, and high-precision control across your hotel business.
+                    A premium hospitality platform crafted for five-star service flow, elegant front-office operations,
+                    and high-precision control across your hotel business.
                 </p>
 
                 <div class="brand-points">
@@ -334,11 +338,13 @@
                     </div>
                     <div class="brand-point">
                         <strong>Executive Feel</strong>
-                        <span>Luxury-inspired interface language designed to reflect premium hospitality standards.</span>
+                        <span>Luxury-inspired interface language designed to reflect premium hospitality
+                            standards.</span>
                     </div>
                     <div class="brand-point">
                         <strong>Always Connected</strong>
-                        <span>Accessible online through your public domain for smooth operations across locations.</span>
+                        <span>Accessible online through your public domain for smooth operations across
+                            locations.</span>
                     </div>
                 </div>
             </div>
@@ -349,23 +355,25 @@
                     <h2 class="panel-title">Welcome Back</h2>
                     <p class="panel-copy">Sign in to continue into the Quantum Hotel control center.</p>
 
-                    @if(session('error'))
-                    <div class="login-alert">
-                        {{ session('error') }}
-                    </div>
+                    @if (session('error'))
+                        <div class="login-alert">
+                            {{ session('error') }}
+                        </div>
                     @endif
 
-                    <form method="POST" action="/login">
+                    <form method="POST" action="{{ route('login.submit') }}">
                         @csrf
 
                         <div class="field-group">
                             <label class="field-label" for="username">User Code</label>
-                            <input type="text" name="username" id="username" class="field-input" placeholder="Enter your user code" autocomplete="username" required autofocus>
+                            <input type="text" name="username" id="username" class="field-input"
+                                placeholder="Enter your user code" autocomplete="username" required autofocus>
                         </div>
 
                         <div class="field-group">
                             <label class="field-label" for="password">Password</label>
-                            <input type="password" name="password" id="password" class="field-input" placeholder="Enter your password" autocomplete="current-password" required>
+                            <input type="password" name="password" id="password" class="field-input"
+                                placeholder="Enter your password" autocomplete="current-password" required>
                         </div>
 
                         <div class="login-actions">
@@ -382,4 +390,5 @@
         </section>
     </main>
 </body>
+
 </html>

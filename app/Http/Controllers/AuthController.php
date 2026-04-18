@@ -30,7 +30,7 @@ class AuthController extends Controller
                     'role' => trim($user->Nama)
                 ]);
 
-                return redirect('/dashboard');
+                return redirect()->route('dashboard');
             }
         }
 
@@ -40,6 +40,6 @@ class AuthController extends Controller
     public function logout()
     {
         session()->flush();
-        return redirect('/');
+        return redirect()->route('login');
     }
 }

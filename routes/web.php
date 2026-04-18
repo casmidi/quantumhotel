@@ -16,6 +16,7 @@ use App\Http\Controllers\CheckinController;
 | DEBUG
 |--------------------------------------------------------------------------
 */
+
 Route::get('/test-db', function () {
     return DB::select("SELECT TOP 5 * FROM KELAS");
 });
@@ -25,9 +26,9 @@ Route::get('/test-db', function () {
 | AUTH
 |--------------------------------------------------------------------------
 */
-Route::get('/', [AuthController::class, 'loginForm']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/logout', [AuthController::class, 'logout']);
+Route::get('/', [AuthController::class, 'loginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +38,7 @@ Route::get('/logout', [AuthController::class, 'logout']);
 Route::get('/dashboard', function () {
     if (!session('user')) return redirect('/');
     return app(DashboardController::class)->index();
-});
+})->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
@@ -208,5 +209,3 @@ Route::get('/change-password', function () {
     if (!session('user')) return redirect('/');
     return "Change Password Page";
 });
-
-
