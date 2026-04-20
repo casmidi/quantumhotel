@@ -14,27 +14,40 @@ class PackageTransactionController extends Controller
         $searchType = trim((string) $request->query('search_type', 'all'));
         $searchValue = trim((string) $request->query('search', ''));
         $sortBy = trim((string) $request->query('sort_by', 'invoice'));
+        if ($sortBy === 'nominal') {
+            $sortBy = 'total';
+        }
         $sortDir = strtolower(trim((string) $request->query('sort_dir', 'desc'))) === 'asc' ? 'asc' : 'desc';
         $perPage = 10;
-        $allowedSorts = ['invoice', 'package', 'room', 'meals', 'others', 'expired', 'nominal'];
+        $allowedSorts = ['invoice', 'package', 'room', 'meals', 'others', 'expired', 'total'];
 
         if (!in_array($sortBy, $allowedSorts, true)) {
             $sortBy = 'invoice';
         }
 
+        $stockIdSelect = $this->legacyIdSelect('StockPackage');
         $items = DB::table('StockPackage')
-            ->selectRaw("RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Kind) as Kind, Hj")
+            ->selectRaw("$stockIdSelect, RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Kind) as Kind, Hj")
             ->orderBy('KodeBrg')
             ->get();
 
         [$packages, $summary] = $this->loadPagedPackages($request, $searchType, $searchValue, $sortBy, $sortDir, $perPage);
         $nextNofak = $this->previewPackageNofak();
 
-        if ($request->ajax()) {
+        if ($request->ajax() && !$this->isApiRequest($request)) {
             return view('package.partials.transaction-directory-section', compact('packages', 'summary', 'searchType', 'searchValue', 'sortBy', 'sortDir'))->render();
         }
 
-        return view('package.transaction', compact('items', 'packages', 'summary', 'nextNofak', 'searchType', 'searchValue', 'sortBy', 'sortDir'));
+        return $this->respond($request, 'package.transaction', compact('items', 'packages', 'summary', 'nextNofak', 'searchType', 'searchValue', 'sortBy', 'sortDir'), [
+            'items' => $items,
+            'packages' => $this->paginatorPayload($packages),
+            'summary' => $summary,
+            'next_nofak' => $nextNofak,
+            'search_type' => $searchType,
+            'search' => $searchValue,
+            'sort_by' => $sortBy,
+            'sort_dir' => $sortDir,
+        ]);
     }
 
     public function store(Request $request)
@@ -47,12 +60,17 @@ class PackageTransactionController extends Controller
         return $this->savePackage($request, trim((string) $nofak));
     }
 
-    public function destroy($nofak)
+    public function destroy(Request $request, $nofak)
     {
         $normalized = trim((string) $nofak);
+        $package = $this->findPackageHeader($normalized);
+
+        if (!$package) {
+            return $this->respondError($request, 'Package transaction was not found.', 404, [], '/menu-package-transaction', false);
+        }
 
         if ($this->packageIsUsed($normalized)) {
-            return redirect('/menu-package-transaction')->with('error', 'This package transaction is already used in guest transactions and cannot be deleted.');
+            return $this->respondError($request, 'This package transaction is already used in guest transactions and cannot be deleted.', 422, [], '/menu-package-transaction', false);
         }
 
         DB::transaction(function () use ($normalized) {
@@ -60,7 +78,10 @@ class PackageTransactionController extends Controller
             DB::table('Package')->whereRaw('RTRIM(Nofak) = ?', [$normalized])->delete();
         });
 
-        return redirect('/menu-package-transaction')->with('success', 'Package transaction deleted successfully');
+        return $this->respondAfterMutation($request, '/menu-package-transaction', 'Package transaction deleted successfully', [
+            'id' => $package->id ?? null,
+            'Nofak' => $normalized,
+        ]);
     }
 
     private function loadPagedPackages(Request $request, string $searchType, string $searchValue, string $sortBy, string $sortDir, int $perPage): array
@@ -92,11 +113,13 @@ class PackageTransactionController extends Controller
 
         $sortExpression = $this->resolvePackageSortExpression($sortBy);
         $direction = $sortDir === 'asc' ? 'ASC' : 'DESC';
+        $packageIdSelect = $this->legacyIdSelect('Package');
         $rowSql = "
-            SELECT paged.Nofak, paged.Meja, paged.JumlahRes, paged.Expired
+            SELECT paged.id, paged.Nofak, paged.Meja, paged.JumlahRes, paged.Expired
             FROM (
                 SELECT
                     ROW_NUMBER() OVER (ORDER BY $sortExpression $direction, RTRIM(P.Nofak) $direction) AS row_num,
+                    $packageIdSelect,
                     RTRIM(P.Nofak) AS Nofak,
                     RTRIM(P.Meja) AS Meja,
                     P.JumlahRes,
@@ -109,7 +132,7 @@ class PackageTransactionController extends Controller
         ";
 
         $pageRows = collect(DB::select($rowSql, array_merge($bindings, [$offsetStart, $offsetEnd])));
-        $packageNofaks = $pageRows->pluck('Nofak')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
+        $packageNofaks = $pageRows->pluck('Nofak')->map(fn($value) => trim((string) $value))->filter()->values()->all();
         $details = $this->loadPackageDetails($packageNofaks);
         $kindTotals = $this->loadPackageKindTotals($packageNofaks);
         $usedPackages = $this->loadUsedPackages($packageNofaks);
@@ -237,7 +260,7 @@ class PackageTransactionController extends Controller
             'meals' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'RESTAURANT'), 0)",
             'others' => "ISNULL((SELECT SUM(CAST(PD.Qty * PD.Harga AS float)) FROM PackageD PD INNER JOIN StockPackage SP ON RTRIM(SP.KodeBrg) = RTRIM(PD.KodeBrg) WHERE RTRIM(PD.Nofak) = RTRIM(P.Nofak) AND UPPER(RTRIM(SP.Kind)) = 'OTHER'), 0)",
             'expired' => 'P.Expired',
-            'nominal' => 'P.JumlahRes',
+            'total' => 'P.JumlahRes',
             default => 'RTRIM(P.Nofak)',
         };
     }
@@ -294,7 +317,7 @@ class PackageTransactionController extends Controller
                     'amount' => (float) ($row->Jumlah ?? 0),
                 ];
             })
-            ->filter(fn ($row) => !empty($row->kind_bucket))
+            ->filter(fn($row) => !empty($row->kind_bucket))
             ->groupBy('Nofak');
     }
 
@@ -309,7 +332,7 @@ class PackageTransactionController extends Controller
             ->whereIn(DB::raw('RTRIM(Package)'), $packageNofaks)
             ->get()
             ->pluck('Package')
-            ->map(fn ($value) => trim((string) $value))
+            ->map(fn($value) => trim((string) $value))
             ->flip();
     }
 
@@ -330,39 +353,35 @@ class PackageTransactionController extends Controller
         $duplicateItemCodes = $this->findDuplicateItemCodes($request);
 
         if ($packageCode === '') {
-            return redirect('/menu-package-transaction')->with('error', 'Package code is required.')->withInput();
+            return $this->respondError($request, 'Package code is required.', 422, [], '/menu-package-transaction', true);
         }
 
         if (!$expired) {
-            return redirect('/menu-package-transaction')->with('error', 'Expired date is required.')->withInput();
+            return $this->respondError($request, 'Expired date is required.', 422, [], '/menu-package-transaction', true);
         }
 
         if ($expired->lt(Carbon::today())) {
-            return redirect('/menu-package-transaction')->with('error', 'Expired date must be greater than or equal to today.')->withInput();
+            return $this->respondError($request, 'Expired date must be greater than or equal to today.', 422, [], '/menu-package-transaction', true);
         }
 
         if (!empty($duplicateItemCodes)) {
-            return redirect('/menu-package-transaction')
-                ->with('error', 'Duplicate item codes are not allowed in one package transaction: ' . implode(', ', $duplicateItemCodes) . '.')
-                ->withInput();
+            return $this->respondError($request, 'Duplicate item codes are not allowed in one package transaction: ' . implode(', ', $duplicateItemCodes) . '.', 422, [], '/menu-package-transaction', true);
         }
 
         if (empty($details)) {
-            return redirect('/menu-package-transaction')->with('error', 'At least one package item is required.')->withInput();
+            return $this->respondError($request, 'At least one package item is required.', 422, [], '/menu-package-transaction', true);
         }
 
         if ($existingNofak && !$this->packageExists($existingNofak)) {
-            return redirect('/menu-package-transaction')->with('error', 'Package transaction was not found.');
+            return $this->respondError($request, 'Package transaction was not found.', 404, [], '/menu-package-transaction', false);
         }
 
         if ($existingNofak && $this->packageIsUsed($existingNofak)) {
-            return redirect('/menu-package-transaction')->with('error', 'This package transaction is already used in guest transactions and cannot be updated.');
+            return $this->respondError($request, 'This package transaction is already used in guest transactions and cannot be updated.', 422, [], '/menu-package-transaction', false);
         }
 
         if ($this->hasDuplicatePackageCode($packageCode, $expired, $existingNofak)) {
-            return redirect('/menu-package-transaction')
-                ->with('error', 'The same package code and expired date already exist.')
-                ->withInput();
+            return $this->respondError($request, 'The same package code and expired date already exist.', 422, [], '/menu-package-transaction', true);
         }
 
         $nominal = collect($details)->sum('amount');
@@ -415,10 +434,10 @@ class PackageTransactionController extends Controller
         });
 
         if ($existingNofak) {
-            return redirect('/menu-package-transaction')->with('success', 'Package transaction updated successfully');
+            return $this->respondAfterMutation($request, '/menu-package-transaction', 'Package transaction updated successfully', $this->findPackageHeader($savedNofak));
         }
 
-        return redirect('/menu-package-transaction')->with('success', 'Package transaction saved successfully. Invoice: ' . $savedNofak);
+        return $this->respondAfterMutation($request, '/menu-package-transaction', 'Package transaction saved successfully. Invoice: ' . $savedNofak, $this->findPackageHeader($savedNofak), 201);
     }
 
     private function extractDetails(Request $request): array
@@ -429,7 +448,7 @@ class PackageTransactionController extends Controller
         $stockItems = DB::table('StockPackage')
             ->selectRaw('RTRIM(KodeBrg) as KodeBrg, Hj')
             ->get()
-            ->keyBy(fn ($item) => strtoupper(trim((string) $item->KodeBrg)));
+            ->keyBy(fn($item) => strtoupper(trim((string) $item->KodeBrg)));
 
         foreach ($codes as $index => $code) {
             $normalizedCode = strtoupper(trim((string) $code));
@@ -491,6 +510,15 @@ class PackageTransactionController extends Controller
         return DB::table('Package')
             ->whereRaw('RTRIM(Nofak) = ?', [trim($nofak)])
             ->exists();
+    }
+
+    private function findPackageHeader(string $nofak)
+    {
+        $idSelect = $this->legacyIdSelect('Package');
+        return DB::table('Package')
+            ->selectRaw("$idSelect, RTRIM(Nofak) as Nofak, RTRIM(Meja) as Meja, JumlahRes, Expired")
+            ->whereRaw('RTRIM(Nofak) = ?', [trim($nofak)])
+            ->first();
     }
 
     private function packageIsUsed(string $nofak): bool

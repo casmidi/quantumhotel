@@ -10,34 +10,32 @@ class KelasController extends Controller
 {
     public function index(Request $request)
     {
-        $query = DB::table('KELAS');
+        $query = DB::table('KELAS')
+            ->selectRaw("ROW_NUMBER() OVER (ORDER BY Kode) AS id, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1, Depo1");
 
         if ($request->q) {
-            $search = trim((string) $request->q);
-            $query->where(function ($builder) use ($search) {
-                $builder->where('Kode', 'like', '%' . $search . '%')
-                    ->orWhere('Nama', 'like', '%' . $search . '%');
+            $keyword = trim((string) $request->q);
+            $query->where(function ($builder) use ($keyword) {
+                $builder->whereRaw('RTRIM(Kode) like ?', ['%' . $keyword . '%'])
+                    ->orWhereRaw('RTRIM(Nama) like ?', ['%' . $keyword . '%']);
             });
         }
 
-        $kelasCollection = $query
-            ->orderBy('Kode')
-            ->get();
-
+        $kelasCollection = $query->orderBy('Kode')->get();
         $kelas = $this->paginateCollection($kelasCollection, 10, $request);
 
-        $summary = [
-            'total' => $kelasCollection->count(),
-            'avgRate' => (float) ($kelasCollection->avg('Rate1') ?? 0),
-            'avgDepo' => (float) ($kelasCollection->avg('Depo1') ?? 0),
-        ];
-
-        return view('kelas.index', compact('kelas', 'summary'));
+        return $this->respond($request, 'kelas.index', [
+            'kelas' => $kelas,
+        ], $kelas);
     }
 
     public function store(Request $request)
     {
         $kode = trim((string) $request->Kode);
+
+        if ($kode === '') {
+            return $this->respondError($request, 'Kode wajib diisi.');
+        }
 
         $existing = DB::table('KELAS')
             ->whereRaw('RTRIM(Kode) = ?', [$kode])
@@ -54,7 +52,7 @@ class KelasController extends Controller
 
             event(new KelasUpdated());
 
-            return redirect('/kelas')->with('success', 'Existing room class updated successfully');
+            return $this->respondAfterMutation($request, '/kelas', 'Existing room class updated successfully', $this->findKelas($kode));
         }
 
         DB::table('KELAS')->insert([
@@ -66,13 +64,20 @@ class KelasController extends Controller
 
         event(new KelasUpdated());
 
-        return redirect('/kelas')->with('success', 'Data saved successfully');
+        return $this->respondAfterMutation($request, '/kelas', 'Data saved successfully', $this->findKelas($kode), 201);
     }
 
     public function update(Request $request, $kode)
     {
+        $kode = trim((string) $kode);
+        $existing = $this->findKelas($kode);
+
+        if (!$existing) {
+            return $this->respondError($request, 'Data kelas tidak ditemukan.', 404, [], '/kelas', false);
+        }
+
         DB::table('KELAS')
-            ->where('Kode', $kode)
+            ->whereRaw('RTRIM(Kode) = ?', [$kode])
             ->update([
                 'Nama' => $request->Nama,
                 'Rate1' => is_numeric($request->Rate1) ? $request->Rate1 : 0,
@@ -81,22 +86,45 @@ class KelasController extends Controller
 
         event(new KelasUpdated());
 
-        return redirect('/kelas')->with('success', 'Data updated successfully');
+        return $this->respondAfterMutation($request, '/kelas', 'Data updated successfully', $this->findKelas($kode));
     }
 
-    public function destroy($kode)
+    public function destroy(Request $request, $kode)
     {
-        DB::table('KELAS')->where('Kode', $kode)->delete();
+        $kode = trim((string) $kode);
+        $existing = $this->findKelas($kode);
+
+        if (!$existing) {
+            return $this->respondError($request, 'Data kelas tidak ditemukan.', 404, [], '/kelas', false);
+        }
+
+        DB::table('KELAS')
+            ->whereRaw('RTRIM(Kode) = ?', [$kode])
+            ->delete();
 
         event(new KelasUpdated());
 
-        return redirect('/kelas')->with('success', 'Data deleted successfully');
+        return $this->respondAfterMutation($request, '/kelas', 'Data deleted successfully', [
+            'Kode' => $kode,
+        ]);
     }
 
     public function data()
     {
-        return response()->json(
-            DB::table('KELAS')->orderBy('Kode')->get()
-        );
+        return response()->json([
+            'success' => true,
+            'data' => DB::table('KELAS')
+                ->selectRaw("ROW_NUMBER() OVER (ORDER BY Kode) AS id, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1, Depo1")
+                ->orderBy('Kode')
+                ->get(),
+        ]);
+    }
+
+    private function findKelas(string $kode)
+    {
+        return DB::table('KELAS')
+            ->selectRaw("1 as id, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1, Depo1")
+            ->whereRaw('RTRIM(Kode) = ?', [$kode])
+            ->first();
     }
 }

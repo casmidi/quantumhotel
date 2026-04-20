@@ -11,19 +11,19 @@ class CheckinController extends Controller
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
-        $records = $this->loadActiveCheckins($search);
+        $records = $this->loadActiveCheckins($search, 80);
         $checkins = $this->paginateCollection($records, 10, $request);
         $rooms = $this->loadRoomOptions();
         $packages = $this->loadPackageOptions();
 
-        return view('checkin.index', [
+        $viewData = [
             'checkins' => $checkins,
             'search' => $search,
             'nextRegNo' => $this->generateNextRegNo(),
             'rooms' => $rooms,
             'packages' => $packages,
             'summary' => [
-                'active' => $records->count(),
+                'active' => $this->countActiveCheckins($search),
                 'rooms_ready' => collect($rooms)->where('available', true)->count(),
                 'packages' => count($packages),
             ],
@@ -33,6 +33,23 @@ class CheckinController extends Controller
             'religionOptions' => ['ISLAM', 'KRISTEN', 'KATOLIK', 'HINDU', 'BUDDHA', 'KONGHUCU'],
             'nationalityOptions' => ['INA', 'MAL', 'SGP', 'AUS', 'JPN', 'KOR', 'USA'],
             'idTypeOptions' => ['KTP', 'SIM', 'PASSPORT', 'KITAS'],
+        ];
+
+        return $this->respond($request, 'checkin.index', $viewData, [
+            'checkins' => $this->paginatorPayload($checkins),
+            'search' => $search,
+            'next_reg_no' => $viewData['nextRegNo'],
+            'rooms' => $rooms,
+            'packages' => $packages,
+            'summary' => $viewData['summary'],
+            'options' => [
+                'type' => $viewData['typeOptions'],
+                'payment' => $viewData['paymentOptions'],
+                'segment' => $viewData['segmentOptions'],
+                'religion' => $viewData['religionOptions'],
+                'nationality' => $viewData['nationalityOptions'],
+                'id_type' => $viewData['idTypeOptions'],
+            ],
         ]);
     }
 
@@ -46,12 +63,12 @@ class CheckinController extends Controller
         return $this->saveCheckin($request, trim((string) $regNo2));
     }
 
-    public function destroy(string $regNo2)
+    public function destroy(Request $request, string $regNo2)
     {
         $detail = $this->findDetailByKey(trim((string) $regNo2));
 
         if (!$detail) {
-            return redirect('/checkin')->with('error', 'Detail check in tidak ditemukan.');
+            return $this->respondError($request, 'Detail check in tidak ditemukan.', 404, [], '/checkin', false);
         }
 
         DB::transaction(function () use ($detail) {
@@ -66,7 +83,12 @@ class CheckinController extends Controller
             $this->syncHeaderFromRemainingDetail($detail->RegNo);
         });
 
-        return redirect('/checkin')->with('success', 'Detail check in berhasil dihapus.');
+        return $this->respondAfterMutation($request, '/checkin', 'Detail check in berhasil dihapus.', [
+            'id' => $detail->id ?? null,
+            'reg_no' => $detail->RegNo,
+            'reg_no2' => $detail->RegNo2,
+            'room_code' => $detail->Kode,
+        ]);
     }
 
     private function saveCheckin(Request $request, ?string $currentRegNo2 = null)
@@ -77,19 +99,19 @@ class CheckinController extends Controller
         $detailRows = $this->collectRoomDetails($validated);
 
         if ($regNo === '') {
-            return back()->withInput()->with('error', 'Reg number wajib diisi.');
+            return $this->respondError($request, 'Reg number wajib diisi.');
         }
 
         if (empty($detailRows)) {
-            return back()->withInput()->with('error', 'Minimal satu room detail harus diisi.');
+            return $this->respondError($request, 'Minimal satu room detail harus diisi.');
         }
 
         if ($currentRegNo2 && !$currentDetail) {
-            return redirect('/checkin')->with('error', 'Detail check in yang akan diubah tidak ditemukan.');
+            return $this->respondError($request, 'Detail check in yang akan diubah tidak ditemukan.', 404, [], '/checkin', false);
         }
 
         if ($currentDetail && count($detailRows) !== 1) {
-            return back()->withInput()->with('error', 'Mode update hanya boleh memuat satu baris detail room.');
+            return $this->respondError($request, 'Mode update hanya boleh memuat satu baris detail room.');
         }
 
         $roomTracker = [];
@@ -98,18 +120,18 @@ class CheckinController extends Controller
             $detailKey = $detailRow['detail_key'];
 
             if (!$this->roomExists($roomCode)) {
-                return back()->withInput()->with('error', 'Kode room ' . $roomCode . ' tidak ditemukan.');
+                return $this->respondError($request, 'Kode room ' . $roomCode . ' tidak ditemukan.');
             }
 
             if (isset($roomTracker[$roomCode])) {
-                return back()->withInput()->with('error', 'Room ' . $roomCode . ' muncul lebih dari satu kali di form yang sama.');
+                return $this->respondError($request, 'Room ' . $roomCode . ' muncul lebih dari satu kali di form yang sama.');
             }
 
             $roomTracker[$roomCode] = true;
             $ignoreKey = $currentDetail && $detailKey !== '' ? $currentDetail->RegNo2 : null;
 
             if ($this->roomHasActiveCheckin($roomCode, $ignoreKey)) {
-                return back()->withInput()->with('error', 'Room ' . $roomCode . ' masih dipakai guest aktif.');
+                return $this->respondError($request, 'Room ' . $roomCode . ' masih dipakai guest aktif.');
             }
 
             $detailRow['regno2'] = $currentDetail
@@ -166,7 +188,11 @@ class CheckinController extends Controller
             }
         });
 
-        return redirect('/checkin')->with('success', $currentDetail ? 'Detail check in berhasil diperbarui.' : 'Check in multi-room berhasil disimpan.');
+        return $this->respondAfterMutation($request, '/checkin', $currentDetail ? 'Detail check in berhasil diperbarui.' : 'Check in multi-room berhasil disimpan.', [
+            'reg_no' => $regNo,
+            'detail_keys' => $detailPayloads->pluck('RegNo2')->values(),
+            'rooms' => $detailPayloads->pluck('Kode')->values(),
+        ], $currentDetail ? 200 : 201);
     }
 
     private function validateRequest(Request $request): array
@@ -418,10 +444,11 @@ class CheckinController extends Controller
             ]);
     }
 
-    private function loadActiveCheckins(string $search)
+    private function loadActiveCheckins(string $search, int $limit = 80)
     {
+        $idSelect = $this->legacyIdSelect('DATA2');
         $query = DB::table('DATA2')
-            ->selectRaw("RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode, RTRIM(Guest) as Guest, RTRIM(Guest2) as Guest2, RTRIM(Tipe) as Tipe, RTRIM(Payment) as Payment, RTRIM(Segment) as Segment, RTRIM(Package) as Package, RTRIM(Receipt) as Receipt, RTRIM(TypeId) as TypeOfId, RTRIM(KTP) as KTP, RTRIM(Alamat) as Alamat, RTRIM(Kelurahan) as Kelurahan, RTRIM(Kecamatan) as Kecamatan, RTRIM(Kota) as Kota, RTRIM(Propinsi) as Propinsi, RTRIM(PlaceBirth) as PlaceBirth, RTRIM(Agama) as Agama, RTRIM(KodeNegara) as KodeNegara, RTRIM(Usaha) as Usaha, RTRIM(CardNumber) as CardNumber, RTRIM(Remark) as Remark, RTRIM(Posisi) as Posisi, RTRIM(Phone) as Phone, RTRIM(Email) as Email, RTRIM(Member) as Member, RTRIM(Sales) as Sales, TglIn, JamIn, JamOut, TglKeluar, TglLahir, Expired, Person, BF, Nominal, SafeDeposit")
+            ->selectRaw("$idSelect, RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode, RTRIM(Guest) as Guest, RTRIM(Guest2) as Guest2, RTRIM(Tipe) as Tipe, RTRIM(Payment) as Payment, RTRIM(Segment) as Segment, RTRIM(Package) as Package, RTRIM(Receipt) as Receipt, RTRIM(TypeId) as TypeOfId, RTRIM(KTP) as KTP, RTRIM(Alamat) as Alamat, RTRIM(Kelurahan) as Kelurahan, RTRIM(Kecamatan) as Kecamatan, RTRIM(Kota) as Kota, RTRIM(Propinsi) as Propinsi, RTRIM(PlaceBirth) as PlaceBirth, RTRIM(Agama) as Agama, RTRIM(KodeNegara) as KodeNegara, RTRIM(Usaha) as Usaha, RTRIM(CardNumber) as CardNumber, RTRIM(Remark) as Remark, RTRIM(Posisi) as Posisi, RTRIM(Phone) as Phone, RTRIM(Email) as Email, RTRIM(Member) as Member, RTRIM(Sales) as Sales, TglIn, JamIn, JamOut, TglKeluar, TglLahir, Expired, Person, BF, Nominal, SafeDeposit")
             ->where('Pst', '=', ' ')
             ->whereRaw("RTRIM(Kode) <> '999'");
 
@@ -439,6 +466,7 @@ class CheckinController extends Controller
         return $query
             ->orderByDesc('TglIn')
             ->orderByDesc('RegNo2')
+            ->limit($limit)
             ->get()
             ->map(function ($row) {
                 $row->check_in_date = !empty($row->TglIn) ? Carbon::parse($row->TglIn)->format('d-m-Y') : '';
@@ -450,6 +478,7 @@ class CheckinController extends Controller
                 $row->check_in_time = $this->displayTime($row->JamIn ?? null);
                 $row->nominal_display = number_format((float) ($row->Nominal ?? 0), 0, ',', '.');
                 $row->record_json = json_encode([
+                    'Id' => $row->id,
                     'DetailKey' => $row->RegNo2,
                     'RegNo' => $row->RegNo,
                     'RoomCode' => $row->Kode,
@@ -491,6 +520,26 @@ class CheckinController extends Controller
 
                 return $row;
             });
+    }
+
+    private function countActiveCheckins(string $search): int
+    {
+        $query = DB::table('DATA2')
+            ->where('Pst', '=', ' ')
+            ->whereRaw("RTRIM(Kode) <> '999'");
+
+        if ($search !== '') {
+            $keyword = '%' . strtoupper($search) . '%';
+            $query->where(function ($builder) use ($keyword) {
+                $builder->whereRaw('UPPER(RTRIM(RegNo)) LIKE ?', [$keyword])
+                    ->orWhereRaw('UPPER(RTRIM(RegNo2)) LIKE ?', [$keyword])
+                    ->orWhereRaw('UPPER(RTRIM(Kode)) LIKE ?', [$keyword])
+                    ->orWhereRaw('UPPER(RTRIM(Guest)) LIKE ?', [$keyword])
+                    ->orWhereRaw('UPPER(RTRIM(Package)) LIKE ?', [$keyword]);
+            });
+        }
+
+        return (int) $query->count();
     }
 
     private function loadRoomOptions(): array
@@ -550,8 +599,9 @@ class CheckinController extends Controller
 
     private function findDetailByKey(string $regNo2)
     {
+        $idSelect = $this->legacyIdSelect('DATA2');
         return DB::table('DATA2')
-            ->selectRaw("RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode")
+            ->selectRaw("$idSelect, RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode")
             ->whereRaw('RTRIM(RegNo2) = ?', [$regNo2])
             ->first();
     }

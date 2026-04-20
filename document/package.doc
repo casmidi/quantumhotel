@@ -2,7 +2,7 @@ DOKUMENTASI MODUL: PACKAGE
 File document: D:\laravel\quantum\document\package.doc
 Table utama: Package
 Table detail: PackageD
-Terakhir diperbarui: 2026-04-04
+Terakhir diperbarui: 2026-04-20
 
 1. TUJUAN MODUL
 Modul Package sekarang dibagi menjadi dua alur:
@@ -10,6 +10,10 @@ Modul Package sekarang dibagi menjadi dua alur:
 - Fast process: Automatic Package
 
 Kedua alur ini sama-sama menghasilkan data di tabel Package dan PackageD.
+
+Catatan maintenance 2026-04-20:
+- Header sort kolom TOTAL pada Package Transactions memakai query key `sort_by=total`.
+- Backend tetap menerima legacy key `sort_by=nominal` dan langsung memetakannya ke `total` agar state sort tetap aktif dan kompatibel dengan link lama.
 
 2. FILE YANG TERLIBAT
 Route:

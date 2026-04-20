@@ -85,6 +85,17 @@ class DashboardController extends Controller
             'occupied_dirty_long' => [],
         ];
 
+        $statusRoomLists = [
+            'occupied' => [],
+            'complimentary' => [],
+            'owner_unit' => [],
+            'vacant_ready' => [],
+            'vacant_clean' => [],
+            'vacant_dirty' => [],
+            'renovated' => [],
+            'out_of_order' => [],
+        ];
+
         foreach ($roomStatuses as $room) {
             $status = trim((string) $room->Status);
             $rawStatus = trim((string) $room->StatusKamar);
@@ -100,10 +111,12 @@ class DashboardController extends Controller
             if ($status === 'Occupied') {
                 if ($payment === 'COMPLIMENT') {
                     $counts['complimentary']++;
+                    $statusRoomLists['complimentary'][] = $kode;
                     continue;
                 }
 
                 $counts['occupied']++;
+                $statusRoomLists['occupied'][] = $kode;
 
                 if ($status2 === 'Occupied Clean') {
                     $counts['occupied_clean']++;
@@ -135,42 +148,50 @@ class DashboardController extends Controller
             if ($rawStatus === 'Check Out') {
                 $counts['check_out']++;
                 $counts['vacant_dirty']++;
+                $statusRoomLists['vacant_dirty'][] = $kode;
                 continue;
             }
 
             if ($status === 'Vacant Dirty') {
                 $counts['vacant_dirty']++;
+                $statusRoomLists['vacant_dirty'][] = $kode;
                 continue;
             }
 
             if ($status === 'Vacant Clean') {
                 $counts['vacant_clean']++;
+                $statusRoomLists['vacant_clean'][] = $kode;
                 continue;
             }
 
             if ($status === 'Vacant Ready') {
                 $counts['vacant_ready']++;
+                $statusRoomLists['vacant_ready'][] = $kode;
                 continue;
             }
 
             if ($status === 'Renovated') {
                 $counts['renovated']++;
+                $statusRoomLists['renovated'][] = $kode;
                 continue;
             }
 
             if ($status === 'Out Of Order') {
                 $counts['out_of_order']++;
+                $statusRoomLists['out_of_order'][] = $kode;
                 continue;
             }
 
             if ($status === 'Owner Unit') {
                 $counts['owner_unit']++;
                 $counts['complimentary']++;
+                $statusRoomLists['owner_unit'][] = $kode;
                 continue;
             }
 
             if ($status === 'Complimentary') {
                 $counts['complimentary']++;
+                $statusRoomLists['complimentary'][] = $kode;
             }
         }
 
@@ -287,6 +308,7 @@ class DashboardController extends Controller
         return view('dashboard', [
             'metrics' => $metrics,
             'occupiedBreakdown' => $occupiedBreakdown,
+            'statusRoomLists' => $statusRoomLists,
             'totalRooms' => $totalRooms,
             'operationalBase' => $operationalBase,
         ]);

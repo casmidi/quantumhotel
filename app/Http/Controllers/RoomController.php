@@ -7,10 +7,12 @@ use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $roomIdSelect = $this->legacyIdSelect('ROOM');
+        $kelasIdSelect = $this->legacyIdSelect('KELAS');
         $roomQuery = DB::table('ROOM')
-            ->selectRaw("RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, RTRIM(Fasilitas) as Fasilitas, RTRIM(ExtNo) as ExtNo, RTRIM(KUNCI) as KUNCI, Rate1, Rate2")
+            ->selectRaw("$roomIdSelect, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, RTRIM(Fasilitas) as Fasilitas, RTRIM(ExtNo) as ExtNo, RTRIM(KUNCI) as KUNCI, Rate1, Rate2")
             ->whereRaw("RTRIM(Kode) <> '999'");
 
         $roomCollection = $roomQuery
@@ -23,14 +25,18 @@ class RoomController extends Controller
             'avgBasicRate' => (float) ($roomCollection->avg('Rate2') ?? 0),
         ];
 
-        $rooms = $this->paginateCollection($roomCollection, 10);
+        $rooms = $this->paginateCollection($roomCollection, 10, $request);
 
         $classes = DB::table('KELAS')
-            ->selectRaw("RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1")
+            ->selectRaw("$kelasIdSelect, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1")
             ->orderBy('Kode')
             ->get();
 
-        return view('room.index', compact('rooms', 'classes', 'summary'));
+        return $this->respond($request, 'room.index', compact('rooms', 'classes', 'summary'), [
+            'rooms' => $this->paginatorPayload($rooms),
+            'classes' => $classes,
+            'summary' => $summary,
+        ]);
     }
 
     public function store(Request $request)
@@ -44,6 +50,10 @@ class RoomController extends Controller
         $extNo = trim((string) $request->ExtNo);
         $roomKey = trim((string) $request->KUNCI);
         $username = strtoupper(trim((string) session('user', 'SYSTEM')));
+
+        if ($kode === '' || $classCode === '') {
+            return $this->respondError($request, 'Room code and class are required.');
+        }
 
         $payload = [
             'Nama' => $classCode,
@@ -67,7 +77,7 @@ class RoomController extends Controller
                 ->whereRaw('RTRIM(Kode) = ?', [$kode])
                 ->update($payload);
 
-            return redirect('/room')->with('success', 'Existing room updated successfully');
+            return $this->respondAfterMutation($request, '/room', 'Existing room updated successfully', $this->findRoom($kode));
         }
 
         DB::table('ROOM')->insert(array_merge($payload, [
@@ -81,12 +91,18 @@ class RoomController extends Controller
             'STATUS2' => null,
         ]));
 
-        return redirect('/room')->with('success', 'Data saved successfully');
+        return $this->respondAfterMutation($request, '/room', 'Data saved successfully', $this->findRoom($kode), 201);
     }
 
     public function update(Request $request, $kode)
     {
         $normalizedKode = strtoupper(trim((string) $kode));
+        $existing = $this->findRoom($normalizedKode);
+
+        if (!$existing) {
+            return $this->respondError($request, 'Room was not found.', 404, [], '/room', false);
+        }
+
         $rateWithTax = $this->normalizeMoney($request->Rate1);
         $basicRate = $this->normalizeMoney($request->Rate2);
         $basicRate = $basicRate > 0 ? $basicRate : $rateWithTax;
@@ -107,16 +123,26 @@ class RoomController extends Controller
                 'UserName' => strtoupper(trim((string) session('user', 'SYSTEM'))),
             ]);
 
-        return redirect('/room')->with('success', 'Data updated successfully');
+        return $this->respondAfterMutation($request, '/room', 'Data updated successfully', $this->findRoom($normalizedKode));
     }
 
-    public function destroy($kode)
+    public function destroy(Request $request, $kode)
     {
+        $normalizedKode = strtoupper(trim((string) $kode));
+        $existing = $this->findRoom($normalizedKode);
+
+        if (!$existing) {
+            return $this->respondError($request, 'Room was not found.', 404, [], '/room', false);
+        }
+
         DB::table('ROOM')
-            ->whereRaw('RTRIM(Kode) = ?', [strtoupper(trim((string) $kode))])
+            ->whereRaw('RTRIM(Kode) = ?', [$normalizedKode])
             ->delete();
 
-        return redirect('/room')->with('success', 'Data deleted successfully');
+        return $this->respondAfterMutation($request, '/room', 'Data deleted successfully', [
+            'id' => $existing->id ?? null,
+            'Kode' => $normalizedKode,
+        ]);
     }
 
     private function normalizeMoney($value): float
@@ -124,5 +150,14 @@ class RoomController extends Controller
         $normalized = preg_replace('/[^\d]/', '', (string) $value);
 
         return is_numeric($normalized) ? (float) $normalized : 0;
+    }
+
+    private function findRoom(string $kode)
+    {
+        $idSelect = $this->legacyIdSelect('ROOM');
+        return DB::table('ROOM')
+            ->selectRaw("$idSelect, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, RTRIM(Fasilitas) as Fasilitas, RTRIM(ExtNo) as ExtNo, RTRIM(KUNCI) as KUNCI, Rate1, Rate2")
+            ->whereRaw('RTRIM(Kode) = ?', [$kode])
+            ->first();
     }
 }

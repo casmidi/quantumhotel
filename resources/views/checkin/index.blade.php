@@ -151,6 +151,7 @@
     height: calc(2.45rem + 2px);
     font-size: 0.96rem;
     font-weight: 700;
+    min-width: 0;
 }
 
 .checkin-row textarea.package-input {
@@ -214,6 +215,10 @@
     margin-bottom: 1rem;
 }
 
+.checkin-directory-head > div {
+    min-width: 0;
+}
+
 .checkin-search-form {
     display: flex;
     align-items: flex-end;
@@ -236,6 +241,7 @@
 .checkin-table-meta {
     font-size: 0.82rem;
     color: #6b7b90;
+    line-height: 1.55;
 }
 
 .checkin-table .package-code {
@@ -302,18 +308,128 @@
 }
 
 @media (max-width: 767.98px) {
+    .checkin-page {
+        padding-bottom: 1rem;
+    }
+
+    .package-shell-header,
+    .package-shell-body {
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
+    }
+
+    .package-shell-heading-block .package-shell-title {
+        font-size: 1.85rem;
+    }
+
+    .checkin-toolbar,
+    .checkin-badge-row,
+    .checkin-search-form,
+    .checkin-search-actions,
+    .checkin-actions,
+    .checkin-actions-main,
+    .checkin-actions-side {
+        align-items: stretch;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .checkin-regno,
+    .checkin-room-note,
+    .checkin-package-note,
+    .checkin-search-group,
+    .checkin-search-actions .btn,
+    .checkin-actions .btn {
+        width: 100%;
+    }
+
+    .checkin-regno {
+        display: block;
+    }
+
+    .checkin-regno .package-input {
+        min-width: 0;
+        width: 100%;
+    }
+
     .checkin-row {
         grid-template-columns: 1fr;
         gap: 0.45rem;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid rgba(16, 35, 59, 0.06);
     }
 
     .checkin-row-note,
     .checkin-row-note.is-empty {
         min-width: 0;
+        font-size: 0.76rem;
     }
 
-    .checkin-actions {
-        align-items: flex-start;
+    .checkin-row-note.is-empty {
+        display: none;
+    }
+
+    .checkin-row-note.is-stack {
+        min-height: 42px;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid rgba(199, 165, 106, 0.22);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.75);
+    }
+
+    .checkin-row .package-input,
+    .checkin-row .package-select,
+    .checkin-row textarea.package-input {
+        height: calc(2.75rem + 2px);
+        font-size: 1rem;
+    }
+
+    .package-grid-table-wrap,
+    .package-table-wrap {
+        margin-left: -0.85rem;
+        margin-right: -0.85rem;
+        border-radius: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .checkin-room-grid,
+    .checkin-table {
+        min-width: 720px;
+    }
+
+    .checkin-directory-head {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .checkin-table-meta {
+        padding: 0.75rem;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.7);
+    }
+}
+
+@media (max-width: 420px) {
+    .package-shell-heading-block .package-shell-title {
+        font-size: 1.55rem;
+    }
+
+    .package-shell-heading-block .package-shell-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .checkin-regno,
+    .checkin-room-note,
+    .checkin-package-note {
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .checkin-room-grid,
+    .checkin-table {
+        min-width: 680px;
     }
 }
 </style>
@@ -446,7 +562,7 @@
                         </div>
                         <div class="checkin-row">
                             <label class="checkin-row-label" for="PackageCode">Package Code</label>
-                            <input type="text" name="PackageCode" id="PackageCode" class="form-control package-input" value="{{ old('PackageCode') }}" list="packageCodeOptions" data-flow>
+                            <input type="text" name="PackageCodeList[]" id="PackageCode" class="form-control package-input" value="{{ $firstPackageCode }}" list="packageCodeOptions" data-flow>
                             <span class="checkin-row-note">Lookup</span>
                         </div>
                         <div class="checkin-row">
@@ -652,6 +768,7 @@
                 <table class="table package-table checkin-table mb-0">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Reg Number</th>
                             <th>Room</th>
                             <th>Guest</th>
@@ -665,6 +782,7 @@
                     <tbody>
                         @forelse($checkins as $record)
                             <tr class="checkin-record-row" data-record="{{ e($record->record_json) }}" data-detail-key="{{ $record->RegNo2 }}">
+                                <td>{{ $record->id ?? '-' }}</td>
                                 <td><span class="package-code">{{ $record->RegNo }}</span></td>
                                 <td><span class="room-pill">{{ $record->Kode }}</span></td>
                                 <td>
@@ -683,7 +801,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="package-empty">Belum ada data check in aktif untuk ditampilkan.</td>
+                                <td colspan="9" class="package-empty">Belum ada data check in aktif untuk ditampilkan.</td>
                             </tr>
                         @endforelse
                     </tbody>

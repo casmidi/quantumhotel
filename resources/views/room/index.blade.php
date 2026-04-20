@@ -80,6 +80,11 @@
 
                 <div class="form-row">
                     <div class="form-group col-lg-2 col-md-3">
+                        <label class="room-label" for="RecordId">ID</label>
+                        <input type="text" id="RecordId" class="form-control room-input" readonly>
+                    </div>
+
+                    <div class="form-group col-lg-2 col-md-3">
                         <label class="room-label" for="Kode">Room</label>
                         <input type="text" name="Kode" id="Kode" class="form-control room-input" required>
                         <small class="text-muted d-block mt-2">If the room code already exists, pressing Enter loads that room into edit mode.</small>
@@ -149,6 +154,7 @@
                 <table class="table room-table" id="tableRoom">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Room</th>
                             <th>Class</th>
                             <th>Facility</th>
@@ -161,13 +167,15 @@
                     </thead>
                     <tbody>
                         @forelse($rooms as $room)
-                        <tr data-kode="{{ $room->Kode }}"
+                        <tr data-id="{{ $room->id }}"
+                            data-kode="{{ $room->Kode }}"
                             data-nama="{{ $room->Nama }}"
                             data-fasilitas="{{ $room->Fasilitas }}"
                             data-rate1="{{ $room->Rate1 }}"
                             data-rate2="{{ $room->Rate2 }}"
                             data-extno="{{ $room->ExtNo }}"
                             data-kunci="{{ $room->KUNCI }}">
+                            <td>{{ $room->id ?? '-' }}</td>
                             <td><span class="room-code">{{ $room->Kode }}</span></td>
                             <td class="room-class">{{ $room->Nama }}</td>
                             <td>{{ $room->Fasilitas }}</td>
@@ -181,7 +189,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="room-empty">No room records yet. Create the first room to start building inventory.</td>
+                            <td colspan="9" class="room-empty">No room records yet. Create the first room to start building inventory.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -239,6 +247,7 @@ function normalizeCode(value) {
 }
 
 const formRoom = document.getElementById('formRoom');
+const recordIdField = document.getElementById('RecordId');
 const kodeField = document.getElementById('Kode');
 const classField = document.getElementById('Nama');
 const fasilitasField = document.getElementById('Fasilitas');
@@ -272,6 +281,7 @@ function autofillFromSelectedClass() {
 }
 
 function loadRowIntoForm(row) {
+    recordIdField.value = row.dataset.id || '';
     kodeField.value = row.dataset.kode;
     classField.value = row.dataset.nama;
     fasilitasField.value = row.dataset.fasilitas || '';
@@ -354,6 +364,7 @@ document.querySelector('#tableRoom tbody').addEventListener('click', function (e
 });
 
 function resetRoomForm() {
+    recordIdField.value = '';
     formRoom.reset();
     kodeField.readOnly = false;
     formRoom.action = '/room';

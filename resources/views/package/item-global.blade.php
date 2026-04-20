@@ -76,6 +76,7 @@
         <div class="package-shell-body">
             <form method="POST" action="/item-package-global" id="formStockPackage">
                 @csrf
+                <div class="form-group"><label class="package-label" for="RecordId">ID</label><input type="text" id="RecordId" class="form-control package-input" readonly></div>
                 <div class="form-group"><label class="package-label" for="KodeBrg">Item Code</label><input type="text" name="KodeBrg" id="KodeBrg" class="form-control package-input" required></div>
                 <div class="form-group"><label class="package-label" for="NamaBrg">Item Name</label><input type="text" name="NamaBrg" id="NamaBrg" class="form-control package-input" required></div>
                 <div class="form-row">
@@ -90,9 +91,10 @@
 
     <section class="package-shell">
         <div class="package-shell-header"><div><h2 class="package-shell-title">Global Item Directory</h2><p class="package-shell-subtitle">Click a row to load the item into the input form and continue in update mode.</p></div><span class="package-shell-badge">{{ number_format($summary['total'], 0, ',', '.') }} Records</span></div>
-        <div class="package-table-wrap"><div class="table-responsive"><table class="table package-table" id="tableStockPackage"><thead><tr><th>Item Code</th><th>Item Name</th><th>Unit</th><th>Category</th><th class="text-right">Selling Price</th><th class="text-center" width="90">Action</th></tr></thead><tbody>
+        <div class="package-table-wrap"><div class="table-responsive"><table class="table package-table" id="tableStockPackage"><thead><tr><th>ID</th><th>Item Code</th><th>Item Name</th><th>Unit</th><th>Category</th><th class="text-right">Selling Price</th><th class="text-center" width="90">Action</th></tr></thead><tbody>
             @forelse($items as $item)
-            <tr data-kode="{{ $item->KodeBrg }}" data-nama="{{ $item->NamaBrg }}" data-satuan="{{ $item->Satuan }}" data-kind="{{ $item->Kind }}" data-hj="{{ $item->Hj }}">
+            <tr data-id="{{ $item->id }}" data-kode="{{ $item->KodeBrg }}" data-nama="{{ $item->NamaBrg }}" data-satuan="{{ $item->Satuan }}" data-kind="{{ $item->Kind }}" data-hj="{{ $item->Hj }}">
+                <td>{{ $item->id ?? '-' }}</td>
                 <td><span class="package-code">{{ $item->KodeBrg }}</span></td>
                 <td>{{ $item->NamaBrg }}</td>
                 <td>{{ $item->Satuan }}</td>
@@ -101,7 +103,7 @@
                 <td class="text-center"><a href="/item-package-global/{{ $item->KodeBrg }}/delete" class="package-delete" title="Delete" aria-label="Delete" data-confirm-delete="Do you want to delete this package item?">&#128465;</a></td>
             </tr>
             @empty
-            <tr><td colspan="6" class="package-empty">No package items yet. Create the first global item to get started.</td></tr>
+            <tr><td colspan="7" class="package-empty">No package items yet. Create the first global item to get started.</td></tr>
             @endforelse
         </tbody></table></div></div>
         @if($items->hasPages())
@@ -117,13 +119,13 @@ function normalizeNumber(value){if(value===null||value===undefined){return '';}c
 function formatRibuan(value){const normalized=normalizeNumber(value);if(!normalized){return '';}return normalized.replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
 function unformat(value){return (value||'').toString().replace(/\./g,'');}
 function normalizeCode(value){return (value||'').toString().trim().toUpperCase();}
-const formStockPackage=document.getElementById('formStockPackage'); const kodeBrgField=document.getElementById('KodeBrg'); const namaBrgField=document.getElementById('NamaBrg'); const satuanField=document.getElementById('Satuan'); const kindField=document.getElementById('Kind'); const hjField=document.getElementById('Hj'); const saveButton=document.getElementById('saveButton'); const resetButton=document.getElementById('resetButton'); const rows=Array.from(document.querySelectorAll('#tableStockPackage tbody tr[data-kode]'));
+const formStockPackage=document.getElementById('formStockPackage'); const recordIdField=document.getElementById('RecordId'); const kodeBrgField=document.getElementById('KodeBrg'); const namaBrgField=document.getElementById('NamaBrg'); const satuanField=document.getElementById('Satuan'); const kindField=document.getElementById('Kind'); const hjField=document.getElementById('Hj'); const saveButton=document.getElementById('saveButton'); const resetButton=document.getElementById('resetButton'); const rows=Array.from(document.querySelectorAll('#tableStockPackage tbody tr[data-kode]'));
 function findRow(kode){const normalized=normalizeCode(kode); return rows.find((row)=>normalizeCode(row.dataset.kode)===normalized)||null;}
-function loadRow(row){kodeBrgField.value=row.dataset.kode; namaBrgField.value=row.dataset.nama; satuanField.value=row.dataset.satuan||'PAX'; kindField.value=normalizeCode(row.dataset.kind||'ROOM'); hjField.value=formatRibuan(row.dataset.hj||''); kodeBrgField.readOnly=true; formStockPackage.action='/item-package-global/'+row.dataset.kode+'/update'; saveButton.textContent='Update Item'; resetButton.textContent='Cancel Edit'; namaBrgField.focus();}
+function loadRow(row){recordIdField.value=row.dataset.id||''; kodeBrgField.value=row.dataset.kode; namaBrgField.value=row.dataset.nama; satuanField.value=row.dataset.satuan||'PAX'; kindField.value=normalizeCode(row.dataset.kind||'ROOM'); hjField.value=formatRibuan(row.dataset.hj||''); kodeBrgField.readOnly=true; formStockPackage.action='/item-package-global/'+row.dataset.kode+'/update'; saveButton.textContent='Update Item'; resetButton.textContent='Cancel Edit'; namaBrgField.focus();}
 hjField.addEventListener('input', function(){this.value=formatRibuan(this.value.replace(/\D/g,''));});
 [kodeBrgField,namaBrgField,satuanField,hjField].forEach((field,index,allFields)=>{field.addEventListener('keydown', function(event){if(event.key!=='Enter'){return;} event.preventDefault(); if(field===kodeBrgField){const existing=findRow(kodeBrgField.value); if(existing){loadRow(existing); return;} kodeBrgField.value=normalizeCode(kodeBrgField.value);} if(index<allFields.length-1){allFields[index+1].focus(); if(typeof allFields[index+1].select==='function'){allFields[index+1].select();} return;} formStockPackage.requestSubmit();});});
 document.querySelector('#tableStockPackage tbody').addEventListener('click', function(event){if(event.target.closest('a')){return;} const row=event.target.closest('tr'); if(!row||!row.dataset.kode){return;} loadRow(row);});
-resetButton.addEventListener('click', function(){formStockPackage.reset(); kodeBrgField.readOnly=false; formStockPackage.action='/item-package-global'; saveButton.textContent='Save Item'; resetButton.textContent='Reset Form'; satuanField.value='PAX'; kindField.value='ROOM'; kodeBrgField.focus();});
+resetButton.addEventListener('click', function(){recordIdField.value=''; formStockPackage.reset(); kodeBrgField.readOnly=false; formStockPackage.action='/item-package-global'; saveButton.textContent='Save Item'; resetButton.textContent='Reset Form'; satuanField.value='PAX'; kindField.value='ROOM'; kodeBrgField.focus();});
 formStockPackage.addEventListener('submit', function(){kodeBrgField.value=normalizeCode(kodeBrgField.value); namaBrgField.value=normalizeCode(namaBrgField.value); satuanField.value=normalizeCode(satuanField.value); kindField.value=normalizeCode(kindField.value); hjField.value=unformat(hjField.value);});
 const successAlert=document.getElementById('successAlert'); if(successAlert){setTimeout(()=>{successAlert.style.transition='opacity .3s ease, transform .3s ease'; successAlert.style.opacity='0'; successAlert.style.transform='translateY(-8px)'; setTimeout(()=>successAlert.remove(),300);},3000);} kodeBrgField.focus();
 </script>

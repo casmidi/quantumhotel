@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 class StockPackageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $idSelect = $this->legacyIdSelect('StockPackage');
         $itemQuery = DB::table('StockPackage')
-            ->selectRaw("RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Satuan) as Satuan, RTRIM(Kind) as Kind, Hj");
+            ->selectRaw("$idSelect, RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Satuan) as Satuan, RTRIM(Kind) as Kind, Hj");
 
         $itemCollection = $itemQuery
             ->orderBy('KodeBrg')
@@ -23,9 +24,12 @@ class StockPackageController extends Controller
             'avgSellingPrice' => (float) ($itemCollection->avg('Hj') ?? 0),
         ];
 
-        $items = $this->paginateCollection($itemCollection, 10);
+        $items = $this->paginateCollection($itemCollection, 10, $request);
 
-        return view('package.item-global', compact('items', 'summary'));
+        return $this->respond($request, 'package.item-global', compact('items', 'summary'), [
+            'items' => $this->paginatorPayload($items),
+            'summary' => $summary,
+        ]);
     }
 
     public function store(Request $request)
@@ -38,15 +42,11 @@ class StockPackageController extends Controller
         $username = strtoupper(trim((string) session('user', 'SYSTEM')));
 
         if ($kodeBrg === '' || $namaBrg === '' || $hj <= 0) {
-            return redirect('/item-package-global')
-                ->with('error', 'Item code, item name, and selling price must be valid.')
-                ->withInput();
+            return $this->respondError($request, 'Item code, item name, and selling price must be valid.', 422, [], '/item-package-global', true);
         }
 
         if (!$this->isAllowedKind($kind)) {
-            return redirect('/item-package-global')
-                ->with('error', 'Category must be ROOM or RESTAURANT.')
-                ->withInput();
+            return $this->respondError($request, 'Category must be ROOM or RESTAURANT.', 422, [], '/item-package-global', true);
         }
 
         $payload = [
@@ -73,14 +73,14 @@ class StockPackageController extends Controller
                 ->whereRaw('RTRIM(KodeBrg) = ?', [$kodeBrg])
                 ->update($payload);
 
-            return redirect('/item-package-global')->with('success', 'Existing package item updated successfully');
+            return $this->respondAfterMutation($request, '/item-package-global', 'Existing package item updated successfully', $this->findStockPackage($kodeBrg));
         }
 
         DB::table('StockPackage')->insert(array_merge($payload, [
             'KodeBrg' => $kodeBrg,
         ]));
 
-        return redirect('/item-package-global')->with('success', 'Data saved successfully');
+        return $this->respondAfterMutation($request, '/item-package-global', 'Data saved successfully', $this->findStockPackage($kodeBrg), 201);
     }
 
     public function update(Request $request, $kode)
@@ -93,15 +93,11 @@ class StockPackageController extends Controller
         $username = strtoupper(trim((string) session('user', 'SYSTEM')));
 
         if ($kodeBrg === '' || $namaBrg === '' || $hj <= 0) {
-            return redirect('/item-package-global')
-                ->with('error', 'Item code, item name, and selling price must be valid.')
-                ->withInput();
+            return $this->respondError($request, 'Item code, item name, and selling price must be valid.', 422, [], '/item-package-global', true);
         }
 
         if (!$this->isAllowedKind($kind)) {
-            return redirect('/item-package-global')
-                ->with('error', 'Category must be ROOM or RESTAURANT.')
-                ->withInput();
+            return $this->respondError($request, 'Category must be ROOM or RESTAURANT.', 422, [], '/item-package-global', true);
         }
 
         $exists = DB::table('StockPackage')
@@ -109,7 +105,7 @@ class StockPackageController extends Controller
             ->exists();
 
         if (!$exists) {
-            return redirect('/item-package-global')->with('error', 'Package item was not found.');
+            return $this->respondError($request, 'Package item was not found.', 404, [], '/item-package-global', false);
         }
 
         DB::table('StockPackage')
@@ -123,26 +119,34 @@ class StockPackageController extends Controller
                 'Tgl' => now(),
             ]);
 
-        return redirect('/item-package-global')->with('success', 'Data updated successfully');
+        return $this->respondAfterMutation($request, '/item-package-global', 'Data updated successfully', $this->findStockPackage($kodeBrg));
     }
 
-    public function destroy($kode)
+    public function destroy(Request $request, $kode)
     {
         $normalizedCode = $this->normalizeCode($kode);
+        $existing = $this->findStockPackage($normalizedCode);
+
+        if (!$existing) {
+            return $this->respondError($request, 'Package item was not found.', 404, [], '/item-package-global', false);
+        }
+
         $isUsed = DB::table('PackageD')
             ->whereRaw('RTRIM(KodeBrg) = ?', [$normalizedCode])
             ->exists();
 
         if ($isUsed) {
-            return redirect('/item-package-global')
-                ->with('error', 'This package item is already used in package transactions and cannot be deleted.');
+            return $this->respondError($request, 'This package item is already used in package transactions and cannot be deleted.', 422, [], '/item-package-global', false);
         }
 
         DB::table('StockPackage')
             ->whereRaw('RTRIM(KodeBrg) = ?', [$normalizedCode])
             ->delete();
 
-        return redirect('/item-package-global')->with('success', 'Data deleted successfully');
+        return $this->respondAfterMutation($request, '/item-package-global', 'Data deleted successfully', [
+            'id' => $existing->id ?? null,
+            'KodeBrg' => $normalizedCode,
+        ]);
     }
 
     private function normalizeCode($value): string
@@ -167,5 +171,14 @@ class StockPackageController extends Controller
     private function isAllowedKind(string $kind): bool
     {
         return in_array($kind, ['ROOM', 'RESTAURANT'], true);
+    }
+
+    private function findStockPackage(string $kodeBrg)
+    {
+        $idSelect = $this->legacyIdSelect('StockPackage');
+        return DB::table('StockPackage')
+            ->selectRaw("$idSelect, RTRIM(KodeBrg) as KodeBrg, RTRIM(NamaBrg) as NamaBrg, RTRIM(Satuan) as Satuan, RTRIM(Kind) as Kind, Hj")
+            ->whereRaw('RTRIM(KodeBrg) = ?', [$kodeBrg])
+            ->first();
     }
 }

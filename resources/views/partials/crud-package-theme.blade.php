@@ -262,7 +262,9 @@
 .room-table-wrap,
 .crud-table-wrap {
     border-radius: 0 0 24px 24px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .package-table,
@@ -410,6 +412,13 @@
 }
 
 @media (max-width: 767.98px) {
+    .package-shell,
+    .kelas-shell,
+    .room-shell,
+    .crud-shell {
+        border-radius: 12px;
+    }
+
     .package-shell-header,
     .kelas-shell-header,
     .room-shell-header,
@@ -427,7 +436,8 @@
 
     .package-shell-heading-block .package-shell-title,
     .crud-shell-heading-block .crud-shell-title {
-        font-size: 2rem;
+        font-size: 1.75rem;
+        line-height: 1.08;
     }
 
     .package-shell-body,
@@ -435,6 +445,28 @@
     .room-shell-body,
     .crud-shell-body {
         padding: 1rem 1.15rem 1.35rem;
+    }
+
+    .package-btn-primary,
+    .package-btn-secondary,
+    .kelas-btn-primary,
+    .kelas-btn-secondary,
+    .room-btn-primary,
+    .room-btn-secondary,
+    .crud-btn-primary,
+    .crud-btn-secondary {
+        width: 100%;
+        justify-content: center;
+        border-radius: 8px;
+    }
+
+    .package-pagination-wrap,
+    .kelas-pagination-wrap,
+    .room-pagination-wrap,
+    .crud-pagination-wrap {
+        justify-content: center;
+        padding: 0.85rem;
+        overflow-x: auto;
     }
 }
 </style>
