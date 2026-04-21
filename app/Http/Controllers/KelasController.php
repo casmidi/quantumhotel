@@ -10,8 +10,9 @@ class KelasController extends Controller
 {
     public function index(Request $request)
     {
+        $idSelect = $this->legacyIdSelect('KELAS');
         $query = DB::table('KELAS')
-            ->selectRaw("ROW_NUMBER() OVER (ORDER BY Kode) AS id, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1, Depo1");
+            ->selectRaw("$idSelect, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1, Depo1");
 
         if ($request->q) {
             $keyword = trim((string) $request->q);
@@ -111,10 +112,11 @@ class KelasController extends Controller
 
     public function data()
     {
+        $idSelect = $this->legacyIdSelect('KELAS');
         return response()->json([
             'success' => true,
             'data' => DB::table('KELAS')
-                ->selectRaw("ROW_NUMBER() OVER (ORDER BY Kode) AS id, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1, Depo1")
+                ->selectRaw("$idSelect, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1, Depo1")
                 ->orderBy('Kode')
                 ->get(),
         ]);
@@ -122,8 +124,9 @@ class KelasController extends Controller
 
     private function findKelas(string $kode)
     {
+        $idSelect = $this->legacyIdSelect('KELAS');
         return DB::table('KELAS')
-            ->selectRaw("1 as id, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1, Depo1")
+            ->selectRaw("$idSelect, RTRIM(Kode) as Kode, RTRIM(Nama) as Nama, Rate1, Depo1")
             ->whereRaw('RTRIM(Kode) = ?', [$kode])
             ->first();
     }

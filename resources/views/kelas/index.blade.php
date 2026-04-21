@@ -4,11 +4,7 @@
 
 @section('content')
 
-    @php
-        $totalKelas = $kelas->count();
-        $avgRate = $kelas->avg('Rate1') ?? 0;
-        $avgDepo = $kelas->avg('Depo1') ?? 0;
-    @endphp
+
 
     <style>
         .content-wrapper {
@@ -79,34 +75,7 @@
             font-size: 1rem;
         }
 
-        .kelas-summary {
-            margin-top: 1.5rem;
-        }
 
-        .kelas-stat {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 18px;
-            padding: 1rem 1.1rem;
-            backdrop-filter: blur(12px);
-            min-height: 100%;
-        }
-
-        .kelas-stat-label {
-            display: block;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: rgba(255, 255, 255, 0.72);
-            margin-bottom: 0.5rem;
-        }
-
-        .kelas-stat-value {
-            display: block;
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: #fff;
-        }
 
         .kelas-shell {
             background: rgba(255, 255, 255, 0.72);
@@ -340,27 +309,6 @@
             <h1>Room Class Management</h1>
             <p>Manage room classes with a more elegant interface, faster operator flow, and a polished CRUD foundation for
                 the next hotel system modules.</p>
-
-            <div class="row kelas-summary">
-                <div class="col-md-4 mb-3 mb-md-0">
-                    <div class="kelas-stat">
-                        <span class="kelas-stat-label">Total Class</span>
-                        <span class="kelas-stat-value">{{ number_format($totalKelas, 0, ',', '.') }}</span>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3 mb-md-0">
-                    <div class="kelas-stat">
-                        <span class="kelas-stat-label">Average Rate</span>
-                        <span class="kelas-stat-value">Rp {{ number_format($avgRate, 0, ',', '.') }}</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="kelas-stat">
-                        <span class="kelas-stat-label">Average Deposit</span>
-                        <span class="kelas-stat-value">Rp {{ number_format($avgDepo, 0, ',', '.') }}</span>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <section class="kelas-shell">
@@ -424,7 +372,6 @@
                     <p class="kelas-shell-subtitle">Click any row to load its data into the form and switch directly into
                         edit mode.</p>
                 </div>
-                <span class="kelas-shell-badge">{{ number_format($totalKelas, 0, ',', '.') }} Records</span>
             </div>
 
             <div class="kelas-table-wrap">
@@ -442,11 +389,10 @@
                         </thead>
                         <tbody>
                             @forelse($kelas as $k)
-                                @php $rowNo = ($kelas->currentPage() - 1) * $kelas->perPage() + $loop->iteration; @endphp
-                                <tr data-id="{{ $rowNo }}" data-kode="{{ $k->Kode }}"
+                                <tr data-id="{{ $k->id }}" data-kode="{{ $k->Kode }}"
                                     data-nama="{{ $k->Nama }}" data-rate="{{ $k->Rate1 }}"
                                     data-depo="{{ $k->Depo1 }}">
-                                    <td>{{ $rowNo }}</td>
+                                    <td>{{ $k->id ?? '-' }}</td>
                                     <td><span class="kelas-code">{{ $k->Kode }}</span></td>
                                     <td class="kelas-name">{{ $k->Nama }}</td>
                                     <td class="text-right kelas-money">{{ number_format($k->Rate1 ?? 0, 0, ',', '.') }}

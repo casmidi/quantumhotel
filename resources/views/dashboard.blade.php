@@ -72,40 +72,39 @@
 
     <style>
         .dashboard-hero {
-            border-radius: 24px;
-            padding: 1.7rem;
+            border-radius: 16px;
+            padding: 0.9rem 1.4rem;
             color: #fff;
             background: linear-gradient(125deg, #182f4a 0%, #2e5c86 50%, #4b8cb5 100%);
             box-shadow: 0 16px 36px rgba(16, 35, 59, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .dashboard-hero h1 {
             margin: 0;
-            font-size: 2rem;
+            font-size: 1.25rem;
             font-weight: 700;
-        }
-
-        .dashboard-hero p {
-            margin: 0.6rem 0 0;
-            color: rgba(255, 255, 255, 0.86);
-            max-width: 820px;
+            white-space: nowrap;
         }
 
         .dashboard-totals {
-            margin-top: 1.2rem;
             display: flex;
-            gap: 0.8rem;
+            gap: 0.6rem;
             flex-wrap: wrap;
         }
 
         .dashboard-total {
             display: inline-flex;
-            flex-direction: column;
-            padding: 0.9rem 1rem;
-            border-radius: 14px;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 10px;
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            min-width: 180px;
         }
 
         .dashboard-total-label {
@@ -207,10 +206,17 @@
         }
 
         .status-grid-count {
-            padding: 0.2rem 0.55rem;
+            min-width: 2.2rem;
+            padding: 0.26rem 0.62rem;
             border-radius: 999px;
-            background: rgba(24, 65, 110, 0.12);
-            font-size: 0.78rem;
+            border: 1px solid rgba(18, 48, 84, 0.28);
+            background: #e8f1ff;
+            color: #0f2c4d;
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-align: center;
+            line-height: 1.1;
+            box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.7);
         }
 
         .status-grid-list {
@@ -226,6 +232,14 @@
             margin: 0;
             padding: 0;
             list-style: none;
+        }
+
+        .status-grid-item.is-extra {
+            display: none;
+        }
+
+        .status-grid-list-items.is-expanded .status-grid-item.is-extra {
+            display: inline-flex;
         }
 
         .status-grid-list-items.is-collapsed li.is-extra {
@@ -248,32 +262,33 @@
             font-style: italic;
         }
 
-        .status-grid-controls {
-            margin-top: 0.55rem;
-        }
-
-        .status-grid-more-btn {
+        .status-grid-toggle-wrap {
             display: none;
+            padding: 0;
+            border: none !important;
+            background: none !important;
+            list-style: none;
             align-items: center;
-            justify-content: center;
-            padding: 0.42rem 0.8rem;
-            border: 1px dashed rgba(24, 65, 110, 0.3);
-            border-radius: 8px;
-            background: #f9fbff;
-            color: #173761;
-            font-size: 0.82rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
         }
 
-        .status-grid-more-btn.is-visible {
+        .status-grid-toggle-wrap.is-visible {
             display: inline-flex;
         }
 
+        .status-grid-more-btn {
+            padding: 0;
+            border: none;
+            background: none;
+            color: #1a3f6f;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            transition: color 0.15s ease;
+        }
+
         .status-grid-more-btn:hover {
-            background: #f0f5ff;
-            border-color: rgba(24, 65, 110, 0.5);
+            color: #0d2442;
         }
 
         @media (max-width: 767.98px) {
@@ -288,13 +303,8 @@
     </style>
 
     <div class="container-fluid">
-        <section class="dashboard-hero mb-4">
+        <section class="dashboard-hero mb-3">
             <h1>Room Status Overview</h1>
-            <p>
-                Menampilkan seluruh status kamar aktif: Occupied, Vacant Ready, Vacant Clean, Vacant Dirty, Complimentary,
-                Owner Unit, Renovated, dan Out Of Order.
-            </p>
-
             <div class="dashboard-totals">
                 <div class="dashboard-total">
                     <span class="dashboard-total-label">Total Rooms</span>
@@ -333,8 +343,9 @@
                     $rooms = collect($statusRoomLists[$statusKey] ?? [])
                         ->filter()
                         ->values();
+                    $colClass = 'col-12';
                 @endphp
-                <div class="col-xl-3 col-md-6 mb-3">
+                <div class="{{ $colClass }} mb-3">
                     <article class="status-grid-card">
                         <div class="status-grid-head">
                             <span>{!! $metricIcons[$statusKey] ?? '&#9632;' !!} {{ $statusLabels[$statusKey] ?? $statusKey }}</span>
@@ -344,7 +355,7 @@
                         @if ($rooms->isEmpty())
                             <div class="status-grid-list">
                                 <ul style="margin: 0; padding: 0; list-style: none;">
-                                    <li class="status-grid-empty">Tidak ada kamar</li>
+                                    <li class="status-grid-empty">No rooms</li>
                                 </ul>
                             </div>
                         @else
@@ -352,19 +363,18 @@
                                 <ul class="status-grid-list-items is-collapsed" data-room-list
                                     data-status="{{ $statusKey }}">
                                     @foreach ($rooms as $roomCode)
-                                        <li>{{ $roomCode }}</li>
+                                        <li class="status-grid-item">{{ $roomCode }}</li>
                                     @endforeach
+                                    @if ($rooms->count() > 1)
+                                        <li class="status-grid-toggle-wrap">
+                                            <button type="button" class="status-grid-more-btn"
+                                                data-status="{{ $statusKey }}" data-toggle="room-list"
+                                                data-more-label="more +" data-less-label="less -" aria-expanded="false">
+                                                <span class="btn-text">more +</span>
+                                            </button>
+                                        </li>
+                                    @endif
                                 </ul>
-
-                                @if ($rooms->count() > 1)
-                                    <div class="status-grid-controls">
-                                        <button type="button" class="status-grid-more-btn"
-                                            data-status="{{ $statusKey }}" data-toggle="room-list"
-                                            data-more-label="More" data-less-label="Less" aria-expanded="false">
-                                            <span class="btn-text">More</span>
-                                        </button>
-                                    </div>
-                                @endif
                             </div>
                         @endif
                     </article>
@@ -384,6 +394,9 @@
                 button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
             };
 
+            const DESKTOP_LIMIT = 20;
+            const isMobile = () => window.innerWidth < 768;
+
             const syncRoomLists = () => {
                 roomLists.forEach(list => {
                     const statusKey = list.getAttribute('data-status');
@@ -394,35 +407,46 @@
                         return;
                     }
 
-                    const items = Array.from(list.querySelectorAll('li'));
                     const expanded = list.classList.contains('is-expanded');
+                    const items = Array.from(list.querySelectorAll('.status-grid-item'));
 
+                    // Reset semua dulu
+                    list.classList.remove('is-collapsed', 'is-expanded');
                     items.forEach(item => item.classList.remove('is-extra'));
 
-                    if (items.length <= 1) {
-                        button.classList.remove('is-visible');
-                        updateButtonLabel(button, false);
+                    if (items.length === 0) {
+                        button.closest('.status-grid-toggle-wrap').classList.remove('is-visible');
                         return;
                     }
 
-                    const firstRowTop = items[0].offsetTop;
-                    let hasExtraItems = false;
+                    let hasExtra = false;
 
-                    items.forEach(item => {
-                        if (item.offsetTop > firstRowTop) {
-                            item.classList.add('is-extra');
-                            hasExtraItems = true;
+                    if (isMobile()) {
+                        // Mobile: deteksi visual — extra = meluber ke baris kedua
+                        const firstTop = items[0].getBoundingClientRect().top;
+                        items.forEach(item => {
+                            if (item.getBoundingClientRect().top > firstTop + 2) {
+                                item.classList.add('is-extra');
+                                hasExtra = true;
+                            }
+                        });
+                    } else {
+                        // Desktop: batasi 20 item per baris collapsed
+                        if (items.length > DESKTOP_LIMIT) {
+                            items.slice(DESKTOP_LIMIT).forEach(item => {
+                                item.classList.add('is-extra');
+                            });
+                            hasExtra = true;
                         }
-                    });
+                    }
 
-                    if (!hasExtraItems) {
-                        list.classList.remove('is-collapsed', 'is-expanded');
-                        button.classList.remove('is-visible');
+                    if (!hasExtra) {
+                        button.closest('.status-grid-toggle-wrap').classList.remove('is-visible');
                         updateButtonLabel(button, false);
                         return;
                     }
 
-                    button.classList.add('is-visible');
+                    button.closest('.status-grid-toggle-wrap').classList.add('is-visible');
 
                     if (expanded) {
                         list.classList.remove('is-collapsed');

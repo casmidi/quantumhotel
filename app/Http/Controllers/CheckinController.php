@@ -15,6 +15,35 @@ class CheckinController extends Controller
         $checkins = $this->paginateCollection($records, 10, $request);
         $rooms = $this->loadRoomOptions();
         $packages = $this->loadPackageOptions();
+        $companyOptions = $this->loadCompanyOptions();
+        $provinceOptions = $this->loadProvinceOptions();
+        $salesOptions = $this->loadSalesOptions();
+        $checkInIso = old('CheckInDate', now()->format('Y-m-d'));
+        $checkOutIso = old('EstimationOut', now()->addDay()->format('Y-m-d'));
+        $birthIso = old('BirthDate', '');
+        $expiredIso = old('ExpiredDate', '');
+        $roomCodeList = old('RoomCodeList', []);
+        $packageCodeList = old('PackageCodeList', []);
+        $nominalList = old('NominalList', []);
+        $breakfastList = old('BreakfastList', []);
+        $detailKeyList = old('DetailKeyList', []);
+        $oldAdditionalRoomRows = collect($roomCodeList)
+            ->values()
+            ->slice(1)
+            ->map(function ($roomCode, $index) use ($packageCodeList, $nominalList, $breakfastList, $detailKeyList) {
+                $rowIndex = $index + 1;
+
+                return [
+                    'detailKey' => (string) ($detailKeyList[$rowIndex] ?? ''),
+                    'roomCode' => (string) ($roomCode ?? ''),
+                    'packageCode' => (string) ($packageCodeList[$rowIndex] ?? ''),
+                    'nominal' => (string) ($nominalList[$rowIndex] ?? ''),
+                    'breakfast' => (int) ($breakfastList[$rowIndex] ?? 0),
+                ];
+            })
+            ->filter(fn (array $detail) => collect($detail)->contains(fn ($value) => $value !== '' && $value !== 0))
+            ->values()
+            ->all();
 
         $viewData = [
             'checkins' => $checkins,
@@ -22,6 +51,9 @@ class CheckinController extends Controller
             'nextRegNo' => $this->generateNextRegNo(),
             'rooms' => $rooms,
             'packages' => $packages,
+            'companyOptions' => $companyOptions,
+            'provinceOptions' => $provinceOptions,
+            'salesOptions' => $salesOptions,
             'summary' => [
                 'active' => $this->countActiveCheckins($search),
                 'rooms_ready' => collect($rooms)->where('available', true)->count(),
@@ -33,6 +65,16 @@ class CheckinController extends Controller
             'religionOptions' => ['ISLAM', 'KRISTEN', 'KATOLIK', 'HINDU', 'BUDDHA', 'KONGHUCU'],
             'nationalityOptions' => ['INA', 'MAL', 'SGP', 'AUS', 'JPN', 'KOR', 'USA'],
             'idTypeOptions' => ['KTP', 'SIM', 'PASSPORT', 'KITAS'],
+            'checkInIso' => $checkInIso,
+            'checkOutIso' => $checkOutIso,
+            'birthIso' => $birthIso,
+            'expiredIso' => $expiredIso,
+            'firstDetailKey' => (string) ($detailKeyList[0] ?? ''),
+            'firstRoomCode' => (string) ($roomCodeList[0] ?? ''),
+            'firstPackageCode' => (string) ($packageCodeList[0] ?? ''),
+            'firstNominal' => (string) ($nominalList[0] ?? ''),
+            'firstBreakfast' => (int) ($breakfastList[0] ?? 0),
+            'oldAdditionalRoomRows' => $oldAdditionalRoomRows,
         ];
 
         return $this->respond($request, 'checkin.index', $viewData, [
@@ -45,6 +87,9 @@ class CheckinController extends Controller
             'options' => [
                 'type' => $viewData['typeOptions'],
                 'payment' => $viewData['paymentOptions'],
+                'company' => $viewData['companyOptions'],
+                'province' => $viewData['provinceOptions'],
+                'sales' => $viewData['salesOptions'],
                 'segment' => $viewData['segmentOptions'],
                 'religion' => $viewData['religionOptions'],
                 'nationality' => $viewData['nationalityOptions'],
@@ -138,8 +183,8 @@ class CheckinController extends Controller
                 && $detailKey !== ''
                 && $currentDetail->RegNo === $regNo
                 && $currentDetail->Kode === $roomCode
-                    ? $currentDetail->RegNo2
-                    : $this->generateRegNo2($regNo, $roomCode);
+                ? $currentDetail->RegNo2
+                : $this->generateRegNo2($regNo, $roomCode);
         }
         unset($detailRow);
 
@@ -148,8 +193,8 @@ class CheckinController extends Controller
         $detailPayloads = collect($detailRows)->map(function ($detailRow) use ($validated, $regNo) {
             return $this->buildData2Payload($validated, $regNo, $detailRow);
         })->values();
-        $movePayloads = $detailPayloads->map(fn ($detailPayload) => $this->buildDataMovePayload($detailPayload))->values();
-        $depositPayloads = $detailPayloads->map(fn ($detailPayload) => $this->buildDepositPayload($regNo, $detailPayload['Kode'], $detailPayload['TglIn']))->values();
+        $movePayloads = $detailPayloads->map(fn($detailPayload) => $this->buildDataMovePayload($detailPayload))->values();
+        $depositPayloads = $detailPayloads->map(fn($detailPayload) => $this->buildDepositPayload($regNo, $detailPayload['Kode'], $detailPayload['TglIn']))->values();
 
         DB::transaction(function () use ($currentDetail, $currentRegNo2, $regNo, $dataPayload, $detailPayloads, $movePayloads, $depositPayloads) {
             $this->upsertHeader($regNo, $dataPayload);
@@ -447,9 +492,16 @@ class CheckinController extends Controller
     private function loadActiveCheckins(string $search, int $limit = 80)
     {
         $idSelect = $this->legacyIdSelect('DATA2');
+        $todayIso = Carbon::today()->format('Y-m-d');
         $query = DB::table('DATA2')
-            ->selectRaw("$idSelect, RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode, RTRIM(Guest) as Guest, RTRIM(Guest2) as Guest2, RTRIM(Tipe) as Tipe, RTRIM(Payment) as Payment, RTRIM(Segment) as Segment, RTRIM(Package) as Package, RTRIM(Receipt) as Receipt, RTRIM(TypeId) as TypeOfId, RTRIM(KTP) as KTP, RTRIM(Alamat) as Alamat, RTRIM(Kelurahan) as Kelurahan, RTRIM(Kecamatan) as Kecamatan, RTRIM(Kota) as Kota, RTRIM(Propinsi) as Propinsi, RTRIM(PlaceBirth) as PlaceBirth, RTRIM(Agama) as Agama, RTRIM(KodeNegara) as KodeNegara, RTRIM(Usaha) as Usaha, RTRIM(CardNumber) as CardNumber, RTRIM(Remark) as Remark, RTRIM(Posisi) as Posisi, RTRIM(Phone) as Phone, RTRIM(Email) as Email, RTRIM(Member) as Member, RTRIM(Sales) as Sales, TglIn, JamIn, JamOut, TglKeluar, TglLahir, Expired, Person, BF, Nominal, SafeDeposit")
-            ->where('Pst', '=', ' ')
+            ->selectRaw("$idSelect, Pst, RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode, RTRIM(Guest) as Guest, RTRIM(Guest2) as Guest2, RTRIM(Tipe) as Tipe, RTRIM(Payment) as Payment, RTRIM(Segment) as Segment, RTRIM(Package) as Package, RTRIM(Receipt) as Receipt, RTRIM(TypeId) as TypeOfId, RTRIM(KTP) as KTP, RTRIM(Alamat) as Alamat, RTRIM(Kelurahan) as Kelurahan, RTRIM(Kecamatan) as Kecamatan, RTRIM(Kota) as Kota, RTRIM(Propinsi) as Propinsi, RTRIM(PlaceBirth) as PlaceBirth, RTRIM(Agama) as Agama, RTRIM(KodeNegara) as KodeNegara, RTRIM(Usaha) as Usaha, RTRIM(CardNumber) as CardNumber, RTRIM(Remark) as Remark, RTRIM(Posisi) as Posisi, RTRIM(Phone) as Phone, RTRIM(Email) as Email, RTRIM(Member) as Member, RTRIM(Sales) as Sales, TglIn, JamIn, JamOut, TglKeluar, TglLahir, Expired, Person, BF, Nominal, SafeDeposit")
+            ->where(function ($q) use ($todayIso) {
+                $q->where('Pst', '=', ' ')
+                    ->orWhere(function ($q2) use ($todayIso) {
+                        $q2->where('Pst', '=', '*')
+                            ->whereDate('TglKeluar', '=', $todayIso);
+                    });
+            })
             ->whereRaw("RTRIM(Kode) <> '999'");
 
         if ($search !== '') {
@@ -477,6 +529,7 @@ class CheckinController extends Controller
                 $row->check_out_date_iso = !empty($row->TglKeluar) ? Carbon::parse($row->TglKeluar)->format('Y-m-d') : '';
                 $row->check_in_time = $this->displayTime($row->JamIn ?? null);
                 $row->nominal_display = number_format((float) ($row->Nominal ?? 0), 0, ',', '.');
+                $row->guest_status = trim((string) ($row->Pst ?? '')) === '*' ? 'CHECKOUT' : 'STAY';
                 $row->record_json = json_encode([
                     'Id' => $row->id,
                     'DetailKey' => $row->RegNo2,
@@ -550,7 +603,7 @@ class CheckinController extends Controller
             ->whereRaw("RTRIM(Kode) <> '999'")
             ->get()
             ->pluck('Kode')
-            ->map(fn ($value) => trim((string) $value))
+            ->map(fn($value) => trim((string) $value))
             ->filter()
             ->flip();
 
@@ -573,6 +626,54 @@ class CheckinController extends Controller
                     'available' => !$activeRooms->has($kode) && !in_array($status, $blockedStatus, true),
                 ];
             })
+            ->values()
+            ->all();
+    }
+
+    private function loadCompanyOptions(): array
+    {
+        return DB::table('DATA2')
+            ->selectRaw('RTRIM(Usaha) as Company')
+            ->whereRaw("LTRIM(RTRIM(ISNULL(Usaha, ''))) <> ''")
+            ->distinct()
+            ->orderBy('Company')
+            ->get()
+            ->pluck('Company')
+            ->map(fn($value) => strtoupper(trim((string) $value)))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function loadProvinceOptions(): array
+    {
+        return DB::table('DATA2')
+            ->selectRaw('RTRIM(Propinsi) as Province')
+            ->whereRaw("LTRIM(RTRIM(ISNULL(Propinsi, ''))) <> ''")
+            ->distinct()
+            ->orderBy('Province')
+            ->get()
+            ->pluck('Province')
+            ->map(fn($value) => strtoupper(trim((string) $value)))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function loadSalesOptions(): array
+    {
+        return DB::table('DATA2')
+            ->selectRaw('RTRIM(Sales) as Sales')
+            ->whereRaw("LTRIM(RTRIM(ISNULL(Sales, ''))) <> ''")
+            ->distinct()
+            ->orderBy('Sales')
+            ->get()
+            ->pluck('Sales')
+            ->map(fn($value) => strtoupper(trim((string) $value)))
+            ->filter()
+            ->unique()
             ->values()
             ->all();
     }
