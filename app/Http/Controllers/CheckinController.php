@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CheckinController extends Controller
 {
@@ -15,6 +16,10 @@ class CheckinController extends Controller
         $checkins = $this->paginateCollection($records, 10, $request);
         $rooms = $this->loadRoomOptions();
         $packages = $this->loadPackageOptions();
+        $typeOptions = $this->loadTypeOptions();
+        $idTypeOptions = $this->loadIdTypeOptions();
+        $defaultIdType = in_array('KTP', $idTypeOptions, true) ? 'KTP' : ($idTypeOptions[0] ?? '');
+        $reservationNumberOptions = $this->loadReservationNumberOptions();
         $companyOptions = $this->loadCompanyOptions();
         $provinceOptions = $this->loadProvinceOptions();
         $salesOptions = $this->loadSalesOptions();
@@ -51,6 +56,7 @@ class CheckinController extends Controller
             'nextRegNo' => $this->generateNextRegNo(),
             'rooms' => $rooms,
             'packages' => $packages,
+            'reservationNumberOptions' => $reservationNumberOptions,
             'companyOptions' => $companyOptions,
             'provinceOptions' => $provinceOptions,
             'salesOptions' => $salesOptions,
@@ -59,12 +65,14 @@ class CheckinController extends Controller
                 'rooms_ready' => collect($rooms)->where('available', true)->count(),
                 'packages' => count($packages),
             ],
-            'typeOptions' => ['INDIVIDUAL', 'GROUP RESERVATION', 'GROUP COMPANY', 'TRAVEL', 'OTA'],
+            'typeOptions' => $typeOptions,
+            'defaultTypeOfCheckIn' => $typeOptions[0] ?? '',
             'paymentOptions' => ['CASH', 'CARD', 'OTA', 'COMPANY', 'TRAVEL', 'COMPLIMENT'],
             'segmentOptions' => ['DIRECT', 'TRAVEL', 'OTA', 'CORPORATE', 'GROUP'],
             'religionOptions' => ['ISLAM', 'KRISTEN', 'KATOLIK', 'HINDU', 'BUDDHA', 'KONGHUCU'],
             'nationalityOptions' => ['INA', 'MAL', 'SGP', 'AUS', 'JPN', 'KOR', 'USA'],
-            'idTypeOptions' => ['KTP', 'SIM', 'PASSPORT', 'KITAS'],
+            'idTypeOptions' => $idTypeOptions,
+            'defaultIdType' => $defaultIdType,
             'checkInIso' => $checkInIso,
             'checkOutIso' => $checkOutIso,
             'birthIso' => $birthIso,
@@ -254,7 +262,7 @@ class CheckinController extends Controller
             'Kecamatan' => 'nullable|string|max:60',
             'KabCity' => 'nullable|string|max:60',
             'ProvinceCountry' => 'nullable|string|max:60',
-            'TypeOfId' => 'nullable|string|max:30',
+            'TypeOfId' => ['required', 'string', 'max:30', Rule::in($this->loadIdTypeOptions())],
             'IdNumber' => 'nullable|string|max:60',
             'ExpiredDate' => 'nullable|date_format:Y-m-d',
             'GroupPosition' => 'nullable|string|max:60',
@@ -646,6 +654,72 @@ class CheckinController extends Controller
             ->all();
     }
 
+    private function loadTypeOptions(): array
+    {
+        return DB::table('PENENG')
+            ->selectRaw('RTRIM(KET) as KET, RTRIM(Flag) as Flag')
+            ->whereRaw("RTRIM(Flag) = 'Tipe'")
+            ->orderBy('Urut')
+            ->get()
+            ->pluck('KET')
+            ->map(fn($value) => trim((string) $value))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    private function loadIdTypeOptions(): array
+    {
+        return DB::table('PENENG')
+            ->selectRaw('RTRIM(KET) as KET')
+            ->whereRaw("RTRIM(Flag) = 'KTP'")
+            ->orderBy('Urut')
+            ->get()
+            ->pluck('KET')
+            ->map(fn($value) => trim((string) $value))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    private function loadReservationNumberOptions(): array
+    {
+        return DB::table('Book')
+            ->join('Book2', 'Book.ResNo', '=', 'Book2.ResNo')
+            ->selectRaw("
+                RTRIM(Book2.ResNo) as ResNo,
+                RTRIM(Book2.TelPhone) as TelPhone,
+                RTRIM(Book2.Remark) as Remark,
+                RTRIM(Book2.OriginalGuest) as OriginalGuest,
+                Book2.TglIn as TglIn,
+                RTRIM(Book2.Alamat) as Alamat,
+                CASE WHEN ISNULL(Book2.Batal, 0) = 0 THEN '' ELSE 'Cancel' END as Status
+            ")
+            ->whereRaw("LTRIM(RTRIM(ISNULL(Book2.ResNo, ''))) <> ''")
+            ->orderByDesc('Book2.TglIn')
+            ->orderByDesc('Book2.ResNo')
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'resno' => trim((string) ($row->ResNo ?? '')),
+                    'phone' => trim((string) ($row->TelPhone ?? '')),
+                    'remarks' => trim((string) ($row->Remark ?? '')),
+                    'original_guest' => trim((string) ($row->OriginalGuest ?? '')),
+                    'address' => trim((string) ($row->Alamat ?? '')),
+                    'room_code' => '',
+                    'room_class' => '',
+                    'accept_by' => '',
+                    'status' => trim((string) ($row->Status ?? '')),
+                    'check_in_date' => !empty($row->TglIn) ? Carbon::parse($row->TglIn)->format('Y-m-d') : '',
+                    'nationality' => 'INA',
+                ];
+            })
+            ->filter(fn (array $row) => $row['resno'] !== '')
+            ->unique('resno')
+            ->values()
+            ->all();
+    }
+
     private function loadProvinceOptions(): array
     {
         return DB::table('DATA2')
@@ -813,9 +887,9 @@ class CheckinController extends Controller
         }
 
         try {
-            return Carbon::parse((string) $value)->format('H:i');
+            return Carbon::parse((string) $value)->format('H:i:s');
         } catch (\Throwable $exception) {
-            return substr(trim((string) $value), 0, 5);
+            return substr(trim((string) $value), 0, 8);
         }
     }
 

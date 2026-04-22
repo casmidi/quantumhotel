@@ -16,34 +16,15 @@
         margin-top: 1.5rem;
     }
 
-    .checkin-toolbar {
+    .checkin-header-side {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        flex-wrap: wrap;
-        margin-bottom: 1rem;
-    }
-
-    .checkin-badge-row {
-        display: flex;
-        align-items: center;
+        align-items: stretch;
+        justify-content: flex-end;
         gap: 0.75rem;
         flex-wrap: wrap;
+        flex: 1 1 420px;
     }
 
-    .checkin-regno {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.7rem;
-        padding: 0.9rem 1rem;
-        border-radius: 20px;
-        border: 1px solid rgba(199, 165, 106, 0.22);
-        background: linear-gradient(180deg, rgba(233, 213, 162, 0.14), rgba(255, 255, 255, 0.96));
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
-    }
-
-    .checkin-regno small,
     .checkin-room-note small,
     .checkin-package-note small {
         display: block;
@@ -55,18 +36,12 @@
         color: #8f6a2d;
     }
 
-    .checkin-regno strong,
     .checkin-room-note strong,
     .checkin-package-note strong {
         display: block;
         font-size: 1rem;
         color: #173761;
         line-height: 1.1;
-    }
-
-    .checkin-regno .package-input {
-        min-width: 240px;
-        margin-top: 0.45rem;
     }
 
     .checkin-room-note,
@@ -78,16 +53,10 @@
         border: 1px solid rgba(199, 165, 106, 0.2);
     }
 
-    .checkin-top-info {
+    .registration-details-grid {
         display: grid;
-        grid-template-columns: 1fr 0.75fr 1fr 1.1fr;
+        grid-template-columns: 1.05fr 1.15fr 1fr 0.82fr 1.05fr 1.2fr;
         gap: 0.95rem;
-        margin-bottom: 1.5rem;
-        padding: 1.15rem;
-        border: 1px solid rgba(23, 55, 97, 0.08);
-        border-radius: 20px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.92));
-        box-shadow: 0 12px 30px rgba(16, 35, 59, 0.06);
     }
 
     .checkin-info-item {
@@ -95,6 +64,10 @@
         flex-direction: column;
         gap: 0.45rem;
         min-width: 0;
+    }
+
+    .registration-number-item .package-input {
+        background: rgba(16, 35, 59, 0.05);
     }
 
     .checkin-info-label {
@@ -150,6 +123,30 @@
         background: rgba(107, 120, 240, 0.12);
         color: #6b78f0;
         font-size: 1rem;
+    }
+
+    .checkin-section-body {
+        display: block;
+        width: 100%;
+    }
+
+    .payment-checkbox-field {
+        justify-content: flex-end;
+    }
+
+    .payment-checkbox-control {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        min-height: calc(3rem + 2px);
+        color: #173761;
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
+
+    .payment-checkbox-control input {
+        width: 1rem;
+        height: 1rem;
     }
 
     .guest-info-grid {
@@ -597,6 +594,16 @@
         line-height: 1.55;
     }
 
+    .checkin-table thead th {
+        background: linear-gradient(180deg, rgba(240, 246, 255, 0.98), rgba(225, 235, 248, 0.95));
+        border-bottom: 2px solid rgba(30, 75, 128, 0.2);
+        color: #10233b;
+        font-size: 0.77rem;
+        font-weight: 900;
+        letter-spacing: 0.11em;
+        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.9);
+    }
+
     .checkin-table .package-code {
         min-width: 132px;
     }
@@ -696,8 +703,7 @@
             padding-bottom: 1rem;
         }
 
-        .checkin-toolbar,
-        .checkin-badge-row,
+        .checkin-header-side,
         .checkin-search-form,
         .checkin-search-actions,
         .checkin-actions,
@@ -708,7 +714,10 @@
             width: 100%;
         }
 
-        .checkin-regno,
+        .checkin-header-side {
+            justify-content: stretch;
+        }
+
         .checkin-room-note,
         .checkin-package-note,
         .checkin-search-group,
@@ -717,7 +726,7 @@
             width: 100%;
         }
 
-        .checkin-top-info,
+        .registration-details-grid,
         .checkin-form-grid,
         .guest-info-row-two,
         .guest-info-row-three,
@@ -800,7 +809,17 @@
         <div class="package-shell-header">
             <div class="package-shell-heading-block">
                 <h1 class="package-shell-title">Check In</h1>
-                <p class="package-shell-subtitle">Input tamu aktif dan pilih room dengan form yang lebih rapi.</p>
+                <p class="package-shell-subtitle">Enter active guest details and choose a room with a cleaner form.</p>
+            </div>
+            <div class="checkin-header-side">
+                <div class="checkin-room-note" id="roomHelper">
+                    <small>Room Status</small>
+                    <strong>Select an available room</strong>
+                </div>
+                <div class="checkin-package-note" id="packageHelper">
+                    <small>Package Note</small>
+                    <strong>Nominal will be filled automatically when a package is found</strong>
+                </div>
             </div>
         </div>
         <div class="package-shell-body">
@@ -808,72 +827,85 @@
                 @csrf
                 <input type="hidden" id="CurrentDetailKey" value="">
 
-                <div class="checkin-toolbar">
-                    <div class="checkin-badge-row">
-                        <div class="checkin-regno">
-                            <div>
-                                <small>Reg. Number</small>
-                                <strong>Header transaksi</strong>
-                                <input type="text" name="GeneratedRegNo" id="GeneratedRegNo"
-                                    class="form-control package-input checkin-info-input"
-                                    value="{{ old('GeneratedRegNo', $nextRegNo) }}" data-flow readonly
-                                    style="background: rgba(16, 35, 59, 0.05);">
+                <div class="checkin-section registration-details-section">
+                    <div class="checkin-section-header">
+                        <h3><i class="fas fa-id-card"></i> Registration Details</h3>
+                    </div>
+                    <div class="registration-details-grid">
+                        <div class="checkin-info-item registration-number-item">
+                            <span class="checkin-info-label">Reg. Number</span>
+                            <input type="text" name="GeneratedRegNo" id="GeneratedRegNo"
+                                class="form-control package-input checkin-info-input"
+                                value="{{ old('GeneratedRegNo', $nextRegNo) }}" data-flow data-vb="xRegNo" readonly>
+                        </div>
+                        <div class="checkin-info-item">
+                            <span class="checkin-info-label">Type of Check In</span>
+                            <select name="TypeOfCheckIn" id="TypeOfCheckIn" class="form-control package-select"
+                                data-flow data-vb="xTipe" required>
+                                @foreach ($typeOptions as $option)
+                                    <option value="{{ $option }}"
+                                        {{ old('TypeOfCheckIn', $defaultTypeOfCheckIn) === $option ? 'selected' : '' }}>
+                                        {{ $option }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="checkin-info-item">
+                            <span class="checkin-info-label">Check In <span class="text-danger">*</span></span>
+                            <div class="package-date-group" data-date-field>
+                                <input type="hidden" name="CheckInDate" id="CheckInDate" value="{{ $checkInIso }}">
+                                <input type="text" id="CheckInDateDisplay" class="form-control package-input"
+                                    value="{{ \Carbon\Carbon::parse($checkInIso)->format('d-m-Y') }}"
+                                    placeholder="dd-MM-yyyy" inputmode="numeric" data-flow data-vb="xTglIn" required>
+                                <button type="button" class="package-date-picker" data-date-button
+                                    aria-label="Open system date picker"><i class="fa-regular fa-calendar"></i></button>
+                                <input type="date" class="package-date-native" data-date-native
+                                    value="{{ $checkInIso }}" tabindex="-1" aria-hidden="true">
                             </div>
                         </div>
-                        <div class="checkin-room-note" id="roomHelper">
-                            <small>Room Status</small>
-                            <strong>Pilih room yang masih tersedia</strong>
+                        <div class="checkin-info-item">
+                            <span class="checkin-info-label">Time <span class="text-danger">*</span></span>
+                            <input type="text" name="CheckInTime" id="CheckInTime" class="form-control package-input"
+                                value="{{ old('CheckInTime', now()->format('H:i:s')) }}" placeholder="HH:mm:ss"
+                                inputmode="numeric" maxlength="8" pattern="^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$"
+                                data-flow data-vb="xJamIn" required>
                         </div>
-                        <div class="checkin-package-note" id="packageHelper">
-                            <small>Package Note</small>
-                            <strong>Nominal akan terisi otomatis bila package ditemukan</strong>
+                        <div class="checkin-info-item">
+                            <span class="checkin-info-label">Reservation Number</span>
+                            <select name="ReservationNumber" id="ReservationNumber" class="form-control package-select"
+                                data-flow data-vb="xResNo">
+                                <option value="">Select reservation number</option>
+                                @foreach ($reservationNumberOptions as $option)
+                                    <option value="{{ $option['resno'] }}"
+                                        data-address="{{ $option['address'] }}"
+                                        data-phone="{{ $option['phone'] }}"
+                                        data-remarks="{{ $option['remarks'] }}"
+                                        data-original-guest="{{ $option['original_guest'] }}"
+                                        data-room-code="{{ $option['room_code'] }}"
+                                        data-room-class="{{ $option['room_class'] }}"
+                                        data-accept-by="{{ $option['accept_by'] }}"
+                                        data-status="{{ $option['status'] }}"
+                                        data-check-in-date="{{ $option['check_in_date'] }}"
+                                        data-nationality="{{ $option['nationality'] }}"
+                                        {{ old('ReservationNumber') === $option['resno'] ? 'selected' : '' }}>
+                                        {{ $option['resno'] }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-                    </div>
-                </div>
-
-                <div class="checkin-top-info">
-                    <div class="checkin-info-item">
-                        <span class="checkin-info-label">Check In <span class="text-danger">*</span></span>
-                        <div class="package-date-group" data-date-field>
-                            <input type="hidden" name="CheckInDate" id="CheckInDate" value="{{ $checkInIso }}">
-                            <input type="text" id="CheckInDateDisplay" class="form-control package-input"
-                                value="{{ \Carbon\Carbon::parse($checkInIso)->format('d-m-Y') }}" placeholder="dd-MM-yyyy"
-                                inputmode="numeric" data-flow required>
-                            <button type="button" class="package-date-picker" data-date-button
-                                aria-label="Open system date picker"><i class="fa-regular fa-calendar"></i></button>
-                            <input type="date" class="package-date-native" data-date-native value="{{ $checkInIso }}"
-                                tabindex="-1" aria-hidden="true">
+                        <div class="checkin-info-item">
+                            <span class="checkin-info-label">Estimation Checkout <span class="text-danger">*</span></span>
+                            <div class="package-date-group" data-date-field>
+                                <input type="hidden" name="EstimationOut" id="EstimationOut" value="{{ $checkOutIso }}">
+                                <input type="text" id="EstimationOutDisplay" class="form-control package-input"
+                                    value="{{ \Carbon\Carbon::parse($checkOutIso)->format('d-m-Y') }}"
+                                    placeholder="dd-MM-yyyy" inputmode="numeric" data-flow data-vb="xTglKeluar" required>
+                                <button type="button" class="package-date-picker" data-date-button
+                                    aria-label="Open system date picker"><i class="fa-regular fa-calendar"></i></button>
+                                <input type="date" class="package-date-native" data-date-native
+                                    value="{{ $checkOutIso }}" tabindex="-1" aria-hidden="true">
+                            </div>
                         </div>
-                    </div>
-                    <div class="checkin-info-item">
-                        <span class="checkin-info-label">Time <span class="text-danger">*</span></span>
-                        <input type="time" name="CheckInTime" id="CheckInTime" class="form-control package-input"
-                            value="{{ old('CheckInTime', now()->format('H:i')) }}" data-flow required>
-                    </div>
-                    <div class="checkin-info-item">
-                        <span class="checkin-info-label">Est. Out <span class="text-danger">*</span></span>
-                        <div class="package-date-group" data-date-field>
-                            <input type="hidden" name="EstimationOut" id="EstimationOut" value="{{ $checkOutIso }}">
-                            <input type="text" id="EstimationOutDisplay" class="form-control package-input"
-                                value="{{ \Carbon\Carbon::parse($checkOutIso)->format('d-m-Y') }}" placeholder="dd-MM-yyyy"
-                                inputmode="numeric" data-flow required>
-                            <button type="button" class="package-date-picker" data-date-button
-                                aria-label="Open system date picker"><i class="fa-regular fa-calendar"></i></button>
-                            <input type="date" class="package-date-native" data-date-native value="{{ $checkOutIso }}"
-                                tabindex="-1" aria-hidden="true">
-                        </div>
-                    </div>
-                    <div class="checkin-info-item">
-                        <span class="checkin-info-label">Type of Check In</span>
-                        <select name="TypeOfCheckIn" id="TypeOfCheckIn" class="form-control package-select" data-flow
-                            required>
-                            @foreach ($typeOptions as $option)
-                                <option value="{{ $option }}"
-                                    {{ old('TypeOfCheckIn', 'GROUP RESERVATION') === $option ? 'selected' : '' }}>
-                                    {{ $option }}
-                                </option>
-                            @endforeach
-                        </select>
                     </div>
                 </div>
 
@@ -886,12 +918,12 @@
                             <div class="guest-info-field">
                                 <label for="GuestName">Guest Name<span class="text-danger">*</span></label>
                                 <input type="text" name="GuestName" id="GuestName" class="form-control package-input"
-                                    value="{{ old('GuestName') }}" placeholder="Budi Santoso" data-flow required>
+                                    value="{{ old('GuestName') }}" placeholder="Budi Santoso" data-flow data-vb="xGuest" required>
                             </div>
                             <div class="guest-info-field">
                                 <label for="GuestName2">Name II</label>
                                 <input type="text" name="GuestName2" id="GuestName2" class="form-control package-input"
-                                    value="{{ old('GuestName2') }}" placeholder="Enter name II (optional)" data-flow>
+                                    value="{{ old('GuestName2') }}" placeholder="Enter name II (optional)" data-flow data-vb="xGuest2">
                             </div>
                         </div>
 
@@ -900,6 +932,7 @@
                                 <label for="PlaceOfBirth">Place of Birth</label>
                                 <input type="text" name="PlaceOfBirth" id="PlaceOfBirth"
                                     class="form-control package-input" value="{{ old('PlaceOfBirth') }}"
+                                    data-vb="xPlaceBirth"
                                     placeholder="Jakarta" data-flow>
                             </div>
                             <div class="guest-info-field">
@@ -908,7 +941,7 @@
                                     <input type="hidden" name="BirthDate" id="BirthDate" value="{{ $birthIso }}">
                                     <input type="text" id="BirthDateDisplay" class="form-control package-input"
                                         value="{{ $birthIso ? \Carbon\Carbon::parse($birthIso)->format('d-m-Y') : '' }}"
-                                        placeholder="dd-MM-yyyy" inputmode="numeric" data-flow>
+                                        placeholder="dd-MM-yyyy" inputmode="numeric" data-flow data-vb="xTglLahir">
                                     <button type="button" class="package-date-picker" data-date-button
                                         aria-label="Open system date picker"><i
                                             class="fa-regular fa-calendar"></i></button>
@@ -918,11 +951,10 @@
                             </div>
                             <div class="guest-info-field">
                                 <label for="TypeOfId">Type of ID</label>
-                                <select name="TypeOfId" id="TypeOfId" class="form-control package-select" data-flow>
-                                    <option value="">Select</option>
+                                <select name="TypeOfId" id="TypeOfId" class="form-control package-select" data-flow data-vb="xTypeId">
                                     @foreach ($idTypeOptions as $option)
                                         <option value="{{ $option }}"
-                                            {{ old('TypeOfId') === $option ? 'selected' : '' }}>
+                                            {{ old('TypeOfId', $defaultIdType) === $option ? 'selected' : '' }}>
                                             {{ $option }}
                                         </option>
                                     @endforeach
@@ -931,7 +963,7 @@
                             <div class="guest-info-field">
                                 <label for="IdNumber">ID Number</label>
                                 <input type="text" name="IdNumber" id="IdNumber" class="form-control package-input"
-                                    value="{{ old('IdNumber') }}" placeholder="3171234567890001" data-flow>
+                                    value="{{ old('IdNumber') }}" placeholder="3171234567890001" data-flow data-vb="xKTP">
                             </div>
                             <div class="guest-info-field">
                                 <label for="ExpiredDateDisplay">Expired Date</label>
@@ -939,7 +971,7 @@
                                     <input type="hidden" name="ExpiredDate" id="ExpiredDate" value="{{ $expiredIso }}">
                                     <input type="text" id="ExpiredDateDisplay" class="form-control package-input"
                                         value="{{ $expiredIso ? \Carbon\Carbon::parse($expiredIso)->format('d-m-Y') : '' }}"
-                                        placeholder="dd-MM-yyyy" inputmode="numeric" data-flow>
+                                        placeholder="dd-MM-yyyy" inputmode="numeric" data-flow data-vb="xExpired">
                                     <button type="button" class="package-date-picker" data-date-button
                                         aria-label="Open system date picker"><i
                                             class="fa-regular fa-calendar"></i></button>
@@ -955,7 +987,7 @@
                                 <div class="guest-contact-input">
                                     <span class="guest-contact-icon"><i class="fa fa-phone"></i></span>
                                     <input type="text" name="Phone" id="Phone" class="form-control package-input"
-                                        value="{{ old('Phone') }}" placeholder="0812-3456-7890" data-flow>
+                                        value="{{ old('Phone') }}" placeholder="0812-3456-7890" data-flow data-vb="xPhone">
                                 </div>
                             </div>
                             <div class="guest-info-field">
@@ -963,7 +995,7 @@
                                 <div class="guest-contact-input">
                                     <span class="guest-contact-icon"><i class="fa fa-envelope-o"></i></span>
                                     <input type="email" name="Email" id="Email" class="form-control package-input"
-                                        value="{{ old('Email') }}" placeholder="budi.santoso@email.com" data-flow>
+                                        value="{{ old('Email') }}" placeholder="budi.santoso@email.com" data-flow data-vb="xEmail">
                                 </div>
                             </div>
                         </div>
@@ -982,29 +1014,29 @@
                                 <input type="text" name="Address" id="Address" class="form-control package-input"
                                     value="{{ old('Address') }}"
                                     placeholder="Jl. Sudirman No. 123, Karet Semanggi, Setiabudi, Jakarta Selatan"
-                                    data-flow>
+                                    data-flow data-vb="xAlamat">
                             </div>
                         </div>
                         <div class="address-info-row address-info-row-five">
                             <div class="address-info-field">
                                 <label for="Kelurahan">Kelurahan</label>
                                 <input type="text" name="Kelurahan" id="Kelurahan" class="form-control package-input"
-                                    value="{{ old('Kelurahan') }}" placeholder="Karet" data-flow>
+                                    value="{{ old('Kelurahan') }}" placeholder="Karet" data-flow data-vb="xKelurahan">
                             </div>
                             <div class="address-info-field">
                                 <label for="Kecamatan">Kecamatan</label>
                                 <input type="text" name="Kecamatan" id="Kecamatan" class="form-control package-input"
-                                    value="{{ old('Kecamatan') }}" placeholder="Setiabudi" data-flow>
+                                    value="{{ old('Kecamatan') }}" placeholder="Setiabudi" data-flow data-vb="xKecamatan">
                             </div>
                             <div class="address-info-field">
                                 <label for="KabCity">City / Kab</label>
                                 <input type="text" name="KabCity" id="KabCity" class="form-control package-input"
-                                    value="{{ old('KabCity') }}" placeholder="Jakarta Selatan" data-flow>
+                                    value="{{ old('KabCity') }}" placeholder="Jakarta Selatan" data-flow data-vb="xKota">
                             </div>
                             <div class="address-info-field">
                                 <label for="ProvinceCountry">Province / Country</label>
                                 <select name="ProvinceCountry" id="ProvinceCountry" class="form-control package-select"
-                                    data-flow>
+                                    data-flow data-vb="xPropinsi">
                                     <option value="">Select province / country</option>
                                     @foreach ($provinceOptions as $option)
                                         <option value="{{ $option }}"
@@ -1017,7 +1049,7 @@
                             <div class="address-info-field">
                                 <label for="Nationality">Nationality<span class="text-danger">*</span></label>
                                 <select name="Nationality" id="Nationality" class="form-control package-select"
-                                    data-flow>
+                                    data-flow data-vb="xKodeNegara">
                                     @foreach ($nationalityOptions as $option)
                                         <option value="{{ $option }}"
                                             {{ old('Nationality', 'INA') === $option ? 'selected' : '' }}>
@@ -1057,7 +1089,7 @@
                                         <input type="hidden" name="DetailKeyList[]" id="PrimaryDetailKey"
                                             value="{{ $firstDetailKey }}">
                                         <select name="RoomCodeList[]" id="RoomCode" class="form-control package-select"
-                                            data-flow required>
+                                            data-flow data-vb="xKode" required>
                                             <option value="">Select room</option>
                                             @foreach ($rooms as $room)
                                                 <option value="{{ $room['kode'] }}"
@@ -1080,7 +1112,7 @@
                                     </td>
                                     <td>
                                         <select name="PackageCodeList[]" id="PackageCode"
-                                            class="form-control package-select" data-flow>
+                                            class="form-control package-select" data-flow data-vb="xPackage">
                                             <option value="">Select package</option>
                                             @foreach ($packages as $package)
                                                 <option value="{{ $package['kode'] }}"
@@ -1093,12 +1125,13 @@
                                     <td>
                                         <input type="text" id="NominalDisplayVisible"
                                             class="form-control package-input text-right room-muted-display"
+                                            data-vb="xNominal"
                                             value="{{ $firstNominal ? number_format((float) preg_replace('/[^\d]/', '', (string) $firstNominal), 0, ',', '.') : '' }}"
                                             readonly>
                                         <input type="hidden" id="NominalDisplay" name="NominalList[]"
                                             value="{{ $firstNominal ? preg_replace('/[^\d]/', '', (string) $firstNominal) : '' }}">
                                         <input type="hidden" name="BreakfastList[]" id="Breakfast"
-                                            value="{{ $firstBreakfast }}">
+                                            value="{{ $firstBreakfast }}" data-vb="xBF">
                                     </td>
                                     <td class="text-center">
                                         <button type="button" class="room-action-btn" id="clearPrimaryRoomButton"
@@ -1123,19 +1156,14 @@
         <div class="detail-info-grid">
             <div class="detail-info-column">
                 <div class="detail-info-field">
-                    <label for="ReservationNumber">Res. Number</label>
-                    <input type="text" name="ReservationNumber" id="ReservationNumber"
-                        class="form-control package-input" value="{{ old('ReservationNumber') }}" data-flow>
-                </div>
-                <div class="detail-info-field">
                     <label for="GroupPosition">Group Position</label>
                     <input type="text" name="GroupPosition" id="GroupPosition" class="form-control package-input"
-                        value="{{ old('GroupPosition') }}" data-flow>
+                        value="{{ old('GroupPosition') }}" data-flow data-vb="xPosisi">
                 </div>
                 <div class="detail-info-row-two">
                     <div class="detail-info-field">
                         <label for="Religion">Religion</label>
-                        <select name="Religion" id="Religion" class="form-control package-select" data-flow>
+                        <select name="Religion" id="Religion" class="form-control package-select" data-flow data-vb="xAgama">
                             <option value="">Select</option>
                             @foreach ($religionOptions as $option)
                                 <option value="{{ $option }}" {{ old('Religion') === $option ? 'selected' : '' }}>
@@ -1148,6 +1176,7 @@
                         <label for="NumberOfPerson">Number of Person</label>
                         <input type="number" name="NumberOfPerson" id="NumberOfPerson"
                             class="form-control package-input text-right" value="{{ old('NumberOfPerson', 2) }}"
+                            data-vb="xPerson"
                             min="1" max="20" data-flow required>
                     </div>
                 </div>
@@ -1156,7 +1185,7 @@
             <div class="detail-info-column">
                 <div class="detail-info-field">
                     <label for="Company">Company</label>
-                    <select name="Company" id="Company" class="form-control package-select" data-flow>
+                    <select name="Company" id="Company" class="form-control package-select" data-flow data-vb="xUsaha">
                         <option value="">Select company</option>
                         @foreach ($companyOptions as $option)
                             <option value="{{ $option }}" {{ old('Company') === $option ? 'selected' : '' }}>
@@ -1167,7 +1196,7 @@
                 </div>
                 <div class="detail-info-field">
                     <label for="Segment">Segment</label>
-                    <select name="Segment" id="Segment" class="form-control package-select" data-flow>
+                    <select name="Segment" id="Segment" class="form-control package-select" data-flow data-vb="xSegment">
                         <option value="">Select</option>
                         @foreach ($segmentOptions as $option)
                             <option value="{{ $option }}"
@@ -1180,59 +1209,64 @@
                 <div class="detail-info-field">
                     <label for="Remarks">Remarks</label>
                     <input type="text" name="Remarks" id="Remarks" class="form-control package-input"
-                        value="{{ old('Remarks') }}" data-flow>
+                        value="{{ old('Remarks') }}" data-flow data-vb="xRemark">
                 </div>
             </div>
         </div>
     </div>
 
     <!-- PAYMENT INFORMATION SECTION -->
-    <div class="checkin-section">
+    <div class="checkin-section payment-info-section">
         <div class="checkin-section-header">
             <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
         </div>
-        <div class="checkin-form-grid">
-            <div class="checkin-column">
-                <div class="checkin-row">
-                    <label class="checkin-row-label" for="PaymentMethod">Payment Method</label>
-                    <select name="PaymentMethod" id="PaymentMethod" class="form-control package-select" data-flow
-                        required>
-                        @foreach ($paymentOptions as $option)
-                            <option value="{{ $option }}"
-                                {{ old('PaymentMethod', 'OTA') === $option ? 'selected' : '' }}>
-                                {{ $option }}</option>
-                        @endforeach
-                    </select>
-                    <span class="checkin-row-note">Pay</span>
+        <div class="checkin-section-body payment-info-body">
+            <div class="detail-info-grid payment-info-grid">
+                <div class="detail-info-column">
+                    <div class="detail-info-field">
+                        <label for="PaymentMethod">Payment Method</label>
+                        <select name="PaymentMethod" id="PaymentMethod" class="form-control package-select" data-flow
+                            data-vb="xPayment" required>
+                            @foreach ($paymentOptions as $option)
+                                <option value="{{ $option }}"
+                                    {{ old('PaymentMethod', 'OTA') === $option ? 'selected' : '' }}>
+                                    {{ $option }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="detail-info-row-two">
+                        <div class="detail-info-field">
+                            <label for="CreditCardNumber">Credit Card #</label>
+                            <input type="text" name="CreditCardNumber" id="CreditCardNumber"
+                                class="form-control package-input" value="{{ old('CreditCardNumber') }}" data-flow data-vb="xCreditCard">
+                        </div>
+                        <div class="detail-info-field payment-checkbox-field">
+                            <label for="CheckDeposit">Deposit</label>
+                            <label class="payment-checkbox-control" for="CheckDeposit"><input type="checkbox"
+                                    name="CheckDeposit" id="CheckDeposit" value="1" data-vb="xPeriksa"
+                                    {{ old('CheckDeposit') ? 'checked' : '' }}>
+                                Check Deposit</label>
+                        </div>
+                    </div>
                 </div>
-                <div class="checkin-row">
-                    <label class="checkin-row-label" for="CreditCardNumber">Credit Card #</label>
-                    <input type="text" name="CreditCardNumber" id="CreditCardNumber"
-                        class="form-control package-input" value="{{ old('CreditCardNumber') }}" data-flow>
-                    <label class="checkin-row-note is-stack"><input type="checkbox" name="CheckDeposit"
-                            id="CheckDeposit" value="1" {{ old('CheckDeposit') ? 'checked' : '' }}>
-                        Check Deposit</label>
-                </div>
-            </div>
 
-            <div class="checkin-column">
-                <div class="checkin-row">
-                    <label class="checkin-row-label" for="Member">Member 1</label>
-                    <input type="text" name="Member" id="Member" class="form-control package-input"
-                        value="{{ old('Member') }}" data-flow>
-                    <span class="checkin-row-note is-empty"></span>
-                </div>
-                <div class="checkin-row">
-                    <label class="checkin-row-label" for="Sales">Sales</label>
-                    <select name="Sales" id="Sales" class="form-control package-select" data-flow>
-                        <option value="">Select sales</option>
-                        @foreach ($salesOptions as $option)
-                            <option value="{{ $option }}" {{ old('Sales') === $option ? 'selected' : '' }}>
-                                {{ $option }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <span class="checkin-row-note is-empty"></span>
+                <div class="detail-info-column">
+                    <div class="detail-info-field">
+                        <label for="Member">Member 1</label>
+                        <input type="text" name="Member" id="Member" class="form-control package-input"
+                            value="{{ old('Member') }}" data-flow data-vb="xMember">
+                    </div>
+                    <div class="detail-info-field">
+                        <label for="Sales">Sales</label>
+                        <select name="Sales" id="Sales" class="form-control package-select" data-flow data-vb="xSales">
+                            <option value="">Select sales</option>
+                            @foreach ($salesOptions as $option)
+                                <option value="{{ $option }}" {{ old('Sales') === $option ? 'selected' : '' }}>
+                                    {{ $option }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1478,6 +1512,7 @@
         const breakfastField = document.getElementById('Breakfast');
         const guestNameField = document.getElementById('GuestName');
         const numberOfPersonField = document.getElementById('NumberOfPerson');
+        const reservationNumberField = document.getElementById('ReservationNumber');
         const primaryRoomGuestName = document.getElementById('PrimaryRoomGuestName');
         const primaryRoomPaxDisplay = document.getElementById('PrimaryRoomPaxDisplay');
         const clearPrimaryRoomButton = document.getElementById('clearPrimaryRoomButton');
@@ -1486,13 +1521,151 @@
         const roomHelper = document.getElementById('roomHelper');
         const packageHelper = document.getElementById('packageHelper');
         const defaultRegNo = @json(old('GeneratedRegNo', $nextRegNo));
+        const defaultTypeOfCheckIn = @json($defaultTypeOfCheckIn);
+        const defaultIdType = @json($defaultIdType);
         const defaultCheckIn = @json($checkInIso);
         const defaultCheckOut = @json($checkOutIso);
+        const defaultCheckInTime = @json(old('CheckInTime', now()->format('H:i:s')));
         const oldAdditionalRoomRows = @json($oldAdditionalRoomRows);
         const initialHasOld = @json((bool) (old('GuestName') || old('RoomCodeList.0')));
+        const vbFields = {};
+        Array.from(document.querySelectorAll('[data-vb]')).forEach(function(field) {
+            const vbName = field.dataset.vb;
+            if (!vbName) {
+                return;
+            }
+
+            vbFields[vbName] = field;
+            if (typeof window[vbName] === 'undefined') {
+                window[vbName] = field;
+            }
+        });
+        window.vbFields = vbFields;
+        const xRegNo = vbFields.xRegNo || generatedRegNoField;
+        const xTipe = vbFields.xTipe || document.getElementById('TypeOfCheckIn');
+        const xTglIn = vbFields.xTglIn || document.getElementById('CheckInDateDisplay');
+        const xJamIn = vbFields.xJamIn || document.getElementById('CheckInTime');
+        const xResNo = vbFields.xResNo || reservationNumberField;
+        const xTglKeluar = vbFields.xTglKeluar || document.getElementById('EstimationOutDisplay');
+        const xGuest = vbFields.xGuest || guestNameField;
+        const xGuest2 = vbFields.xGuest2 || document.getElementById('GuestName2');
+        const xPlaceBirth = vbFields.xPlaceBirth || document.getElementById('PlaceOfBirth');
+        const xTglLahir = vbFields.xTglLahir || document.getElementById('BirthDateDisplay');
+        const xTypeId = vbFields.xTypeId || document.getElementById('TypeOfId');
+        const xKTP = vbFields.xKTP || document.getElementById('IdNumber');
+        const xExpired = vbFields.xExpired || document.getElementById('ExpiredDateDisplay');
+        const xPhone = vbFields.xPhone || document.getElementById('Phone');
+        const xEmail = vbFields.xEmail || document.getElementById('Email');
+        const xAlamat = vbFields.xAlamat || document.getElementById('Address');
+        const xKelurahan = vbFields.xKelurahan || document.getElementById('Kelurahan');
+        const xKecamatan = vbFields.xKecamatan || document.getElementById('Kecamatan');
+        const xKota = vbFields.xKota || document.getElementById('KabCity');
+        const xPropinsi = vbFields.xPropinsi || document.getElementById('ProvinceCountry');
+        const xKodeNegara = vbFields.xKodeNegara || document.getElementById('Nationality');
+        const xKode = vbFields.xKode || roomCodeField;
+        const xPackage = vbFields.xPackage || packageCodeField;
+        const xNominal = vbFields.xNominal || nominalVisibleField;
+        const xBF = vbFields.xBF || breakfastField;
+        const xPosisi = vbFields.xPosisi || document.getElementById('GroupPosition');
+        const xAgama = vbFields.xAgama || document.getElementById('Religion');
+        const xPerson = vbFields.xPerson || numberOfPersonField;
+        const xUsaha = vbFields.xUsaha || document.getElementById('Company');
+        const xSegment = vbFields.xSegment || document.getElementById('Segment');
+        const xRemark = vbFields.xRemark || document.getElementById('Remarks');
+        const xPayment = vbFields.xPayment || document.getElementById('PaymentMethod');
+        const xCreditCard = vbFields.xCreditCard || document.getElementById('CreditCardNumber');
+        const xPeriksa = vbFields.xPeriksa || document.getElementById('CheckDeposit');
+        const xMember = vbFields.xMember || document.getElementById('Member');
+        const xSales = vbFields.xSales || document.getElementById('Sales');
+
+        function normalizeTimeDisplay(value) {
+            const raw = (value || '').toString().trim();
+            if (!raw) {
+                return '';
+            }
+
+            const directMatch = raw.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+            if (directMatch) {
+                const hours = parseInt(directMatch[1], 10);
+                const minutes = parseInt(directMatch[2], 10);
+                const seconds = parseInt(directMatch[3] || '0', 10);
+
+                if (hours <= 23 && minutes <= 59 && seconds <= 59) {
+                    return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':');
+                }
+            }
+
+            const digits = raw.replace(/[^\d]/g, '');
+            if (digits.length === 6) {
+                const hours = parseInt(digits.slice(0, 2), 10);
+                const minutes = parseInt(digits.slice(2, 4), 10);
+                const seconds = parseInt(digits.slice(4, 6), 10);
+
+                if (hours <= 23 && minutes <= 59 && seconds <= 59) {
+                    return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':');
+                }
+            }
+
+            if (digits.length === 4) {
+                const hours = parseInt(digits.slice(0, 2), 10);
+                const minutes = parseInt(digits.slice(2, 4), 10);
+
+                if (hours <= 23 && minutes <= 59) {
+                    return [hours, minutes, '00'].map(part => String(part).padStart(2, '0')).join(':');
+                }
+            }
+
+            return raw;
+        }
+
+        function ensureSelectValueExists(field, label) {
+            if (!field) {
+                return true;
+            }
+
+            const currentValue = (field.value || '').toString().trim().toUpperCase();
+            const hasOption = Array.from(field.options || []).some(function(option) {
+                return (option.value || '').toString().trim().toUpperCase() === currentValue;
+            });
+
+            if (!hasOption) {
+                showCrudAlert(label + ' must be selected from the available list.');
+                field.focus();
+                return false;
+            }
+
+            return true;
+        }
 
         function updatePrimaryGuestDisplay() {
-            primaryRoomGuestName.textContent = (guestNameField?.value || '').trim() || '-';
+            primaryRoomGuestName.textContent = (xGuest?.value || '').trim() || '-';
+        }
+
+        function applyReservationNumberSelection() {
+            if (!xResNo) {
+                return;
+            }
+
+            const option = xResNo.options[xResNo.selectedIndex];
+            if (!option || !option.value) {
+                return;
+            }
+
+            if (xAlamat) {
+                xAlamat.value = option.dataset.address || '';
+            }
+
+            if (xKodeNegara) {
+                xKodeNegara.value = option.dataset.nationality || 'INA';
+            }
+
+            if (xPhone) {
+                xPhone.value = option.dataset.phone || '';
+            }
+
+            if (xRemark) {
+                xRemark.value = option.dataset.remarks || '';
+            }
         }
 
         function updateRoomSummary() {
@@ -1557,7 +1730,7 @@
         function updateRoomHelper() {
             const option = findOptionByValue('roomCodeOptions', roomCodeField.value);
             if (!option) {
-                roomHelper.querySelector('strong').textContent = 'Pilih room yang masih tersedia';
+                roomHelper.querySelector('strong').textContent = 'Select an available room';
                 updateRoomSummary();
                 return;
             }
@@ -1572,7 +1745,7 @@
         function updatePackageHelper() {
             const option = findOptionByValue('packageCodeOptions', packageCodeField.value);
             if (!option) {
-                packageHelper.querySelector('strong').textContent = 'Nominal akan terisi otomatis bila package ditemukan';
+                packageHelper.querySelector('strong').textContent = 'Nominal will be filled automatically when a package is found';
                 nominalField.value = '';
                 nominalVisibleField.value = '';
                 return;
@@ -1650,7 +1823,7 @@
             form.action = '/checkin';
             currentDetailKeyField.value = '';
             primaryDetailKeyField.value = '';
-            generatedRegNoField.value = regNo || defaultRegNo;
+            xRegNo.value = regNo || defaultRegNo;
             saveButton.textContent = 'Save Check In';
             Array.from(document.querySelectorAll('.checkin-record-row')).forEach(row => row.classList.remove('is-active'));
         }
@@ -1672,29 +1845,29 @@
                     field.value = record[id] ?? '';
                 }
             });
-            document.getElementById('CheckDeposit').checked = String(record.CheckDeposit || '0') === '1';
+            xPeriksa.checked = String(record.CheckDeposit || '0') === '1';
             document.getElementById('CheckInDate').value = record.CheckInDate || '';
-            document.getElementById('CheckInDateDisplay').value = formatDisplayDate(record.CheckInDate || '');
-            document.querySelector('#CheckInDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]')
+            xTglIn.value = formatDisplayDate(record.CheckInDate || '');
+            xTglIn.closest('[data-date-field]').querySelector('[data-date-native]')
                 .value = record.CheckInDate || '';
             document.getElementById('BirthDate').value = record.BirthDate || '';
-            document.getElementById('BirthDateDisplay').value = formatDisplayDate(record.BirthDate || '');
-            document.querySelector('#BirthDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]')
+            xTglLahir.value = formatDisplayDate(record.BirthDate || '');
+            xTglLahir.closest('[data-date-field]').querySelector('[data-date-native]')
                 .value = record.BirthDate || '';
             document.getElementById('ExpiredDate').value = record.ExpiredDate || '';
-            document.getElementById('ExpiredDateDisplay').value = formatDisplayDate(record.ExpiredDate || '');
-            document.querySelector('#ExpiredDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]')
+            xExpired.value = formatDisplayDate(record.ExpiredDate || '');
+            xExpired.closest('[data-date-field]').querySelector('[data-date-native]')
                 .value = record.ExpiredDate || '';
             document.getElementById('EstimationOut').value = record.EstimationOut || '';
-            document.getElementById('EstimationOutDisplay').value = formatDisplayDate(record.EstimationOut || '');
-            document.querySelector('#EstimationOutDisplay').closest('[data-date-field]').querySelector('[data-date-native]')
+            xTglKeluar.value = formatDisplayDate(record.EstimationOut || '');
+            xTglKeluar.closest('[data-date-field]').querySelector('[data-date-native]')
                 .value = record.EstimationOut || '';
-            document.getElementById('CheckInTime').value = record.CheckInTime || '';
-            roomCodeField.value = record.RoomCode || '';
-            packageCodeField.value = record.PackageCode || '';
+            xJamIn.value = normalizeTimeDisplay(record.CheckInTime || '');
+            xKode.value = record.RoomCode || '';
+            xPackage.value = record.PackageCode || '';
             nominalField.value = normalizeNumber(String(record.Nominal || ''));
-            nominalVisibleField.value = record.Nominal ? formatRibuan(String(record.Nominal)) : '';
-            breakfastField.value = record.Breakfast || 0;
+            xNominal.value = record.Nominal ? formatRibuan(String(record.Nominal)) : '';
+            xBF.value = record.Breakfast || 0;
             primaryRoomPaxDisplay.value = record.NumberOfPerson || record.Breakfast || 1;
             updatePrimaryGuestDisplay();
             resetAdditionalRoomRows();
@@ -1703,47 +1876,64 @@
         }
 
         function resetForm() {
-            const preservedRegNo = (generatedRegNoField.value || defaultRegNo).trim().toUpperCase();
+            const preservedRegNo = (xRegNo.value || defaultRegNo).trim().toUpperCase();
             form.reset();
             setFormModeCreate(preservedRegNo);
             resetAdditionalRoomRows();
             document.getElementById('CheckInDate').value = defaultCheckIn;
-            document.getElementById('CheckInDateDisplay').value = formatDisplayDate(defaultCheckIn);
-            document.querySelector('#CheckInDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]')
+            xTglIn.value = formatDisplayDate(defaultCheckIn);
+            xTglIn.closest('[data-date-field]').querySelector('[data-date-native]')
                 .value = defaultCheckIn;
             document.getElementById('EstimationOut').value = defaultCheckOut;
-            document.getElementById('EstimationOutDisplay').value = formatDisplayDate(defaultCheckOut);
-            document.querySelector('#EstimationOutDisplay').closest('[data-date-field]').querySelector('[data-date-native]')
+            xTglKeluar.value = formatDisplayDate(defaultCheckOut);
+            xTglKeluar.closest('[data-date-field]').querySelector('[data-date-native]')
                 .value = defaultCheckOut;
             document.getElementById('BirthDate').value = '';
-            document.getElementById('BirthDateDisplay').value = '';
-            document.querySelector('#BirthDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]')
+            xTglLahir.value = '';
+            xTglLahir.closest('[data-date-field]').querySelector('[data-date-native]')
                 .value = '';
             document.getElementById('ExpiredDate').value = '';
-            document.getElementById('ExpiredDateDisplay').value = '';
-            document.querySelector('#ExpiredDateDisplay').closest('[data-date-field]').querySelector('[data-date-native]')
+            xExpired.value = '';
+            xExpired.closest('[data-date-field]').querySelector('[data-date-native]')
                 .value = '';
-            roomHelper.querySelector('strong').textContent = 'Pilih room yang masih tersedia';
-            packageHelper.querySelector('strong').textContent = 'Nominal akan terisi otomatis bila package ditemukan';
+            roomHelper.querySelector('strong').textContent = 'Select an available room';
+            packageHelper.querySelector('strong').textContent = 'Nominal will be filled automatically when a package is found';
             nominalField.value = '';
-            nominalVisibleField.value = '';
-            packageCodeField.value = '';
-            roomCodeField.value = '';
-            breakfastField.value = '2';
-            document.getElementById('CheckInTime').value = '{{ now()->format('H:i') }}';
-            document.getElementById('TypeOfCheckIn').value = 'GROUP RESERVATION';
-            document.getElementById('PaymentMethod').value = 'OTA';
-            document.getElementById('Segment').value = 'TRAVEL';
-            document.getElementById('Nationality').value = 'INA';
-            document.getElementById('NumberOfPerson').value = '2';
+            xNominal.value = '';
+            xPackage.value = '';
+            xKode.value = '';
+            xBF.value = '2';
+            xJamIn.value = defaultCheckInTime;
+            xTipe.value = defaultTypeOfCheckIn;
+            xTypeId.value = defaultIdType;
+            xPayment.value = 'OTA';
+            xSegment.value = 'TRAVEL';
+            xKodeNegara.value = 'INA';
+            xPerson.value = '2';
             primaryRoomPaxDisplay.value = '2';
             updatePrimaryGuestDisplay();
             updateRoomSummary();
-            document.getElementById('GuestName').focus();
+            xGuest.focus();
         }
 
         Array.from(document.querySelectorAll('[data-date-field]')).forEach(bindDateGroup);
-        guestNameField.addEventListener('input', updatePrimaryGuestDisplay);
+        xGuest.addEventListener('input', updatePrimaryGuestDisplay);
+        if (xResNo) {
+            xResNo.addEventListener('change', applyReservationNumberSelection);
+            xResNo.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    applyReservationNumberSelection();
+                }
+            });
+        }
+        xJamIn.addEventListener('blur', function() {
+            this.value = normalizeTimeDisplay(this.value);
+        });
+        xJamIn.value = normalizeTimeDisplay(xJamIn.value);
+        if (xTypeId) {
+            xTypeId.value = xTypeId.value || defaultIdType;
+        }
         numberOfPersonField.addEventListener('input', function() {
             primaryRoomPaxDisplay.value = this.value || '1';
             updateRoomSummary();
@@ -1809,6 +1999,10 @@
                 event.preventDefault();
                 showCrudAlert('Estimation Out tidak boleh lebih kecil dari Check In.');
                 document.getElementById('EstimationOutDisplay').focus();
+                return;
+            }
+            if (!ensureSelectValueExists(xTypeId, 'Type of ID')) {
+                event.preventDefault();
                 return;
             }
             roomCodeField.value = roomCodeField.value.trim().toUpperCase();
