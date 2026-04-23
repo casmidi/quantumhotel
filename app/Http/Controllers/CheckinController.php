@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\HotelBranding;
 use Carbon\Carbon;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
@@ -15,8 +16,13 @@ class CheckinController extends Controller
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
-        $records = $this->loadActiveCheckins($search, 80);
-        $checkins = $this->paginateCollection($records, 10, $request);
+        $perPage = (int) $request->query('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50], true)) {
+            $perPage = 10;
+        }
+
+        $records = $this->loadActiveCheckins($search);
+        $checkins = $this->paginateCollection($records, $perPage, $request);
         $rooms = $this->loadRoomOptions();
         $packages = $this->loadPackageOptions();
         $typeOptions = $this->loadTypeOptions();
@@ -92,6 +98,7 @@ class CheckinController extends Controller
         $viewData = [
             'checkins' => $checkins,
             'search' => $search,
+            'perPage' => $perPage,
             'nextRegNo' => $this->generateNextRegNo(),
             'rooms' => $rooms,
             'packages' => $packages,
@@ -129,6 +136,7 @@ class CheckinController extends Controller
         return $this->respond($request, 'checkin.index', $viewData, [
             'checkins' => $this->paginatorPayload($checkins),
             'search' => $search,
+            'per_page' => $perPage,
             'next_reg_no' => $viewData['nextRegNo'],
             'rooms' => $rooms,
             'packages' => $packages,
@@ -260,6 +268,73 @@ class CheckinController extends Controller
         ]);
     }
 
+    public function printRegistration(Request $request, string $regNo2)
+    {
+        $registration = DB::table('DATA as Data')
+            ->join('DATA2 as Data2', 'Data.RegNo', '=', 'Data2.RegNo')
+            ->join('ROOM as ROOM', 'Data2.Kode', '=', 'ROOM.Kode')
+            ->selectRaw("
+                RTRIM(Data2.RegNo) as RegNo,
+                RTRIM(Data2.RegNo2) as RegNo2,
+                RTRIM(Data2.SafeDeposit) as SafeDeposit,
+                Data2.TglIn as TglIn,
+                Data2.TglKeluar as TglKeluar,
+                Data2.JamIn as JamIn,
+                RTRIM(Data2.Kode) as Kode,
+                RTRIM(ROOM.Nama) as Kelas,
+                CASE
+                    WHEN RTRIM(Data2.Payment) = 'TA' OR RTRIM(Data2.Payment) = 'COMPLIMENT' THEN 0
+                    ELSE Data2.Nominal
+                END as Rate,
+                RTRIM(Data2.Guest) as Guest,
+                RTRIM(Data2.Guest2) as Guest2,
+                RTRIM(Data2.Guest3) as Guest3,
+                RTRIM(Data2.Alamat) as Alamat,
+                RTRIM(Data2.Kelurahan) as Kelurahan,
+                RTRIM(Data2.Kecamatan) as Kecamatan,
+                RTRIM(Data2.Kota) as Kota,
+                RTRIM(Data2.Propinsi) as Propinsi,
+                RTRIM(Data2.Purpose) as Purpose,
+                RTRIM(Data2.Usaha) as Usaha,
+                RTRIM(Data2.Profesi) as Profesi,
+                RTRIM(Data2.Phone) as Phone,
+                RTRIM(Data2.TypeId) + ' : ' + RTRIM(Data2.KTP) as Ktp,
+                RTRIM(Data2.Agama) as Agama,
+                RTRIM(Data2.KodeNegara) as KodeNegara,
+                RTRIM(Data2.PlaceBirth) as TempatLahir,
+                Data2.TglLahir as TglLahir,
+                RTRIM(Data2.Payment) as Payment,
+                RTRIM(Data2.CreditCard) as CreditCard,
+                RTRIM(Data2.Visa) as Visa,
+                RTRIM(Data2.Remark) as Remark,
+                RTRIM(Data2.PlaceIssued) as PlaceIssued,
+                Data2.DateIssued as DateIssued,
+                RTRIM(Data.UserIn) as UserIn
+            ")
+            ->whereRaw('RTRIM(Data2.RegNo2) = ?', [trim((string) $regNo2)])
+            ->first();
+
+        if (!$registration) {
+            return $this->respondError($request, 'Data print registrasi tidak ditemukan.', 404, [], '/checkin', false);
+        }
+
+        $hotelProfile = $this->loadHotelProfile();
+
+        $viewData = [
+            'registration' => $registration,
+            'hotelProfile' => $hotelProfile,
+            'cashierName' => trim((string) session('user', '')),
+            'guestCaption' => trim((string) ($registration->Guest ?? '')),
+        ];
+
+        return $this->respond($request, 'checkin.print-registration', $viewData, [
+            'registration' => $registration,
+            'hotel_profile' => $hotelProfile,
+            'cashier_name' => $viewData['cashierName'],
+            'guest_caption' => $viewData['guestCaption'],
+        ]);
+    }
+
     private function saveCheckin(Request $request, ?string $currentRegNo2 = null)
     {
         $validated = $this->validateRequest($request);
@@ -368,6 +443,8 @@ class CheckinController extends Controller
             ->values()
             ->all();
 
+        $nextRegNo2Sequence = $this->nextRegNo2Sequence($regNo);
+
         foreach ($detailRows as $index => &$detailRow) {
             $roomCode = $detailRow['room_code'];
 
@@ -393,9 +470,12 @@ class CheckinController extends Controller
             }
 
             $matchedExistingDetail = $existingDetailMap->get($roomCode);
-            $detailRow['regno2'] = $matchedExistingDetail
-                ? trim((string) ($matchedExistingDetail->RegNo2 ?? ''))
-                : $this->generateRegNo2($regNo, $roomCode);
+            if ($matchedExistingDetail) {
+                $detailRow['regno2'] = trim((string) ($matchedExistingDetail->RegNo2 ?? ''));
+            } else {
+                $detailRow['regno2'] = $this->buildRegNo2($regNo, $nextRegNo2Sequence);
+                $nextRegNo2Sequence++;
+            }
         }
         unset($detailRow);
 
@@ -472,6 +552,8 @@ class CheckinController extends Controller
             foreach ($detailPayloads as $detailPayload) {
                 $this->markRoomOccupiedClean($detailPayload['Kode']);
             }
+
+            $this->syncHeaderFromRemainingDetail($regNo);
         });
 
         return $this->respondAfterMutation($request, '/checkin', $currentDetail ? 'Detail check in berhasil diperbarui.' : 'Check in multi-room berhasil disimpan.', [
@@ -575,6 +657,16 @@ class CheckinController extends Controller
         return $validated;
     }
 
+    private function loadHotelProfile(): array
+    {
+        $profile = HotelBranding::profile();
+        $profile['logo_url'] = !empty($profile['logo_path'])
+            ? url('/settings/hotel-branding/logo?ts=' . rawurlencode((string) ($profile['updated_at'] ?? now()->timestamp)))
+            : null;
+
+        return $profile;
+    }
+
     private function collectRoomDetails(array $validated): array
     {
         $roomCodes = $validated['RoomCodeList'] ?? [];
@@ -641,11 +733,18 @@ class CheckinController extends Controller
 
     private function buildDataPayload(array $validated, string $regNo, string $roomCode): array
     {
+        $sales = $this->normalizeSalesValue($validated['Sales'] ?? '');
+        $checkInDate = Carbon::createFromFormat('Y-m-d', $validated['CheckInDate'])->format('Y-m-d');
+        $jamIn = $this->normalizeTime($validated['CheckInTime']);
+
         return [
             'RegNo' => $regNo,
             'ResNo' => trim((string) ($validated['ReservationNumber'] ?? '')),
             'Tipe' => strtoupper(trim((string) $validated['TypeOfCheckIn'])),
-            'KodeCust' => strtoupper(trim((string) ($validated['Company'] ?? ''))),
+            'KodeCust' => '000',
+            'Guest' => strtoupper(trim((string) ($validated['GuestName'] ?? ''))),
+            'TglIn' => $checkInDate,
+            'strTgl' => $this->buildStrTgl($checkInDate, $jamIn),
             'Service' => 0,
             'Deposit' => 0,
             'Tax' => 0,
@@ -654,7 +753,7 @@ class CheckinController extends Controller
             'DiscWeekDay' => 0,
             'Kode' => $roomCode,
             'Periksa' => !empty($validated['CheckDeposit']) ? 1 : 0,
-            'Sales' => strtoupper(trim((string) ($validated['Sales'] ?? ''))),
+            'Sales' => $sales,
         ];
     }
 
@@ -685,7 +784,14 @@ class CheckinController extends Controller
         $occupation = strtoupper(trim((string) ($validated['Occupation'] ?? '')));
         $creditCard = strtoupper(trim((string) ($validated['CreditCardNumber'] ?? '')));
         $reservationNumber = trim((string) ($validated['ReservationNumber'] ?? ''));
+        $sales = $this->normalizeSalesValue($validated['Sales'] ?? '');
         $sameAsLeader = (bool) ($detailRow['same_as_leader'] ?? true);
+        $leaderReligion = strtoupper(trim((string) ($validated['Religion'] ?? '')));
+        $leaderPlaceBirth = strtoupper(trim((string) ($validated['PlaceOfBirth'] ?? '')));
+        $leaderKelurahan = strtoupper(trim((string) ($validated['Kelurahan'] ?? '')));
+        $leaderKecamatan = strtoupper(trim((string) ($validated['Kecamatan'] ?? '')));
+        $leaderKota = strtoupper(trim((string) ($validated['KabCity'] ?? '')));
+        $leaderPropinsi = strtoupper(trim((string) ($validated['ProvinceCountry'] ?? '')));
         $guestBirthDate = $sameAsLeader
             ? $birthDate
             : (!empty($detailRow['guest_birth_date'])
@@ -712,12 +818,12 @@ class CheckinController extends Controller
         $guestNationality = $sameAsLeader
             ? strtoupper(trim((string) ($validated['Nationality'] ?? 'INA')))
             : strtoupper(trim((string) ($detailRow['guest_nationality'] ?? 'INA')));
-        $guestReligion = $sameAsLeader ? strtoupper(trim((string) ($validated['Religion'] ?? ''))) : '';
-        $guestPlaceBirth = $sameAsLeader ? strtoupper(trim((string) ($validated['PlaceOfBirth'] ?? ''))) : '';
-        $guestKelurahan = $sameAsLeader ? strtoupper(trim((string) ($validated['Kelurahan'] ?? ''))) : '';
-        $guestKecamatan = $sameAsLeader ? strtoupper(trim((string) ($validated['Kecamatan'] ?? ''))) : '';
-        $guestKota = $sameAsLeader ? strtoupper(trim((string) ($validated['KabCity'] ?? ''))) : '';
-        $guestPropinsi = $sameAsLeader ? strtoupper(trim((string) ($validated['ProvinceCountry'] ?? ''))) : '';
+        $guestReligion = $leaderReligion;
+        $guestPlaceBirth = $leaderPlaceBirth;
+        $guestKelurahan = $leaderKelurahan;
+        $guestKecamatan = $leaderKecamatan;
+        $guestKota = $leaderKota;
+        $guestPropinsi = $leaderPropinsi;
 
         return [
             'RegNo' => $regNo,
@@ -778,7 +884,7 @@ class CheckinController extends Controller
             'Plot' => 0,
             'Email' => $guestEmail,
             'Member' => strtoupper(trim((string) ($validated['Member'] ?? ''))),
-            'Sales' => strtoupper(trim((string) ($validated['Sales'] ?? ''))),
+            'Sales' => $sales,
             'Member2' => '',
             'Member3' => '',
             'BF' => (int) ($detailRow['breakfast'] ?? 0),
@@ -839,9 +945,10 @@ class CheckinController extends Controller
     private function syncHeaderFromRemainingDetail(string $regNo): void
     {
         $remaining = DB::table('DATA2')
-            ->selectRaw("RTRIM(RegNo) as RegNo, RTRIM(Kode) as Kode, RTRIM(Tipe) as Tipe, RTRIM(Receipt) as Receipt, RTRIM(Sales) as Sales, Periksa")
+            ->selectRaw("RTRIM(RegNo) as RegNo, RTRIM(Kode) as Kode, RTRIM(Tipe) as Tipe, RTRIM(Receipt) as Receipt, RTRIM(Sales) as Sales, RTRIM(Guest) as Guest, RTRIM(strTglIn) as StrTglIn, Periksa, TglIn")
             ->whereRaw('RTRIM(RegNo) = ?', [$regNo])
             ->orderBy('TglIn')
+            ->orderBy('RegNo2')
             ->first();
 
         if (!$remaining) {
@@ -854,25 +961,21 @@ class CheckinController extends Controller
             ->update([
                 'ResNo' => trim((string) ($remaining->Receipt ?? '')),
                 'Tipe' => trim((string) ($remaining->Tipe ?? '')),
+                'Guest' => trim((string) ($remaining->Guest ?? '')),
+                'TglIn' => !empty($remaining->TglIn) ? Carbon::parse($remaining->TglIn)->format('Y-m-d') : null,
+                'strTgl' => trim((string) ($remaining->StrTglIn ?? '')),
                 'Kode' => trim((string) ($remaining->Kode ?? '')),
                 'Periksa' => (int) ($remaining->Periksa ?? 0),
                 'Sales' => trim((string) ($remaining->Sales ?? '')),
             ]);
     }
 
-    private function loadActiveCheckins(string $search, int $limit = 80)
+    private function loadActiveCheckins(string $search)
     {
         $idSelect = $this->legacyIdSelect('DATA2');
-        $todayIso = Carbon::today()->format('Y-m-d');
         $query = DB::table('DATA2')
             ->selectRaw("$idSelect, Pst, RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode, RTRIM(Guest) as Guest, RTRIM(Guest2) as Guest2, RTRIM(Tipe) as Tipe, RTRIM(Payment) as Payment, RTRIM(Segment) as Segment, RTRIM(Package) as Package, RTRIM(Receipt) as Receipt, RTRIM(TypeId) as TypeOfId, RTRIM(KTP) as KTP, RTRIM(Alamat) as Alamat, RTRIM(Kelurahan) as Kelurahan, RTRIM(Kecamatan) as Kecamatan, RTRIM(Kota) as Kota, RTRIM(Propinsi) as Propinsi, RTRIM(PlaceBirth) as PlaceBirth, RTRIM(Agama) as Agama, RTRIM(KodeNegara) as KodeNegara, RTRIM(Usaha) as Usaha, RTRIM(Profesi) as Profesi, RTRIM(CardNumber) as CardNumber, RTRIM(Remark) as Remark, RTRIM(Posisi) as Posisi, RTRIM(Phone) as Phone, RTRIM(Email) as Email, RTRIM(Member) as Member, RTRIM(Sales) as Sales, TglIn, JamIn, JamOut, TglKeluar, TglLahir, Expired, Person, BF, Nominal, SafeDeposit")
-            ->where(function ($q) use ($todayIso) {
-                $q->where('Pst', '=', ' ')
-                    ->orWhere(function ($q2) use ($todayIso) {
-                        $q2->where('Pst', '=', '*')
-                            ->whereDate('TglKeluar', '=', $todayIso);
-                    });
-            })
+            ->where('Pst', '=', ' ')
             ->whereRaw("RTRIM(Kode) <> '999'");
 
         if ($search !== '') {
@@ -889,7 +992,6 @@ class CheckinController extends Controller
         $rows = $query
             ->orderByDesc('TglIn')
             ->orderByDesc('RegNo2')
-            ->limit($limit)
             ->get();
 
         $groupedRows = $rows->groupBy(fn ($row) => trim((string) ($row->RegNo ?? '')));
@@ -905,7 +1007,7 @@ class CheckinController extends Controller
                 $row->check_out_date_iso = !empty($row->TglKeluar) ? Carbon::parse($row->TglKeluar)->format('Y-m-d') : '';
                 $row->check_in_time = $this->displayTime($row->JamIn ?? null);
                 $row->nominal_display = number_format((float) ($row->Nominal ?? 0), 0, ',', '.');
-                $row->guest_status = trim((string) ($row->Pst ?? '')) === '*' ? 'CHECKOUT' : 'STAY';
+                $row->guest_status = 'STAY';
                 $additionalRooms = $registrationRows->slice(1)->map(function ($detail) use ($primaryRow) {
                     $detailBirthDate = !empty($detail->TglLahir) ? Carbon::parse($detail->TglLahir)->format('Y-m-d') : '';
                     $sameAsLeader = strtoupper(trim((string) ($detail->Guest ?? ''))) === strtoupper(trim((string) ($primaryRow->Guest ?? '')))
@@ -935,7 +1037,7 @@ class CheckinController extends Controller
                         'sameAsLeader' => $sameAsLeader,
                     ];
                 })->values()->all();
-                $row->record_json = json_encode([
+                $row->record_json = $this->encodeRecordPayload([
                     'Id' => $primaryRow->id,
                     'DetailKey' => $primaryRow->RegNo2,
                     'RegNo' => $primaryRow->RegNo,
@@ -976,10 +1078,24 @@ class CheckinController extends Controller
                     'Nominal' => (float) ($primaryRow->Nominal ?? 0),
                     'CheckDeposit' => (int) ($primaryRow->SafeDeposit ?? 0),
                     'AdditionalRooms' => $additionalRooms,
-                ], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_QUOT);
+                ]);
 
                 return $row;
             });
+    }
+
+    private function encodeRecordPayload(array $payload): string
+    {
+        $json = json_encode(
+            $payload,
+            JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE
+        );
+
+        if ($json === false) {
+            $json = '{}';
+        }
+
+        return base64_encode($json);
     }
 
     private function countActiveCheckins(string $search): int
@@ -2115,11 +2231,23 @@ class CheckinController extends Controller
             ->orderBy('Sales')
             ->get()
             ->pluck('Sales')
-            ->map(fn($value) => strtoupper(trim((string) $value)))
+            ->map(fn($value) => $this->normalizeSalesValue($value))
             ->filter()
             ->unique()
             ->values()
             ->all();
+    }
+
+    private function normalizeSalesValue($value): string
+    {
+        $normalized = strtoupper(trim((string) $value));
+        $normalized = preg_replace('/\s+/', ' ', $normalized) ?? $normalized;
+
+        if ($normalized === '' || !preg_match('/[A-Z0-9]/', $normalized)) {
+            return '';
+        }
+
+        return $normalized;
     }
 
     private function loadPackageOptions(): array
@@ -2220,23 +2348,32 @@ class CheckinController extends Controller
         return $prefix . str_pad((string) ($maxSequence + 1), 4, '0', STR_PAD_LEFT);
     }
 
-    private function generateRegNo2(string $regNo, string $roomCode): string
+    private function nextRegNo2Sequence(string $regNo): int
     {
-        $last = DB::table('DATA2')
+        $maxSequence = DB::table('DATA2')
             ->selectRaw('RTRIM(RegNo2) as RegNo2')
             ->whereRaw('RTRIM(RegNo) = ?', [$regNo])
-            ->whereRaw('RTRIM(Kode) = ?', [$roomCode])
-            ->orderByRaw('RTRIM(RegNo2) DESC')
-            ->first();
+            ->get()
+            ->map(function ($row) use ($regNo) {
+                $regNo2 = trim((string) ($row->RegNo2 ?? ''));
 
-        $sequence = 1;
+                if ($regNo2 === '' || !str_starts_with($regNo2, $regNo)) {
+                    return 0;
+                }
 
-        if ($last && !empty($last->RegNo2)) {
-            $lastSequence = (int) substr(trim((string) $last->RegNo2), -2);
-            $sequence = $lastSequence + 1;
-        }
+                $suffix = preg_replace('/\D+/', '', substr($regNo2, strlen($regNo))) ?? '';
 
-        return $regNo . $roomCode . str_pad((string) $sequence, 2, '0', STR_PAD_LEFT);
+                return $suffix !== '' ? (int) $suffix : 0;
+            })
+            ->max() ?? 0;
+
+        return $maxSequence + 1;
+    }
+
+    private function buildRegNo2(string $regNo, int $sequence): string
+    {
+        // RegNo2 baru dibuat unik per register, tidak lagi tergantung kode kamar.
+        return $regNo . str_pad((string) $sequence, 6, '0', STR_PAD_LEFT);
     }
 
     private function nextLegacyId(string $table): ?int

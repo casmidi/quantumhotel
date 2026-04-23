@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\CheckinController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\HotelSettingsController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StockPackageController;
 use App\Http\Controllers\PackageTransactionController;
@@ -214,6 +216,11 @@ Route::post('/checkin/scan-ktp', function () {
     return app(CheckinController::class)->scanKtp(request());
 });
 
+Route::get('/checkin/{regNo2}/print-registration', function ($regNo2) {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(CheckinController::class)->printRegistration(request(), $regNo2);
+});
+
 Route::post('/checkin/{regNo2}/update', function ($regNo2) {
     if ($response = ensureSessionAccess()) return $response;
     return app(CheckinController::class)->update(request(), $regNo2);
@@ -226,7 +233,22 @@ Route::get('/checkin/{regNo2}/delete', function ($regNo2) {
 
 Route::get('/checkout', function () {
     if ($response = ensureSessionAccess()) return $response;
-    return respondPlaceholder('Check-Out Page');
+    return app(CheckoutController::class)->index(request());
+});
+
+Route::get('/settings/hotel-branding', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(HotelSettingsController::class)->edit(request());
+});
+
+Route::post('/settings/hotel-branding', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(HotelSettingsController::class)->update(request());
+});
+
+Route::get('/settings/hotel-branding/logo', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(HotelSettingsController::class)->logo();
 });
 
 

@@ -14,8 +14,8 @@
             justify-content: center;
             padding: 0.45rem 0.7rem;
             border-radius: 999px;
-            background: rgba(23, 55, 97, 0.08);
-            color: #173761;
+            background: var(--package-badge-bg);
+            color: var(--package-badge-text);
             font-weight: 700;
             letter-spacing: 0.06em;
         }
@@ -26,7 +26,7 @@
 
         .room-money {
             font-weight: 700;
-            color: #173761;
+            color: var(--package-title);
         }
 
         .room-delete {
@@ -54,7 +54,7 @@
         .room-empty {
             text-align: center;
             padding: 2.2rem 1rem;
-            color: #6b7b90;
+            color: var(--package-muted);
         }
     </style>
 

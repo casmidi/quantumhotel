@@ -2,11 +2,54 @@
 
 @section('title', '')
 
+@section('topbar_brand')
+    <div class="checkin-topbar-brand">
+        <div class="checkin-topbar-title">Check In</div>
+        <div class="checkin-topbar-subtitle">Enter active guest details and choose a room with a cleaner form.</div>
+    </div>
+@endsection
+
+@section('topbar_tools')
+    <div class="checkin-header-side">
+        <div class="checkin-room-note" id="roomHelper">
+            <small>Room Status</small>
+            <strong>Select an available room</strong>
+        </div>
+        <div class="checkin-package-note" id="packageHelper">
+            <small>Package Note</small>
+            <strong>Nominal will be filled automatically when a package is found</strong>
+        </div>
+    </div>
+@endsection
+
 @section('content')
 
 @include('partials.crud-package-theme')
 
 <style>
+    .checkin-topbar-brand {
+        display: grid;
+        gap: 0.22rem;
+    }
+
+    .checkin-topbar-title {
+        color: #173761;
+        font-size: 2.05rem;
+        line-height: 0.98;
+        font-weight: 900;
+        letter-spacing: -0.045em;
+        font-family: "Segoe UI", "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
+        text-transform: none;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.42);
+    }
+
+    .checkin-topbar-subtitle {
+        color: #516783;
+        font-size: 0.94rem;
+        line-height: 1.4;
+        font-weight: 600;
+    }
+
     .checkin-page {
         padding: 0 0 2rem;
         color: #10233b;
@@ -49,8 +92,9 @@
         min-width: 220px;
         padding: 0.82rem 0.95rem;
         border-radius: 18px;
-        background: rgba(255, 255, 255, 0.88);
-        border: 1px solid rgba(199, 165, 106, 0.2);
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(138, 170, 219, 0.28);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
     }
 
     .registration-details-grid {
@@ -273,10 +317,33 @@
         align-items: start;
     }
 
+    .checkin-content-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.95fr);
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .checkin-main-stack,
+    .checkin-sidebar-stack {
+        display: grid;
+        gap: 1rem;
+        align-content: start;
+        min-height: 100%;
+    }
+
+    .checkin-main-stack .checkin-section {
+        margin-bottom: 0;
+    }
+
     .guest-primary-panel,
     .guest-side-stack {
         display: grid;
         gap: 1rem;
+    }
+
+    .checkin-sidebar-stack {
+        grid-template-rows: auto auto auto minmax(0, 1fr);
     }
 
     .guest-main-row-five,
@@ -317,6 +384,13 @@
     .ktp-scan-card {
         display: grid;
         gap: 0.85rem;
+    }
+
+    .ktp-scan-card {
+        height: 100%;
+        min-height: 100%;
+        grid-template-rows: auto auto minmax(170px, 1fr) auto auto;
+        align-content: stretch;
     }
 
     .group-info-card small,
@@ -460,6 +534,8 @@
         border-radius: 16px;
         background: rgba(255, 255, 255, 0.94);
         border: 1px solid rgba(137, 167, 214, 0.24);
+        display: grid;
+        align-content: start;
     }
 
     .ktp-scan-result-title {
@@ -482,6 +558,7 @@
     .ktp-scan-card-footer {
         display: flex;
         justify-content: flex-end;
+        margin-top: auto;
     }
 
     .room-follow-badge {
@@ -989,6 +1066,37 @@
         line-height: 1.55;
     }
 
+    .checkin-directory-tools {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .checkin-directory-result {
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: var(--package-muted);
+    }
+
+    .checkin-per-page {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+    }
+
+    .checkin-per-page .package-label {
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+
+    .checkin-per-page .package-select {
+        min-width: 110px;
+    }
+
     .checkin-table thead th {
         background: linear-gradient(180deg, rgba(240, 246, 255, 0.98), rgba(225, 235, 248, 0.95));
         border-bottom: 2px solid rgba(30, 75, 128, 0.2);
@@ -1077,6 +1185,215 @@
         text-decoration: none;
     }
 
+    .checkin-page {
+        color: var(--package-text);
+    }
+
+    .checkin-topbar-title,
+    .checkin-room-note strong,
+    .checkin-package-note strong,
+    .checkin-section-header h3,
+    .group-info-card strong,
+    .scan-guide-card strong,
+    .ktp-scan-card-head strong,
+    .ktp-scan-result-title,
+    .room-guest-detail-head strong,
+    .guest-brief-card strong,
+    .guest-note-card strong,
+    .checkin-table .guest-block strong,
+    .checkin-table .nominal-cell,
+    .status-stay,
+    .room-display-text,
+    .room-follow-toggle,
+    .payment-checkbox-control {
+        color: var(--package-title);
+    }
+
+    .checkin-topbar-subtitle,
+    .checkin-info-label,
+    .group-info-card small,
+    .scan-guide-card small,
+    .ktp-scan-card-head small,
+    .guest-brief-card small,
+    .guest-note-card small,
+    .guest-brief-card span,
+    .guest-note-card span,
+    .scan-guide-card ol,
+    .ktp-scan-result ul,
+    .room-guest-summary-note,
+    .room-guest-scan-status,
+    .room-summary,
+    .room-allocation-note,
+    .checkin-table-meta,
+    .checkin-table .guest-block span,
+    .checkin-table .room-pill,
+    .room-muted-display,
+    .checkin-row-note,
+    .guest-contact-icon,
+    .checkin-row-label,
+    .guest-info-field label,
+    .address-info-field label,
+    .room-info-field label,
+    .detail-info-field label {
+        color: var(--package-muted);
+    }
+
+    .checkin-room-note small,
+    .checkin-package-note small {
+        color: var(--package-label);
+    }
+
+    .checkin-room-note,
+    .checkin-package-note {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 74px;
+        background: var(--package-shell-bg);
+        border: 1px solid var(--package-heading-border);
+        box-shadow: 0 10px 24px rgba(16, 35, 59, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .checkin-section,
+    .group-info-card,
+    .scan-guide-card,
+    .ktp-scan-card,
+    .guest-brief-card,
+    .guest-note-card,
+    .room-allocation-wrap,
+    .ktp-scan-result {
+        background: var(--package-shell-bg);
+        border-color: var(--package-shell-border);
+        box-shadow: 0 14px 30px rgba(16, 35, 59, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .checkin-section-header {
+        background: var(--package-header-bg);
+        border-bottom-color: var(--package-shell-border);
+    }
+
+    .checkin-section-header i,
+    .address-section .checkin-section-header i {
+        background: var(--package-badge-bg);
+        color: var(--package-badge-text);
+    }
+
+    .group-info-card,
+    .scan-guide-card,
+    .ktp-scan-card,
+    .guest-brief-card,
+    .guest-note-card {
+        height: 100%;
+    }
+
+    .guest-brief-card,
+    .guest-note-card {
+        border-radius: 18px;
+    }
+
+    .guest-note-card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(245, 248, 243, 0.98) 100%);
+    }
+
+    .ktp-scan-status {
+        background: var(--package-badge-bg);
+        color: var(--package-badge-text);
+    }
+
+    .ktp-scan-preview {
+        border-color: var(--package-input-border);
+        background: var(--package-input-bg);
+    }
+
+    .room-guest-detail-row td,
+    .room-summary {
+        background: var(--package-table-even);
+    }
+
+    .room-guest-detail-card {
+        border-top-color: var(--package-shell-border);
+    }
+
+    .room-follow-badge,
+    .room-main-badge,
+    .checkin-table .room-pill {
+        background: var(--package-badge-bg);
+        color: var(--package-badge-text);
+    }
+
+    .room-allocation-wrap {
+        border-color: var(--package-shell-border);
+    }
+
+    .room-allocation-table thead th,
+    .checkin-table thead th {
+        background: var(--package-table-head-bg);
+        border-bottom-color: var(--package-shell-border);
+        color: var(--package-text);
+        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.72);
+    }
+
+    .room-allocation-table tbody td,
+    .checkin-table tbody td {
+        border-bottom-color: rgba(16, 35, 59, 0.08);
+    }
+
+    .room-allocation-table tbody tr:nth-child(odd),
+    .checkin-table tbody tr:nth-child(odd) {
+        background: var(--package-table-odd);
+    }
+
+    .room-allocation-table tbody tr:nth-child(even),
+    .checkin-table tbody tr:nth-child(even) {
+        background: var(--package-table-even);
+    }
+
+    .room-allocation-table tbody tr:hover,
+    .checkin-table tbody tr:hover {
+        background: var(--package-table-hover);
+    }
+
+    .checkin-table tbody tr.is-active {
+        background: var(--package-table-hover) !important;
+        box-shadow: inset 4px 0 0 var(--package-table-hover-accent);
+    }
+
+    .status-stay {
+        background: var(--package-badge-bg);
+    }
+
+    .status-checkout {
+        background: rgba(56, 128, 86, 0.12);
+        color: #295e40;
+    }
+
+    .guest-info-field .package-input,
+    .guest-info-field .package-select,
+    .address-info-field .package-input,
+    .address-info-field .package-select,
+    .room-info-field .package-input,
+    .room-info-field .package-select,
+    .detail-info-field .package-input,
+    .detail-info-field .package-select,
+    .room-allocation-table .package-input,
+    .room-allocation-table .package-select {
+        border-color: var(--package-input-border);
+        background: var(--package-input-bg);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    }
+
+    .guest-info-field .package-input:focus,
+    .guest-info-field .package-select:focus,
+    .address-info-field .package-input:focus,
+    .address-info-field .package-select:focus,
+    .room-info-field .package-input:focus,
+    .room-info-field .package-select:focus,
+    .detail-info-field .package-input:focus,
+    .detail-info-field .package-select:focus {
+        border-color: var(--package-input-focus);
+        box-shadow: var(--package-input-focus-shadow);
+    }
+
     @media (max-width: 1199.98px) {
         .checkin-top-info,
         .checkin-form-grid,
@@ -1103,6 +1420,7 @@
 
         .checkin-header-side,
         .checkin-search-form,
+        .checkin-directory-tools,
         .checkin-search-actions,
         .checkin-actions,
         .checkin-actions-main,
@@ -1204,6 +1522,21 @@
             grid-template-columns: 1fr;
         }
 
+        .checkin-content-grid {
+            grid-template-columns: 1fr;
+            align-items: start;
+        }
+
+        .checkin-sidebar-stack {
+            grid-template-rows: none;
+        }
+
+        .ktp-scan-card {
+            height: auto;
+            min-height: 0;
+            grid-template-rows: none;
+        }
+
         .room-guest-detail-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
@@ -1246,61 +1579,6 @@
     @endif
 
     <section class="package-shell checkin-shell">
-        <div class="package-shell-header">
-            <div class="package-shell-heading-block">
-                <h1 class="package-shell-title">Check In</h1>
-                <p class="package-shell-subtitle">Enter active guest details and choose a room with a cleaner form.</p>
-            </div>
-            <div class="checkin-header-side">
-                <div class="checkin-room-note" id="roomHelper">
-                    <small>Room Status</small>
-                    <strong>Select an available room</strong>
-                </div>
-                <div class="checkin-package-note" id="packageHelper">
-                    <small>Package Note</small>
-                    <strong>Nominal will be filled automatically when a package is found</strong>
-                </div>
-            </div>
-        </div>
-        <div class="ktp-flow-board">
-            <div class="ktp-flow-title">Concept: Scan KTP / ID Card Flow</div>
-            <div class="ktp-flow-grid">
-                <div class="ktp-flow-step">
-                    <span class="ktp-flow-number">1</span>
-                    <strong>Click Scan ID</strong>
-                    <p>Start from the leader or guest row using the scan button.</p>
-                </div>
-                <div class="ktp-flow-step">
-                    <span class="ktp-flow-number">2</span>
-                    <strong>Upload KTP</strong>
-                    <p>Select the KTP image and let the browser read the data.</p>
-                </div>
-                <div class="ktp-flow-step">
-                    <span class="ktp-flow-number">3</span>
-                    <strong>Auto Read Data</strong>
-                    <p>The system extracts the main KTP fields automatically.</p>
-                </div>
-                <div class="ktp-flow-step">
-                    <span class="ktp-flow-number">4</span>
-                    <strong>Review & Confirm</strong>
-                    <p>Review the result, then keep or adjust the extracted fields.</p>
-                </div>
-                <div class="ktp-flow-step">
-                    <span class="ktp-flow-number">5</span>
-                    <strong>Save to Form</strong>
-                    <p>The form is filled instantly and ready for check-in processing.</p>
-                </div>
-                <div class="ktp-flow-benefits">
-                    <small>Key Benefits</small>
-                    <ul>
-                        <li>Faster guest registration</li>
-                        <li>Less manual typing</li>
-                        <li>More consistent KTP data entry</li>
-                        <li>Ready for leader and guest rows</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
         <div class="package-shell-body">
             <form method="POST" action="/checkin" id="checkinForm" autocomplete="off">
                 @csrf
@@ -1388,12 +1666,13 @@
                     </div>
                 </div>
 
-                <div class="checkin-section guest-info-section">
-                    <div class="checkin-section-header">
-                        <h3><i class="fas fa-user-circle"></i> Leader / Primary Guest</h3>
-                    </div>
-                    <div class="checkin-overview-grid">
-                        <div class="guest-primary-panel">
+                <div class="checkin-content-grid">
+                    <div class="checkin-main-stack">
+                        <div class="checkin-section guest-info-section">
+                            <div class="checkin-section-header">
+                                <h3><i class="fas fa-user-circle"></i> Leader / Primary Guest</h3>
+                            </div>
+                            <div class="guest-primary-panel">
                             <div class="guest-main-row-five">
                                 <div class="guest-info-field">
                                     <label for="GuestName">Full Name<span class="text-danger">*</span></label>
@@ -1458,7 +1737,7 @@
                                         value="{{ old('Kelurahan') }}" placeholder="Kelapa Dua" data-flow data-vb="xKelurahan">
                                 </div>
                                 <div class="guest-info-field">
-                                    <label for="Kecamatan">Sub-District / Kecamatan</label>
+                                        <label for="Kecamatan">Sub-Dis/Kecamatan</label>
                                     <input type="text" name="Kecamatan" id="Kecamatan" class="form-control package-input"
                                         value="{{ old('Kecamatan') }}" placeholder="Curug" data-flow data-vb="xKecamatan">
                                 </div>
@@ -1532,126 +1811,19 @@
                                     </div>
                                 </div>
                             </div>
+                            </div>
                         </div>
 
-                        <aside class="guest-side-stack">
-                            <div class="group-info-card">
-                                <div>
-                                    <small>Group Information</small>
-                                    <strong>Group / Billing Summary</strong>
-                                </div>
-                                <div class="group-info-form">
-                                    <div class="guest-info-field">
-                                        <label for="Company">Group / Company Name</label>
-                                        <select name="Company" id="Company" class="form-control package-select" data-flow data-vb="xUsaha">
-                                            <option value="">Select company</option>
-                                            @foreach ($companyOptions as $option)
-                                                <option value="{{ $option }}" {{ old('Company') === $option ? 'selected' : '' }}>
-                                                    {{ $option }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="guest-info-field">
-                                        <label for="BillingTypeDisplay">Billing Type</label>
-                                        <input type="text" id="BillingTypeDisplay" class="form-control package-input"
-                                            value="Direct Folio" readonly>
-                                    </div>
-                                    <div class="guest-info-field">
-                                        <label for="Remarks">Remarks</label>
-                                        <textarea name="Remarks" id="Remarks" class="form-control package-input group-info-remark"
-                                            data-flow data-vb="xRemark"
-                                            placeholder="Meeting & training for 3 days">{{ old('Remarks') }}</textarea>
-                                    </div>
-                                </div>
+                        <!-- ROOMS SECTION -->
+                        <div class="checkin-section">
+                            <div class="checkin-section-header">
+                                <h3><i class="fas fa-bed"></i> Guest & Rooms</h3>
+                                <span class="room-allocation-note">Use <strong>Same as Leader</strong> when the guest follows the leader data. Uncheck it to fill guest detail manually or by scanning KTP.</span>
+                                <button type="button" class="btn package-btn-add" id="addRoomRowButton"
+                                    style="margin-left: auto;"><i class="fa-solid fa-plus mr-1"></i>Add Room</button>
                             </div>
-
-                            <div class="guest-brief-grid">
-                                <div class="guest-brief-card">
-                                    <small>Leader / Person in Charge</small>
-                                    <strong id="LeaderSummaryName">{{ old('GuestName') ?: '-' }}</strong>
-                                    <span id="LeaderSummaryPhone">{{ old('Phone') ?: '-' }}</span>
-                                </div>
-                                <div class="guest-note-card">
-                                    <small>Note</small>
-                                    <strong>Check-in guidance</strong>
-                                    <span>All group charges can follow the leader until each room is confirmed separately.</span>
-                                </div>
-                            </div>
-
-                            <div class="scan-guide-card">
-                                <div>
-                                    <small>How to Scan KTP</small>
-                                    <strong>Quick OCR Flow</strong>
-                                </div>
-                                <ol>
-                                    <li>Click the <em>Scan KTP</em> button below.</li>
-                                    <li>Choose a clear KTP image from your device.</li>
-                                    <li>Wait until OCR reads the main guest information.</li>
-                                    <li>Review the result and correct any field if needed.</li>
-                                </ol>
-                            </div>
-
-                            <div class="ktp-scan-card">
-                                <div class="ktp-scan-card-head">
-                                    <div>
-                                        <small>Scan Result Preview</small>
-                                        <strong>Upload KTP to fill leader data</strong>
-                                    </div>
-                                </div>
-                                <p class="ktp-scan-status" id="leaderScanStatus">No KTP scanned yet. Upload an image to start OCR.</p>
-                                <div class="ktp-scan-preview" id="leaderScanPreview">
-                                    <span class="ktp-scan-preview-empty">KTP preview will appear here after upload.</span>
-                                    <img id="leaderScanImage" alt="Leader KTP preview" hidden>
-                                </div>
-                                <div class="ktp-scan-result" id="leaderScanResult">
-                                    <span class="ktp-scan-result-title">Auto-filled fields</span>
-                                    <ul>
-                                        <li>Name and ID number</li>
-                                        <li>Date of birth and nationality</li>
-                                        <li>Address, district, city, province</li>
-                                        <li>Religion and basic guest profile</li>
-                                    </ul>
-                                    <div id="leaderScanInlineDebug" style="margin-top: 0.85rem; display: none; padding: 0.85rem; border-radius: 14px; background: #f6f9ff; border: 1px solid rgba(137, 167, 214, 0.24);">
-                                        <strong style="display: block; margin-bottom: 0.45rem; color: #173761; font-size: 0.84rem;">Hasil OCR Terdeteksi</strong>
-                                        <div id="leaderScanInlineMessage" style="margin-bottom: 0.55rem; color: #41546f; font-size: 0.8rem;"></div>
-                                        <pre id="leaderScanInlineRawText" style="margin: 0; max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; padding: 0.75rem; border-radius: 12px; background: #fff; border: 1px solid rgba(137, 167, 214, 0.24); color: #41546f; font-size: 0.78rem;"></pre>
-                                    </div>
-                                    <details id="leaderScanDebug" style="margin-top: 0.85rem;" hidden>
-                                        <summary style="cursor: pointer; font-weight: 700; color: #173761;">OCR Debug / Detail Teks</summary>
-                                        <div style="margin-top: 0.75rem; display: grid; gap: 0.65rem;">
-                                            <div>
-                                                <strong style="display: block; margin-bottom: 0.35rem; color: #173761; font-size: 0.82rem;">Parsed Fields</strong>
-                                                <pre id="leaderScanParsed" style="margin: 0; max-height: 140px; overflow: auto; white-space: pre-wrap; word-break: break-word; padding: 0.75rem; border-radius: 12px; background: #f6f9ff; border: 1px solid rgba(137, 167, 214, 0.24); color: #41546f; font-size: 0.78rem;"></pre>
-                                            </div>
-                                            <div>
-                                                <strong style="display: block; margin-bottom: 0.35rem; color: #173761; font-size: 0.82rem;">Raw OCR Text</strong>
-                                                <pre id="leaderScanRawText" style="margin: 0; max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; padding: 0.75rem; border-radius: 12px; background: #f6f9ff; border: 1px solid rgba(137, 167, 214, 0.24); color: #41546f; font-size: 0.78rem;"></pre>
-                                            </div>
-                                        </div>
-                                    </details>
-                                </div>
-                                <div class="ktp-scan-card-footer">
-                                    <button type="button" class="btn package-btn-primary ktp-scan-trigger" id="leaderScanButton">
-                                        <i class="fa-solid fa-camera mr-1"></i>Scan KTP
-                                    </button>
-                                    <input type="file" id="leaderKtpUpload" accept="image/*" hidden>
-                                </div>
-                            </div>
-                        </aside>
-                    </div>
-                </div>
-
-                <!-- ROOMS SECTION -->
-                <div class="checkin-section">
-                    <div class="checkin-section-header">
-                        <h3><i class="fas fa-bed"></i> Guest & Rooms</h3>
-                        <span class="room-allocation-note">Use <strong>Same as Leader</strong> when the guest follows the leader data. Uncheck it to fill guest detail manually or by scanning KTP.</span>
-                        <button type="button" class="btn package-btn-add" id="addRoomRowButton"
-                            style="margin-left: auto;"><i class="fa-solid fa-plus mr-1"></i>Add Room</button>
-                    </div>
-                    <div class="room-allocation-wrap">
-                        <table class="room-allocation-table">
+                            <div class="room-allocation-wrap">
+                                <table class="room-allocation-table">
                             <thead>
                                 <tr>
                                     <th width="15%">Room Number</th>
@@ -1745,136 +1917,245 @@
                                 </tr>
                             </tbody>
                             <tbody id="additionalRoomBody"></tbody>
-                        </table>
-                        <div class="room-summary">
-                            <span>Total Rooms: <strong id="RoomSummaryCount">1</strong></span>
-                            <span>Total Pax: <strong id="RoomSummaryPax">2</strong></span>
+                                </table>
+                                <div class="room-summary">
+                                    <span>Total Rooms: <strong id="RoomSummaryCount">1</strong></span>
+                                    <span>Total Pax: <strong id="RoomSummaryPax">2</strong></span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-    <!-- ADDITIONAL DETAILS SECTION -->
-    <div class="checkin-section">
-        <div class="checkin-section-header">
-            <h3><i class="fas fa-clipboard-list"></i> Additional Details</h3>
-        </div>
-        <div class="checkin-section-body additional-details-body">
-            <div class="detail-info-grid additional-details-grid">
-                <div class="detail-info-column">
-                    <div class="detail-info-row-two">
-                        <div class="detail-info-field">
-                            <label for="Religion">Religion</label>
-                            <select name="Religion" id="Religion" class="form-control package-select" data-flow data-vb="xAgama">
-                                <option value="">Select</option>
-                                @foreach ($religionOptions as $option)
-                                    <option value="{{ $option }}" {{ old('Religion') === $option ? 'selected' : '' }}>
-                                        {{ $option }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="detail-info-field">
-                            <label for="NumberOfPerson">Number of Person</label>
-                            <input type="number" name="NumberOfPerson" id="NumberOfPerson"
-                                class="form-control package-input text-right" value="{{ old('NumberOfPerson', 2) }}"
-                                data-vb="xPerson"
-                                min="1" max="20" data-flow required>
-                        </div>
-                    </div>
-                    <div class="detail-info-field">
-                        <label for="GuestName2">Name II</label>
-                        <input type="text" name="GuestName2" id="GuestName2" class="form-control package-input"
-                            value="{{ old('GuestName2') }}" placeholder="Enter secondary guest name (optional)" data-flow data-vb="xGuest2">
-                    </div>
-                </div>
+                        <!-- ADDITIONAL DETAILS SECTION -->
+                        <div class="checkin-section">
+                            <div class="checkin-section-header">
+                                <h3><i class="fas fa-clipboard-list"></i> Additional Details</h3>
+                            </div>
+                            <div class="checkin-section-body additional-details-body">
+                                <div class="detail-info-grid additional-details-grid">
+                                    <div class="detail-info-column">
+                                        <div class="detail-info-row-two">
+                                            <div class="detail-info-field">
+                                                <label for="Religion">Religion</label>
+                                                <select name="Religion" id="Religion" class="form-control package-select" data-flow data-vb="xAgama">
+                                                    <option value="">Select</option>
+                                                    @foreach ($religionOptions as $option)
+                                                        <option value="{{ $option }}" {{ old('Religion') === $option ? 'selected' : '' }}>
+                                                            {{ $option }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="detail-info-field">
+                                                <label for="NumberOfPerson">Number of Person</label>
+                                                <input type="number" name="NumberOfPerson" id="NumberOfPerson"
+                                                    class="form-control package-input text-right" value="{{ old('NumberOfPerson', 2) }}"
+                                                    data-vb="xPerson"
+                                                    min="1" max="20" data-flow required>
+                                            </div>
+                                        </div>
+                                        <div class="detail-info-field">
+                                            <label for="GuestName2">Name II</label>
+                                            <input type="text" name="GuestName2" id="GuestName2" class="form-control package-input"
+                                                value="{{ old('GuestName2') }}" placeholder="Enter secondary guest name (optional)" data-flow data-vb="xGuest2">
+                                        </div>
+                                    </div>
 
-                <div class="detail-info-column">
-                    <div class="detail-info-row-two">
-                        <div class="detail-info-field">
-                            <label for="PlaceOfBirth">Place of Birth</label>
-                            <input type="text" name="PlaceOfBirth" id="PlaceOfBirth"
-                                class="form-control package-input" value="{{ old('PlaceOfBirth') }}"
-                                data-vb="xPlaceBirth" placeholder="Jakarta" data-flow>
+                                    <div class="detail-info-column">
+                                        <div class="detail-info-row-two">
+                                            <div class="detail-info-field">
+                                                <label for="PlaceOfBirth">Place of Birth</label>
+                                                <input type="text" name="PlaceOfBirth" id="PlaceOfBirth"
+                                                    class="form-control package-input" value="{{ old('PlaceOfBirth') }}"
+                                                    data-vb="xPlaceBirth" placeholder="Jakarta" data-flow>
+                                            </div>
+                                            <div class="detail-info-field">
+                                                <label for="Segment">Segment</label>
+                                                <select name="Segment" id="Segment" class="form-control package-select" data-flow data-vb="xSegment">
+                                                    <option value="">Select</option>
+                                                    @foreach ($segmentOptions as $option)
+                                                        <option value="{{ $option }}"
+                                                            {{ old('Segment', 'TRAVEL') === $option ? 'selected' : '' }}>
+                                                            {{ $option }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="detail-info-field">
+                                            <label for="Member">Member 1</label>
+                                            <input type="text" name="Member" id="Member" class="form-control package-input"
+                                                value="{{ old('Member') }}" data-flow data-vb="xMember">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="detail-info-field">
-                            <label for="Segment">Segment</label>
-                            <select name="Segment" id="Segment" class="form-control package-select" data-flow data-vb="xSegment">
-                                <option value="">Select</option>
-                                @foreach ($segmentOptions as $option)
-                                    <option value="{{ $option }}"
-                                        {{ old('Segment', 'TRAVEL') === $option ? 'selected' : '' }}>
-                                        {{ $option }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="detail-info-field">
-                        <label for="Member">Member 1</label>
-                        <input type="text" name="Member" id="Member" class="form-control package-input"
-                            value="{{ old('Member') }}" data-flow data-vb="xMember">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- PAYMENT INFORMATION SECTION -->
-    <div class="checkin-section payment-info-section">
-        <div class="checkin-section-header">
-            <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
-        </div>
-        <div class="checkin-section-body payment-info-body">
-            <div class="detail-info-grid payment-info-grid">
-                <div class="detail-info-column">
-                    <div class="detail-info-field">
-                        <label for="PaymentMethod">Payment Method</label>
-                        <select name="PaymentMethod" id="PaymentMethod" class="form-control package-select" data-flow
-                            data-vb="xPayment" required>
-                            @foreach ($paymentOptions as $option)
-                                <option value="{{ $option }}"
-                                    {{ old('PaymentMethod', 'OTA') === $option ? 'selected' : '' }}>
-                                    {{ $option }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="detail-info-row-two">
-                        <div class="detail-info-field">
-                            <label for="CreditCardNumber">Credit Card #</label>
-                            <input type="text" name="CreditCardNumber" id="CreditCardNumber"
-                                class="form-control package-input" value="{{ old('CreditCardNumber') }}" data-flow data-vb="xCreditCard">
-                        </div>
-                        <div class="detail-info-field payment-checkbox-field">
-                            <label for="CheckDeposit">Deposit</label>
-                            <label class="payment-checkbox-control" for="CheckDeposit"><input type="checkbox"
-                                    name="CheckDeposit" id="CheckDeposit" value="1" data-vb="xPeriksa"
-                                    {{ old('CheckDeposit') ? 'checked' : '' }}>
-                                Check Deposit</label>
-                        </div>
-                    </div>
-                </div>
+                        <!-- PAYMENT INFORMATION SECTION -->
+                        <div class="checkin-section payment-info-section">
+                            <div class="checkin-section-header">
+                                <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
+                            </div>
+                            <div class="checkin-section-body payment-info-body">
+                                <div class="detail-info-grid payment-info-grid">
+                                    <div class="detail-info-column">
+                                        <div class="detail-info-field">
+                                            <label for="PaymentMethod">Payment Method</label>
+                                            <select name="PaymentMethod" id="PaymentMethod" class="form-control package-select" data-flow
+                                                data-vb="xPayment" required>
+                                                @foreach ($paymentOptions as $option)
+                                                    <option value="{{ $option }}"
+                                                        {{ old('PaymentMethod', 'OTA') === $option ? 'selected' : '' }}>
+                                                        {{ $option }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="detail-info-row-two">
+                                            <div class="detail-info-field">
+                                                <label for="CreditCardNumber">Credit Card #</label>
+                                                <input type="text" name="CreditCardNumber" id="CreditCardNumber"
+                                                    class="form-control package-input" value="{{ old('CreditCardNumber') }}" data-flow data-vb="xCreditCard">
+                                            </div>
+                                            <div class="detail-info-field payment-checkbox-field">
+                                                <label for="CheckDeposit">Deposit</label>
+                                                <label class="payment-checkbox-control" for="CheckDeposit"><input type="checkbox"
+                                                        name="CheckDeposit" id="CheckDeposit" value="1" data-vb="xPeriksa"
+                                                        {{ old('CheckDeposit') ? 'checked' : '' }}>
+                                                    Check Deposit</label>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                <div class="detail-info-column">
-                    <div class="detail-info-field">
-                        <label for="Sales">Sales</label>
-                        <select name="Sales" id="Sales" class="form-control package-select" data-flow data-vb="xSales">
-                            <option value="">Select sales</option>
-                            @foreach ($salesOptions as $option)
-                                <option value="{{ $option }}" {{ old('Sales') === $option ? 'selected' : '' }}>
-                                    {{ $option }}
-                                </option>
-                            @endforeach
-                        </select>
+                                    <div class="detail-info-column">
+                                        <div class="detail-info-field">
+                                            <label for="Sales">Sales</label>
+                                            <select name="Sales" id="Sales" class="form-control package-select" data-flow data-vb="xSales">
+                                                <option value="">Select sales</option>
+                                                @foreach ($salesOptions as $option)
+                                                    <option value="{{ $option }}" {{ old('Sales') === $option ? 'selected' : '' }}>
+                                                        {{ $option }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <aside class="checkin-sidebar-stack guest-side-stack">
+                        <div class="group-info-card">
+                            <div>
+                                <small>Group Information</small>
+                                <strong>Group / Billing Summary</strong>
+                            </div>
+                            <div class="group-info-form">
+                                <div class="guest-info-field">
+                                    <label for="Company">Group / Company Name</label>
+                                    <select name="Company" id="Company" class="form-control package-select" data-flow data-vb="xUsaha">
+                                        <option value="">Select company</option>
+                                        @foreach ($companyOptions as $option)
+                                            <option value="{{ $option }}" {{ old('Company') === $option ? 'selected' : '' }}>
+                                                {{ $option }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="BillingTypeDisplay">Billing Type</label>
+                                    <input type="text" id="BillingTypeDisplay" class="form-control package-input"
+                                        value="Direct Folio" readonly>
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="Remarks">Remarks</label>
+                                    <textarea name="Remarks" id="Remarks" class="form-control package-input group-info-remark"
+                                        data-flow data-vb="xRemark"
+                                        placeholder="Meeting & training for 3 days">{{ old('Remarks') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="guest-brief-grid">
+                            <div class="guest-brief-card">
+                                <small>Leader / Person in Charge</small>
+                                <strong id="LeaderSummaryName">{{ old('GuestName') ?: '-' }}</strong>
+                                <span id="LeaderSummaryPhone">{{ old('Phone') ?: '-' }}</span>
+                            </div>
+                            <div class="guest-note-card">
+                                <small>Note</small>
+                                <strong>Check-in guidance</strong>
+                                <span>All group charges can follow the leader until each room is confirmed separately.</span>
+                            </div>
+                        </div>
+
+                        <div class="scan-guide-card">
+                            <div>
+                                <small>How to Scan KTP</small>
+                                <strong>Quick OCR Flow</strong>
+                            </div>
+                            <ol>
+                                <li>Click the <em>Scan KTP</em> button below.</li>
+                                <li>Choose a clear KTP image from your device.</li>
+                                <li>Wait until OCR reads the main guest information.</li>
+                                <li>Review the result and correct any field if needed.</li>
+                            </ol>
+                        </div>
+
+                        <div class="ktp-scan-card">
+                            <div class="ktp-scan-card-head">
+                                <div>
+                                    <small>Scan Result Preview</small>
+                                    <strong>Upload KTP to fill leader data</strong>
+                                </div>
+                            </div>
+                            <p class="ktp-scan-status" id="leaderScanStatus">No KTP scanned yet. Upload an image to start OCR.</p>
+                            <div class="ktp-scan-preview" id="leaderScanPreview">
+                                <span class="ktp-scan-preview-empty">KTP preview will appear here after upload.</span>
+                                <img id="leaderScanImage" alt="Leader KTP preview" hidden>
+                            </div>
+                            <div class="ktp-scan-result" id="leaderScanResult">
+                                <span class="ktp-scan-result-title">Auto-filled fields</span>
+                                <ul>
+                                    <li>Name and ID number</li>
+                                    <li>Date of birth and nationality</li>
+                                    <li>Address, district, city, province</li>
+                                    <li>Religion and basic guest profile</li>
+                                </ul>
+                                <div id="leaderScanInlineDebug" style="margin-top: 0.85rem; display: none; padding: 0.85rem; border-radius: 14px; background: #f6f9ff; border: 1px solid rgba(137, 167, 214, 0.24);">
+                                    <strong style="display: block; margin-bottom: 0.45rem; color: #173761; font-size: 0.84rem;">Hasil OCR Terdeteksi</strong>
+                                    <div id="leaderScanInlineMessage" style="margin-bottom: 0.55rem; color: #41546f; font-size: 0.8rem;"></div>
+                                    <pre id="leaderScanInlineRawText" style="margin: 0; max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; padding: 0.75rem; border-radius: 12px; background: #fff; border: 1px solid rgba(137, 167, 214, 0.24); color: #41546f; font-size: 0.78rem;"></pre>
+                                </div>
+                                <details id="leaderScanDebug" style="margin-top: 0.85rem;" hidden>
+                                    <summary style="cursor: pointer; font-weight: 700; color: #173761;">OCR Debug / Detail Teks</summary>
+                                    <div style="margin-top: 0.75rem; display: grid; gap: 0.65rem;">
+                                        <div>
+                                            <strong style="display: block; margin-bottom: 0.35rem; color: #173761; font-size: 0.82rem;">Parsed Fields</strong>
+                                            <pre id="leaderScanParsed" style="margin: 0; max-height: 140px; overflow: auto; white-space: pre-wrap; word-break: break-word; padding: 0.75rem; border-radius: 12px; background: #f6f9ff; border: 1px solid rgba(137, 167, 214, 0.24); color: #41546f; font-size: 0.78rem;"></pre>
+                                        </div>
+                                        <div>
+                                            <strong style="display: block; margin-bottom: 0.35rem; color: #173761; font-size: 0.82rem;">Raw OCR Text</strong>
+                                            <pre id="leaderScanRawText" style="margin: 0; max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; padding: 0.75rem; border-radius: 12px; background: #f6f9ff; border: 1px solid rgba(137, 167, 214, 0.24); color: #41546f; font-size: 0.78rem;"></pre>
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+                            <div class="ktp-scan-card-footer">
+                                <button type="button" class="btn package-btn-primary ktp-scan-trigger" id="leaderScanButton">
+                                    <i class="fa-solid fa-camera mr-1"></i>Scan KTP
+                                </button>
+                                <input type="file" id="leaderKtpUpload" accept="image/*" hidden>
+                            </div>
+                        </div>
+                    </aside>
                 </div>
-            </div>
-        </div>
-    </div>
 
 
     <div class="checkin-actions">
         <div class="checkin-actions-main">
             <button type="submit" class="btn package-btn-primary" id="saveButton">Save Check In</button>
+            <button type="button" class="btn package-btn-secondary" id="printRegistrationButton">Print</button>
             <button type="button" class="btn package-btn-secondary" id="newEntryButton">New
                 Entry</button>
             <button type="button" class="btn package-btn-secondary" id="focusSearchButton">Search
@@ -1912,6 +2193,29 @@
                     <a href="/checkin" class="btn package-btn-secondary">Clear</a>
                 </div>
             </form>
+            <div class="checkin-directory-tools">
+                <div class="checkin-directory-result">
+                    Showing
+                    <strong>{{ number_format($checkins->firstItem() ?? 0, 0, ',', '.') }}</strong>
+                    -
+                    <strong>{{ number_format($checkins->lastItem() ?? 0, 0, ',', '.') }}</strong>
+                    of
+                    <strong>{{ number_format($checkins->total(), 0, ',', '.') }}</strong>
+                    active stay record(s)
+                </div>
+                <form method="GET" action="/checkin" class="checkin-per-page">
+                    <input type="hidden" name="search" value="{{ $search }}">
+                    <label class="package-label" for="perPage">Rows Per Page</label>
+                    <select name="per_page" id="perPage" class="form-control package-select"
+                        onchange="this.form.submit()">
+                        @foreach ([10, 25, 50] as $size)
+                            <option value="{{ $size }}" {{ (int) $perPage === $size ? 'selected' : '' }}>
+                                {{ $size }} rows
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
             <div class="package-table-wrap mt-4">
                 <table class="table package-table checkin-table mb-0">
                     <thead>
@@ -1930,7 +2234,7 @@
                     </thead>
                     <tbody>
                         @forelse($checkins as $record)
-                            <tr class="checkin-record-row" data-record="{{ e($record->record_json) }}"
+                            <tr class="checkin-record-row" data-record="{{ $record->record_json }}"
                                 data-detail-key="{{ $record->RegNo2 }}">
                                 <td>{{ $record->id ?? '-' }}</td>
                                 <td>
@@ -1968,6 +2272,11 @@
                     </tbody>
                 </table>
             </div>
+            @if ($checkins->hasPages())
+                <div class="package-pagination-wrap mt-4">
+                    {{ $checkins->onEachSide(1)->links('pagination::bootstrap-4') }}
+                </div>
+            @endif
 
 
         </div>
@@ -2184,6 +2493,7 @@
         const currentDetailKeyField = document.getElementById('CurrentDetailKey');
         const primaryDetailKeyField = document.getElementById('PrimaryDetailKey');
         const saveButton = document.getElementById('saveButton');
+        const printRegistrationButton = document.getElementById('printRegistrationButton');
         const newEntryButton = document.getElementById('newEntryButton');
         const focusSearchButton = document.getElementById('focusSearchButton');
         const addRoomRowButton = document.getElementById('addRoomRowButton');
@@ -4028,13 +4338,16 @@
             const row = fragment.querySelector('[data-room-row]');
             const detailRow = fragment.querySelector('[data-room-detail-row]');
             row.querySelector('.detail-key-input').value = detail.detailKey || '';
-            row.querySelector('.room-code-input').value = detail.roomCode || '';
+            setSelectValueDirect(row.querySelector('.room-code-input'), detail.roomCode || '');
             row.querySelector('.room-pax-display-input').value = detail.pax || detail.breakfast || 1;
-            row.querySelector('.package-code-input').value = detail.packageCode || '';
+            setSelectValueDirect(row.querySelector('.package-code-input'), detail.packageCode || '');
             row.querySelector('.nominal-input').value = detail.nominal ? normalizeNumber(String(detail.nominal)) : '';
             row.querySelector('.nominal-display-input').value = detail.nominal ? formatRibuan(String(detail.nominal)) : '';
             row.querySelector('.breakfast-input').value = detail.breakfast ?? 0;
-            row.querySelector('.room-position-input').value = detail.groupPosition || (isGroupCheckInType(xTipe?.value) ? 'SUB' : '');
+            setSelectValueDirect(
+                row.querySelector('.room-position-input'),
+                detail.groupPosition || (isGroupCheckInType(xTipe?.value) ? 'SUB' : '')
+            );
             row.querySelector('.same-as-leader-input').value = detail.sameAsLeader === false ? '0' : '1';
             row.querySelector('.room-same-checkbox').checked = detail.sameAsLeader !== false;
             if (detailRow) {
@@ -4070,6 +4383,9 @@
             }
             syncPrimaryRoomPositionValue();
             saveButton.textContent = 'Save Check In';
+            if (printRegistrationButton) {
+                printRegistrationButton.disabled = true;
+            }
             Array.from(document.querySelectorAll('.checkin-record-row')).forEach(row => row.classList.remove('is-active'));
         }
 
@@ -4079,6 +4395,9 @@
             primaryDetailKeyField.value = record.DetailKey || '';
             form.action = '/checkin/' + encodeURIComponent(record.DetailKey) + '/update';
             saveButton.textContent = 'Update Check In';
+            if (printRegistrationButton) {
+                printRegistrationButton.disabled = !(record.DetailKey || '');
+            }
             const mappings = ['ReservationNumber', 'GuestName', 'GuestName2', 'Address', 'Kelurahan', 'Kecamatan',
                 'KabCity', 'ProvinceCountry', 'TypeOfId', 'IdNumber', 'TypeOfCheckIn', 'PlaceOfBirth',
                 'Religion', 'Nationality', 'NumberOfPerson', 'PaymentMethod', 'Company', 'Occupation', 'CreditCardNumber', 'Segment',
@@ -4115,8 +4434,8 @@
             xTglKeluar.closest('[data-date-field]').querySelector('[data-date-native]')
                 .value = record.EstimationOut || '';
             xJamIn.value = normalizeTimeDisplay(record.CheckInTime || '');
-            xKode.value = record.RoomCode || '';
-            xPackage.value = record.PackageCode || '';
+            setSelectValueDirect(xKode, record.RoomCode || '');
+            setSelectValueDirect(xPackage, record.PackageCode || '');
             nominalField.value = normalizeNumber(String(record.Nominal || ''));
             xNominal.value = record.Nominal ? formatRibuan(String(record.Nominal)) : '';
             xBF.value = record.Breakfast || 0;
@@ -4131,6 +4450,16 @@
             updateRoomHelper();
             updatePackageHelper();
             updateRoomSummary();
+        }
+
+        function openRegistrationPrint() {
+            const detailKey = (currentDetailKeyField?.value || primaryDetailKeyField?.value || '').trim();
+            if (!detailKey) {
+                showCrudAlert('Pilih data check in yang sudah tersimpan terlebih dahulu untuk print registrasi.');
+                return;
+            }
+
+            window.open('/checkin/' + encodeURIComponent(detailKey) + '/print-registration', '_blank', 'noopener');
         }
 
         function resetForm() {
@@ -4321,6 +4650,10 @@
             updatePackageHelper();
         });
         newEntryButton.addEventListener('click', resetForm);
+        if (printRegistrationButton) {
+            printRegistrationButton.addEventListener('click', openRegistrationPrint);
+            printRegistrationButton.disabled = !(currentDetailKeyField?.value || primaryDetailKeyField?.value || '').trim();
+        }
         focusSearchButton.addEventListener('click', function() {
             document.getElementById('checkinDirectoryShell').scrollIntoView({
                 behavior: 'smooth',
@@ -4475,6 +4808,16 @@
                 normalizeNumber(input.value));
             numberOfPersonField.value = primaryRoomPaxDisplay.value || numberOfPersonField.value || '1';
         });
+        function parseRowRecordPayload(encodedPayload) {
+            const payload = (encodedPayload || '').trim();
+            if (!payload) {
+                throw new Error('Empty row payload');
+            }
+
+            const json = window.atob(payload);
+            return JSON.parse(json);
+        }
+
         Array.from(document.querySelectorAll('.checkin-record-row')).forEach(function(row) {
             row.addEventListener('click', function(event) {
                 if (event.target.closest('.checkin-delete-link')) {
@@ -4484,7 +4827,7 @@
                     .remove('is-active'));
                 row.classList.add('is-active');
                 try {
-                    applyRecord(JSON.parse(row.dataset.record));
+                    applyRecord(parseRowRecordPayload(row.dataset.record));
                     window.scrollTo({
                         top: 0,
                         behavior: 'smooth'

@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @php
+        $layoutBrandingProfile = \App\Support\HotelBranding::profile();
+        $layoutTheme = \App\Support\HotelBranding::themeVariables($layoutBrandingProfile);
+    @endphp
     <meta charset="utf-8">
     <title>Quantum Hotel System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,18 +14,63 @@
 
     <style>
         body {
-            background: #edf2f7;
-            color: #10233b;
+            background: {{ $layoutTheme['page_bg'] }};
+            color: {{ $layoutTheme['text'] }};
         }
 
         .main-header .navbar-nav {
             align-items: center;
         }
 
+        .main-header.navbar {
+            background: {{ $layoutTheme['header_bg'] }} !important;
+            border-bottom: 1px solid {{ $layoutTheme['shell_border'] }};
+            box-shadow: 0 12px 26px rgba(16, 35, 59, 0.08);
+        }
+
+        .main-header .nav-link,
+        .main-header .navbar-brand,
+        .main-header .navbar-brand:hover {
+            color: {{ $layoutTheme['title'] }} !important;
+        }
+
+        .main-header .nav-link {
+            border-radius: 12px;
+            transition: background 0.18s ease, color 0.18s ease;
+        }
+
+        .main-header .nav-link:hover {
+            background: {{ $layoutTheme['badge_bg'] }};
+            color: {{ $layoutTheme['badge_text'] }} !important;
+        }
+
         .navbar-brand {
             font-weight: 700;
             white-space: normal;
             line-height: 1.2;
+        }
+
+        .navbar-topbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex: 1 1 auto;
+            min-width: 0;
+            flex-wrap: wrap;
+        }
+
+        .navbar-topbar-brand-slot {
+            min-width: 0;
+            flex: 1 1 260px;
+        }
+
+        .navbar-page-tools {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 1 1 360px;
+            min-width: 0;
         }
 
         .main-sidebar {
@@ -44,6 +93,7 @@
         }
 
         .content-wrapper {
+            background: {{ $layoutTheme['page_bg'] }};
             min-height: calc(100vh - 57px);
             overflow-x: hidden;
             max-width: 100%;
@@ -112,7 +162,7 @@
             margin-bottom: 0.55rem;
             font-size: 0.78rem;
             font-weight: 700;
-            color: #5b6f88;
+            color: {{ $layoutTheme['muted'] }};
         }
 
         img,
@@ -161,6 +211,11 @@
 
             .navbar-brand {
                 font-size: 0.98rem;
+            }
+
+            .navbar-topbar-content,
+            .navbar-page-tools {
+                width: 100%;
             }
 
             .content-wrapper {
@@ -218,7 +273,20 @@
                 </a>
             </li>
         </ul>
-        <span class="navbar-brand">Quantum Hotel System</span>
+        <div class="navbar-topbar-content">
+            <div class="navbar-topbar-brand-slot">
+                @if(trim($__env->yieldContent('topbar_brand')) !== '')
+                    {!! $__env->yieldContent('topbar_brand') !!}
+                @else
+                    <span class="navbar-brand">Quantum Hotel System</span>
+                @endif
+            </div>
+            @if(trim($__env->yieldContent('topbar_tools')) !== '')
+                <div class="navbar-page-tools">
+                    {!! $__env->yieldContent('topbar_tools') !!}
+                </div>
+            @endif
+        </div>
     </nav>
 
     <!-- SIDEBAR -->
@@ -251,6 +319,12 @@
                     <li class="nav-item">
                         <a href="/room" class="nav-link {{ request()->is('room') || request()->is('room/*') ? 'active' : '' }}">
                             <p>Room</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/settings/hotel-branding" class="nav-link {{ request()->is('settings/hotel-branding') || request()->is('settings/hotel-branding/*') ? 'active' : '' }}">
+                            <p>Hotel Branding</p>
                         </a>
                     </li>
 
