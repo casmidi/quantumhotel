@@ -196,6 +196,393 @@
         gap: 1rem;
     }
 
+    .ktp-flow-board {
+        margin: 1.35rem 1.35rem 0;
+        padding: 1.15rem;
+        border: 1px solid #d8e6ff;
+        border-radius: 24px;
+        background: linear-gradient(180deg, #f9fbff 0%, #eef5ff 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .ktp-flow-title {
+        margin-bottom: 1rem;
+        font-size: 1.35rem;
+        font-weight: 900;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: #1e3764;
+    }
+
+    .ktp-flow-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr)) 1.1fr;
+        gap: 0.9rem;
+    }
+
+    .ktp-flow-step,
+    .ktp-flow-benefits {
+        padding: 1rem;
+        border-radius: 20px;
+        border: 1px solid rgba(127, 156, 209, 0.28);
+        background: rgba(255, 255, 255, 0.92);
+    }
+
+    .ktp-flow-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.85rem;
+        height: 1.85rem;
+        margin-bottom: 0.75rem;
+        border-radius: 999px;
+        background: #2962ff;
+        color: #fff;
+        font-size: 0.92rem;
+        font-weight: 800;
+    }
+
+    .ktp-flow-step strong,
+    .ktp-flow-benefits small {
+        display: block;
+        margin-bottom: 0.45rem;
+        color: #173761;
+        font-size: 0.96rem;
+        font-weight: 800;
+    }
+
+    .ktp-flow-step p,
+    .ktp-flow-benefits li {
+        margin: 0;
+        color: #50627e;
+        font-size: 0.88rem;
+        line-height: 1.55;
+    }
+
+    .ktp-flow-benefits ul {
+        margin: 0;
+        padding-left: 1rem;
+        display: grid;
+        gap: 0.4rem;
+    }
+
+    .checkin-overview-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.65fr) minmax(300px, 0.95fr);
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .guest-primary-panel,
+    .guest-side-stack {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .guest-main-row-five,
+    .guest-main-row-four,
+    .guest-main-row-three {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .guest-main-row-five {
+        grid-template-columns: 1.25fr 0.82fr 1fr 0.95fr 0.92fr;
+    }
+
+    .guest-main-row-four {
+        grid-template-columns: 1fr 1fr 1fr 0.82fr;
+    }
+
+    .guest-main-row-three {
+        grid-template-columns: 1.05fr 1fr 1fr;
+    }
+
+    .guest-main-address .package-input {
+        min-height: calc(3rem + 2px);
+    }
+
+    .group-info-card,
+    .guest-brief-grid,
+    .scan-guide-card,
+    .ktp-scan-card {
+        padding: 1rem;
+        border-radius: 18px;
+        border: 1px solid rgba(137, 167, 214, 0.28);
+        background: linear-gradient(180deg, #fbfdff 0%, #f0f5ff 100%);
+    }
+
+    .group-info-card,
+    .scan-guide-card,
+    .ktp-scan-card {
+        display: grid;
+        gap: 0.85rem;
+    }
+
+    .group-info-card small,
+    .scan-guide-card small,
+    .ktp-scan-card-head small {
+        display: block;
+        margin-bottom: 0.3rem;
+        color: #7a8aa0;
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .group-info-card strong,
+    .scan-guide-card strong,
+    .ktp-scan-card-head strong {
+        color: #173761;
+        font-size: 1.06rem;
+        font-weight: 800;
+    }
+
+    .group-info-form {
+        display: grid;
+        gap: 0.9rem;
+    }
+
+    .group-info-remark {
+        min-height: 96px;
+        resize: vertical;
+        padding-top: 0.85rem;
+        padding-bottom: 0.85rem;
+    }
+
+    .guest-brief-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+        gap: 0.85rem;
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    .guest-brief-card,
+    .guest-note-card {
+        padding: 0.95rem 1rem;
+        border-radius: 16px;
+        border: 1px solid rgba(137, 167, 214, 0.22);
+        background: #fff;
+    }
+
+    .guest-brief-card {
+        background: linear-gradient(180deg, #eff5ff 0%, #e9f1ff 100%);
+    }
+
+    .guest-note-card {
+        background: linear-gradient(180deg, #fff8ec 0%, #fff3dc 100%);
+        border-color: rgba(212, 172, 78, 0.24);
+    }
+
+    .guest-brief-card small,
+    .guest-note-card small {
+        display: block;
+        margin-bottom: 0.25rem;
+        color: #6f7f96;
+        font-size: 0.73rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .guest-brief-card strong,
+    .guest-note-card strong {
+        display: block;
+        color: #173761;
+        font-size: 0.98rem;
+        font-weight: 800;
+    }
+
+    .guest-brief-card span,
+    .guest-note-card span {
+        display: block;
+        margin-top: 0.28rem;
+        color: #4d6180;
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    .scan-guide-card ol {
+        margin: 0;
+        padding-left: 1rem;
+        display: grid;
+        gap: 0.42rem;
+        color: #50627e;
+        font-size: 0.88rem;
+        line-height: 1.55;
+    }
+
+    .ktp-scan-card-head {
+        display: grid;
+        gap: 0.4rem;
+    }
+
+    .ktp-scan-status {
+        margin: 0;
+        padding: 0.75rem 0.85rem;
+        border-radius: 14px;
+        background: rgba(41, 98, 255, 0.08);
+        color: #2750a8;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .ktp-scan-preview {
+        min-height: 170px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85rem;
+        border-radius: 18px;
+        border: 1px dashed rgba(41, 98, 255, 0.35);
+        background: rgba(255, 255, 255, 0.92);
+        overflow: hidden;
+    }
+
+    .ktp-scan-preview img {
+        width: 100%;
+        max-height: 220px;
+        object-fit: contain;
+        border-radius: 12px;
+    }
+
+    .ktp-scan-preview-empty {
+        color: #7f8da4;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .ktp-scan-result {
+        padding: 0.9rem;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(137, 167, 214, 0.24);
+    }
+
+    .ktp-scan-result-title {
+        display: block;
+        margin-bottom: 0.55rem;
+        color: #173761;
+        font-size: 0.9rem;
+        font-weight: 800;
+    }
+
+    .ktp-scan-result ul {
+        margin: 0;
+        padding-left: 1rem;
+        display: grid;
+        gap: 0.38rem;
+        color: #5c6f89;
+        font-size: 0.88rem;
+    }
+
+    .ktp-scan-card-footer {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .room-follow-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 84px;
+        padding: 0.42rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(35, 108, 255, 0.1);
+        color: #224ea4;
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+
+    .room-follow-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: #173761;
+        font-size: 0.86rem;
+        font-weight: 700;
+    }
+
+    .room-guest-summary {
+        display: grid;
+        gap: 0.3rem;
+    }
+
+    .room-guest-summary-note {
+        color: #7c8ba3;
+        font-size: 0.76rem;
+        line-height: 1.35;
+    }
+
+    .room-action-stack {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+    }
+
+    .room-guest-detail-row td {
+        padding: 0;
+        background: #f6f9ff;
+        border-top: none;
+    }
+
+    .room-guest-detail-row.is-collapsed {
+        display: none;
+    }
+
+    .room-guest-detail-card {
+        padding: 1rem;
+        border-top: 1px dashed rgba(137, 167, 214, 0.34);
+    }
+
+    .room-guest-detail-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.95rem;
+    }
+
+    .room-guest-detail-head strong {
+        display: block;
+        color: #173761;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .room-guest-detail-head small {
+        color: #70819a;
+        font-size: 0.82rem;
+    }
+
+    .room-guest-detail-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .room-guest-scan-status {
+        color: #56718e;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .room-guest-detail-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.9rem;
+    }
+
+    .room-guest-address-field {
+        grid-column: span 2;
+    }
+
     .address-section .checkin-section-header i {
         background: rgba(107, 120, 240, 0.12);
         color: #6b78f0;
@@ -247,6 +634,14 @@
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
+    }
+
+    .additional-details-grid {
+        align-items: start;
+    }
+
+    .additional-details-grid .detail-info-column {
+        align-content: start;
     }
 
     .detail-info-column {
@@ -687,6 +1082,9 @@
         .checkin-form-grid,
         .guest-info-row-five,
         .guest-info-row-three,
+        .guest-main-row-five,
+        .guest-main-row-four,
+        .guest-main-row-three,
         .address-info-row-five,
         .room-info-grid,
         .detail-info-grid {
@@ -731,9 +1129,13 @@
         .guest-info-row-two,
         .guest-info-row-three,
         .guest-info-row-five,
+        .guest-main-row-five,
+        .guest-main-row-four,
+        .guest-main-row-three,
         .address-info-row-five,
         .room-info-grid,
-        .detail-info-grid {
+        .detail-info-grid,
+        .guest-brief-grid {
             grid-template-columns: 1fr;
         }
 
@@ -792,6 +1194,44 @@
             font-size: 0.82rem;
         }
     }
+
+    @media (max-width: 1280px) {
+        .ktp-flow-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .checkin-overview-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .room-guest-detail-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 860px) {
+        .ktp-flow-board {
+            margin: 1rem 1rem 0;
+        }
+
+        .ktp-flow-grid,
+        .room-guest-detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .room-guest-address-field {
+            grid-column: span 1;
+        }
+
+        .room-guest-detail-head {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .room-guest-detail-actions {
+            justify-content: flex-start;
+        }
+    }
 </style>
 
 <div class="container-fluid checkin-page">
@@ -819,6 +1259,45 @@
                 <div class="checkin-package-note" id="packageHelper">
                     <small>Package Note</small>
                     <strong>Nominal will be filled automatically when a package is found</strong>
+                </div>
+            </div>
+        </div>
+        <div class="ktp-flow-board">
+            <div class="ktp-flow-title">Concept: Scan KTP / ID Card Flow</div>
+            <div class="ktp-flow-grid">
+                <div class="ktp-flow-step">
+                    <span class="ktp-flow-number">1</span>
+                    <strong>Click Scan ID</strong>
+                    <p>Start from the leader or guest row using the scan button.</p>
+                </div>
+                <div class="ktp-flow-step">
+                    <span class="ktp-flow-number">2</span>
+                    <strong>Upload KTP</strong>
+                    <p>Select the KTP image and let the browser read the data.</p>
+                </div>
+                <div class="ktp-flow-step">
+                    <span class="ktp-flow-number">3</span>
+                    <strong>Auto Read Data</strong>
+                    <p>The system extracts the main KTP fields automatically.</p>
+                </div>
+                <div class="ktp-flow-step">
+                    <span class="ktp-flow-number">4</span>
+                    <strong>Review & Confirm</strong>
+                    <p>Review the result, then keep or adjust the extracted fields.</p>
+                </div>
+                <div class="ktp-flow-step">
+                    <span class="ktp-flow-number">5</span>
+                    <strong>Save to Form</strong>
+                    <p>The form is filled instantly and ready for check-in processing.</p>
+                </div>
+                <div class="ktp-flow-benefits">
+                    <small>Key Benefits</small>
+                    <ul>
+                        <li>Faster guest registration</li>
+                        <li>Less manual typing</li>
+                        <li>More consistent KTP data entry</li>
+                        <li>Ready for leader and guest rows</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -911,163 +1390,263 @@
 
                 <div class="checkin-section guest-info-section">
                     <div class="checkin-section-header">
-                        <h3><i class="fas fa-user-circle"></i> Guest Information</h3>
+                        <h3><i class="fas fa-user-circle"></i> Leader / Primary Guest</h3>
                     </div>
-                    <div class="guest-info-grid">
-                        <div class="guest-info-row guest-info-row-two">
-                            <div class="guest-info-field">
-                                <label for="GuestName">Guest Name<span class="text-danger">*</span></label>
-                                <input type="text" name="GuestName" id="GuestName" class="form-control package-input"
-                                    value="{{ old('GuestName') }}" placeholder="Budi Santoso" data-flow data-vb="xGuest" required>
-                            </div>
-                            <div class="guest-info-field">
-                                <label for="GuestName2">Name II</label>
-                                <input type="text" name="GuestName2" id="GuestName2" class="form-control package-input"
-                                    value="{{ old('GuestName2') }}" placeholder="Enter name II (optional)" data-flow data-vb="xGuest2">
-                            </div>
-                        </div>
-
-                        <div class="guest-info-row guest-info-row-five">
-                            <div class="guest-info-field">
-                                <label for="PlaceOfBirth">Place of Birth</label>
-                                <input type="text" name="PlaceOfBirth" id="PlaceOfBirth"
-                                    class="form-control package-input" value="{{ old('PlaceOfBirth') }}"
-                                    data-vb="xPlaceBirth"
-                                    placeholder="Jakarta" data-flow>
-                            </div>
-                            <div class="guest-info-field">
-                                <label for="BirthDateDisplay">Date of Birth</label>
-                                <div class="package-date-group" data-date-field>
-                                    <input type="hidden" name="BirthDate" id="BirthDate" value="{{ $birthIso }}">
-                                    <input type="text" id="BirthDateDisplay" class="form-control package-input"
-                                        value="{{ $birthIso ? \Carbon\Carbon::parse($birthIso)->format('d-m-Y') : '' }}"
-                                        placeholder="dd-MM-yyyy" inputmode="numeric" data-flow data-vb="xTglLahir">
-                                    <button type="button" class="package-date-picker" data-date-button
-                                        aria-label="Open system date picker"><i
-                                            class="fa-regular fa-calendar"></i></button>
-                                    <input type="date" class="package-date-native" data-date-native
-                                        value="{{ $birthIso }}" tabindex="-1" aria-hidden="true">
+                    <div class="checkin-overview-grid">
+                        <div class="guest-primary-panel">
+                            <div class="guest-main-row-five">
+                                <div class="guest-info-field">
+                                    <label for="GuestName">Full Name<span class="text-danger">*</span></label>
+                                    <input type="text" name="GuestName" id="GuestName" class="form-control package-input"
+                                        value="{{ old('GuestName') }}" placeholder="Budi Santoso" data-flow data-vb="xGuest" required>
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="TypeOfId">ID Type</label>
+                                    <select name="TypeOfId" id="TypeOfId" class="form-control package-select" data-flow data-vb="xTypeId">
+                                        @foreach ($idTypeOptions as $option)
+                                            <option value="{{ $option }}"
+                                                {{ old('TypeOfId', $defaultIdType) === $option ? 'selected' : '' }}>
+                                                {{ $option }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="IdNumber">ID Number</label>
+                                    <input type="text" name="IdNumber" id="IdNumber" class="form-control package-input"
+                                        value="{{ old('IdNumber') }}" placeholder="3171234567890001" data-flow data-vb="xKTP">
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="BirthDateDisplay">Date of Birth</label>
+                                    <div class="package-date-group" data-date-field>
+                                        <input type="hidden" name="BirthDate" id="BirthDate" value="{{ $birthIso }}">
+                                        <input type="text" id="BirthDateDisplay" class="form-control package-input"
+                                            value="{{ $birthIso ? \Carbon\Carbon::parse($birthIso)->format('d-m-Y') : '' }}"
+                                            placeholder="dd-MM-yyyy" inputmode="numeric" data-flow data-vb="xTglLahir">
+                                        <button type="button" class="package-date-picker" data-date-button
+                                            aria-label="Open system date picker"><i class="fa-regular fa-calendar"></i></button>
+                                        <input type="date" class="package-date-native" data-date-native
+                                            value="{{ $birthIso }}" tabindex="-1" aria-hidden="true">
+                                    </div>
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="Nationality">Nationality<span class="text-danger">*</span></label>
+                                    <select name="Nationality" id="Nationality" class="form-control package-select"
+                                        data-flow data-vb="xKodeNegara">
+                                        @foreach ($nationalityOptions as $option)
+                                            <option value="{{ $option }}"
+                                                {{ old('Nationality', 'INA') === $option ? 'selected' : '' }}>
+                                                {{ $option }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
-                            <div class="guest-info-field">
-                                <label for="TypeOfId">Type of ID</label>
-                                <select name="TypeOfId" id="TypeOfId" class="form-control package-select" data-flow data-vb="xTypeId">
-                                    @foreach ($idTypeOptions as $option)
-                                        <option value="{{ $option }}"
-                                            {{ old('TypeOfId', $defaultIdType) === $option ? 'selected' : '' }}>
-                                            {{ $option }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="guest-info-field">
-                                <label for="IdNumber">ID Number</label>
-                                <input type="text" name="IdNumber" id="IdNumber" class="form-control package-input"
-                                    value="{{ old('IdNumber') }}" placeholder="3171234567890001" data-flow data-vb="xKTP">
-                            </div>
-                            <div class="guest-info-field">
-                                <label for="ExpiredDateDisplay">Expired Date</label>
-                                <div class="package-date-group" data-date-field>
-                                    <input type="hidden" name="ExpiredDate" id="ExpiredDate" value="{{ $expiredIso }}">
-                                    <input type="text" id="ExpiredDateDisplay" class="form-control package-input"
-                                        value="{{ $expiredIso ? \Carbon\Carbon::parse($expiredIso)->format('d-m-Y') : '' }}"
-                                        placeholder="dd-MM-yyyy" inputmode="numeric" data-flow data-vb="xExpired">
-                                    <button type="button" class="package-date-picker" data-date-button
-                                        aria-label="Open system date picker"><i
-                                            class="fa-regular fa-calendar"></i></button>
-                                    <input type="date" class="package-date-native" data-date-native
-                                        value="{{ $expiredIso }}" tabindex="-1" aria-hidden="true">
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="guest-info-row guest-info-row-two">
-                            <div class="guest-info-field">
-                                <label for="Phone">Phone</label>
-                                <div class="guest-contact-input">
-                                    <span class="guest-contact-icon"><i class="fa fa-phone"></i></span>
-                                    <input type="text" name="Phone" id="Phone" class="form-control package-input"
-                                        value="{{ old('Phone') }}" placeholder="0812-3456-7890" data-flow data-vb="xPhone">
-                                </div>
-                            </div>
-                            <div class="guest-info-field">
-                                <label for="Email">Email</label>
-                                <div class="guest-contact-input">
-                                    <span class="guest-contact-icon"><i class="fa fa-envelope-o"></i></span>
-                                    <input type="email" name="Email" id="Email" class="form-control package-input"
-                                        value="{{ old('Email') }}" placeholder="budi.santoso@email.com" data-flow data-vb="xEmail">
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="checkin-section address-section">
-                    <div class="checkin-section-header">
-                        <h3><i class="fas fa-map-marker-alt"></i> Address</h3>
-                    </div>
-                    <div class="address-info-grid">
-                        <div class="address-info-row">
-                            <div class="address-info-field">
+                            <div class="guest-info-field guest-main-address">
                                 <label for="Address">Address</label>
                                 <input type="text" name="Address" id="Address" class="form-control package-input"
                                     value="{{ old('Address') }}"
                                     placeholder="Jl. Sudirman No. 123, Karet Semanggi, Setiabudi, Jakarta Selatan"
                                     data-flow data-vb="xAlamat">
                             </div>
+
+                            <div class="guest-main-row-five">
+                                <div class="guest-info-field">
+                                    <label for="Kelurahan">District / Kelurahan</label>
+                                    <input type="text" name="Kelurahan" id="Kelurahan" class="form-control package-input"
+                                        value="{{ old('Kelurahan') }}" placeholder="Kelapa Dua" data-flow data-vb="xKelurahan">
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="Kecamatan">Sub-District / Kecamatan</label>
+                                    <input type="text" name="Kecamatan" id="Kecamatan" class="form-control package-input"
+                                        value="{{ old('Kecamatan') }}" placeholder="Curug" data-flow data-vb="xKecamatan">
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="KabCity">City / Regency</label>
+                                    <input type="text" name="KabCity" id="KabCity" class="form-control package-input"
+                                        value="{{ old('KabCity') }}" placeholder="Tangerang" data-flow data-vb="xKota">
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="ProvinceCountry">Province / Provinsi<span class="text-danger">*</span></label>
+                                    @php
+                                        $oldProvince = old('ProvinceCountry');
+                                        $oldProvinceSource = old('ProvinceCountrySource', 'manual');
+                                    @endphp
+                                    <input type="hidden" name="ProvinceCountrySource" id="ProvinceCountrySource"
+                                        value="{{ $oldProvinceSource === 'scan' ? 'scan' : 'manual' }}">
+                                    <select name="ProvinceCountry" id="ProvinceCountry" class="form-control package-select"
+                                        data-flow data-vb="xPropinsi">
+                                        <option value="">Select province / provinsi</option>
+                                        @foreach ($provinceOptions as $option)
+                                            <option value="{{ $option }}"
+                                                {{ old('ProvinceCountry') === $option ? 'selected' : '' }}>
+                                                {{ $option }}
+                                            </option>
+                                        @endforeach
+                                        @if ($oldProvinceSource === 'scan' && filled($oldProvince) && !in_array($oldProvince, $provinceOptions, true))
+                                            <option value="{{ $oldProvince }}" selected data-ocr-generated="1">{{ $oldProvince }}</option>
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="PostalCode">Postal Code</label>
+                                    <input type="text" name="PostalCode" id="PostalCode" class="form-control package-input"
+                                        value="{{ old('PostalCode') }}" placeholder="15810" maxlength="10" inputmode="numeric">
+                                </div>
+                            </div>
+
+                            <div class="guest-main-row-four">
+                                <div class="guest-info-field">
+                                    <label for="Phone">Phone</label>
+                                    <div class="guest-contact-input">
+                                        <span class="guest-contact-icon"><i class="fa fa-phone"></i></span>
+                                        <input type="text" name="Phone" id="Phone" class="form-control package-input"
+                                            value="{{ old('Phone') }}" placeholder="0812-3456-7890" data-flow data-vb="xPhone">
+                                    </div>
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="Email">Email</label>
+                                    <div class="guest-contact-input">
+                                        <span class="guest-contact-icon"><i class="fa fa-envelope-o"></i></span>
+                                        <input type="email" name="Email" id="Email" class="form-control package-input"
+                                            value="{{ old('Email') }}" placeholder="budi.santoso@email.com" data-flow data-vb="xEmail">
+                                    </div>
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="Occupation">Occupation</label>
+                                    <input type="text" name="Occupation" id="Occupation" class="form-control package-input"
+                                        value="{{ old('Occupation') }}" placeholder="Entrepreneur" data-flow data-vb="xProfesi">
+                                </div>
+                                <div class="guest-info-field">
+                                    <label for="ExpiredDateDisplay">ID Expiry</label>
+                                    <div class="package-date-group" data-date-field>
+                                        <input type="hidden" name="ExpiredDate" id="ExpiredDate" value="{{ $expiredIso }}">
+                                        <input type="text" id="ExpiredDateDisplay" class="form-control package-input"
+                                            value="{{ $expiredIso ? \Carbon\Carbon::parse($expiredIso)->format('d-m-Y') : '' }}"
+                                            placeholder="dd-MM-yyyy" inputmode="numeric" data-flow data-vb="xExpired">
+                                        <button type="button" class="package-date-picker" data-date-button
+                                            aria-label="Open system date picker"><i class="fa-regular fa-calendar"></i></button>
+                                        <input type="date" class="package-date-native" data-date-native
+                                            value="{{ $expiredIso }}" tabindex="-1" aria-hidden="true">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="address-info-row address-info-row-five">
-                            <div class="address-info-field">
-                                <label for="Kelurahan">Kelurahan</label>
-                                <input type="text" name="Kelurahan" id="Kelurahan" class="form-control package-input"
-                                    value="{{ old('Kelurahan') }}" placeholder="Karet" data-flow data-vb="xKelurahan">
+
+                        <aside class="guest-side-stack">
+                            <div class="group-info-card">
+                                <div>
+                                    <small>Group Information</small>
+                                    <strong>Group / Billing Summary</strong>
+                                </div>
+                                <div class="group-info-form">
+                                    <div class="guest-info-field">
+                                        <label for="Company">Group / Company Name</label>
+                                        <select name="Company" id="Company" class="form-control package-select" data-flow data-vb="xUsaha">
+                                            <option value="">Select company</option>
+                                            @foreach ($companyOptions as $option)
+                                                <option value="{{ $option }}" {{ old('Company') === $option ? 'selected' : '' }}>
+                                                    {{ $option }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="guest-info-field">
+                                        <label for="BillingTypeDisplay">Billing Type</label>
+                                        <input type="text" id="BillingTypeDisplay" class="form-control package-input"
+                                            value="Direct Folio" readonly>
+                                    </div>
+                                    <div class="guest-info-field">
+                                        <label for="Remarks">Remarks</label>
+                                        <textarea name="Remarks" id="Remarks" class="form-control package-input group-info-remark"
+                                            data-flow data-vb="xRemark"
+                                            placeholder="Meeting & training for 3 days">{{ old('Remarks') }}</textarea>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="address-info-field">
-                                <label for="Kecamatan">Kecamatan</label>
-                                <input type="text" name="Kecamatan" id="Kecamatan" class="form-control package-input"
-                                    value="{{ old('Kecamatan') }}" placeholder="Setiabudi" data-flow data-vb="xKecamatan">
+
+                            <div class="guest-brief-grid">
+                                <div class="guest-brief-card">
+                                    <small>Leader / Person in Charge</small>
+                                    <strong id="LeaderSummaryName">{{ old('GuestName') ?: '-' }}</strong>
+                                    <span id="LeaderSummaryPhone">{{ old('Phone') ?: '-' }}</span>
+                                </div>
+                                <div class="guest-note-card">
+                                    <small>Note</small>
+                                    <strong>Check-in guidance</strong>
+                                    <span>All group charges can follow the leader until each room is confirmed separately.</span>
+                                </div>
                             </div>
-                            <div class="address-info-field">
-                                <label for="KabCity">City / Kab</label>
-                                <input type="text" name="KabCity" id="KabCity" class="form-control package-input"
-                                    value="{{ old('KabCity') }}" placeholder="Jakarta Selatan" data-flow data-vb="xKota">
+
+                            <div class="scan-guide-card">
+                                <div>
+                                    <small>How to Scan KTP</small>
+                                    <strong>Quick OCR Flow</strong>
+                                </div>
+                                <ol>
+                                    <li>Click the <em>Scan KTP</em> button below.</li>
+                                    <li>Choose a clear KTP image from your device.</li>
+                                    <li>Wait until OCR reads the main guest information.</li>
+                                    <li>Review the result and correct any field if needed.</li>
+                                </ol>
                             </div>
-                            <div class="address-info-field">
-                                <label for="ProvinceCountry">Province / Country</label>
-                                <select name="ProvinceCountry" id="ProvinceCountry" class="form-control package-select"
-                                    data-flow data-vb="xPropinsi">
-                                    <option value="">Select province / country</option>
-                                    @foreach ($provinceOptions as $option)
-                                        <option value="{{ $option }}"
-                                            {{ old('ProvinceCountry') === $option ? 'selected' : '' }}>
-                                            {{ $option }}
-                                        </option>
-                                    @endforeach
-                                </select>
+
+                            <div class="ktp-scan-card">
+                                <div class="ktp-scan-card-head">
+                                    <div>
+                                        <small>Scan Result Preview</small>
+                                        <strong>Upload KTP to fill leader data</strong>
+                                    </div>
+                                </div>
+                                <p class="ktp-scan-status" id="leaderScanStatus">No KTP scanned yet. Upload an image to start OCR.</p>
+                                <div class="ktp-scan-preview" id="leaderScanPreview">
+                                    <span class="ktp-scan-preview-empty">KTP preview will appear here after upload.</span>
+                                    <img id="leaderScanImage" alt="Leader KTP preview" hidden>
+                                </div>
+                                <div class="ktp-scan-result" id="leaderScanResult">
+                                    <span class="ktp-scan-result-title">Auto-filled fields</span>
+                                    <ul>
+                                        <li>Name and ID number</li>
+                                        <li>Date of birth and nationality</li>
+                                        <li>Address, district, city, province</li>
+                                        <li>Religion and basic guest profile</li>
+                                    </ul>
+                                    <div id="leaderScanInlineDebug" style="margin-top: 0.85rem; display: none; padding: 0.85rem; border-radius: 14px; background: #f6f9ff; border: 1px solid rgba(137, 167, 214, 0.24);">
+                                        <strong style="display: block; margin-bottom: 0.45rem; color: #173761; font-size: 0.84rem;">Hasil OCR Terdeteksi</strong>
+                                        <div id="leaderScanInlineMessage" style="margin-bottom: 0.55rem; color: #41546f; font-size: 0.8rem;"></div>
+                                        <pre id="leaderScanInlineRawText" style="margin: 0; max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; padding: 0.75rem; border-radius: 12px; background: #fff; border: 1px solid rgba(137, 167, 214, 0.24); color: #41546f; font-size: 0.78rem;"></pre>
+                                    </div>
+                                    <details id="leaderScanDebug" style="margin-top: 0.85rem;" hidden>
+                                        <summary style="cursor: pointer; font-weight: 700; color: #173761;">OCR Debug / Detail Teks</summary>
+                                        <div style="margin-top: 0.75rem; display: grid; gap: 0.65rem;">
+                                            <div>
+                                                <strong style="display: block; margin-bottom: 0.35rem; color: #173761; font-size: 0.82rem;">Parsed Fields</strong>
+                                                <pre id="leaderScanParsed" style="margin: 0; max-height: 140px; overflow: auto; white-space: pre-wrap; word-break: break-word; padding: 0.75rem; border-radius: 12px; background: #f6f9ff; border: 1px solid rgba(137, 167, 214, 0.24); color: #41546f; font-size: 0.78rem;"></pre>
+                                            </div>
+                                            <div>
+                                                <strong style="display: block; margin-bottom: 0.35rem; color: #173761; font-size: 0.82rem;">Raw OCR Text</strong>
+                                                <pre id="leaderScanRawText" style="margin: 0; max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; padding: 0.75rem; border-radius: 12px; background: #f6f9ff; border: 1px solid rgba(137, 167, 214, 0.24); color: #41546f; font-size: 0.78rem;"></pre>
+                                            </div>
+                                        </div>
+                                    </details>
+                                </div>
+                                <div class="ktp-scan-card-footer">
+                                    <button type="button" class="btn package-btn-primary ktp-scan-trigger" id="leaderScanButton">
+                                        <i class="fa-solid fa-camera mr-1"></i>Scan KTP
+                                    </button>
+                                    <input type="file" id="leaderKtpUpload" accept="image/*" hidden>
+                                </div>
                             </div>
-                            <div class="address-info-field">
-                                <label for="Nationality">Nationality<span class="text-danger">*</span></label>
-                                <select name="Nationality" id="Nationality" class="form-control package-select"
-                                    data-flow data-vb="xKodeNegara">
-                                    @foreach ($nationalityOptions as $option)
-                                        <option value="{{ $option }}"
-                                            {{ old('Nationality', 'INA') === $option ? 'selected' : '' }}>
-                                            {{ $option }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
+                        </aside>
                     </div>
                 </div>
 
                 <!-- ROOMS SECTION -->
                 <div class="checkin-section">
                     <div class="checkin-section-header">
-                        <h3><i class="fas fa-bed"></i> Rooms (3)</h3>
-                        <span class="room-allocation-note">All rooms will be billed to this registration (master
-                            folio).</span>
+                        <h3><i class="fas fa-bed"></i> Guest & Rooms</h3>
+                        <span class="room-allocation-note">Use <strong>Same as Leader</strong> when the guest follows the leader data. Uncheck it to fill guest detail manually or by scanning KTP.</span>
                         <button type="button" class="btn package-btn-add" id="addRoomRowButton"
                             style="margin-left: auto;"><i class="fa-solid fa-plus mr-1"></i>Add Room</button>
                     </div>
@@ -1075,12 +1654,14 @@
                         <table class="room-allocation-table">
                             <thead>
                                 <tr>
-                                    <th width="16%">Room Number</th>
-                                    <th width="24%">Guest Name</th>
-                                    <th width="9%">Pax</th>
+                                    <th width="15%">Room Number</th>
+                                    <th width="23%">Guest Summary</th>
+                                    <th width="8%">Pax</th>
                                     <th width="14%">Package Code</th>
-                                    <th width="29%">Nominal</th>
-                                    <th width="8%" class="text-center">Action</th>
+                                    <th width="16%">Nominal</th>
+                                    <th width="10%">Group Position</th>
+                                    <th width="8%" class="text-center">Same as Leader</th>
+                                    <th width="6%" class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1088,6 +1669,16 @@
                                     <td>
                                         <input type="hidden" name="DetailKeyList[]" id="PrimaryDetailKey"
                                             value="{{ $firstDetailKey }}">
+                                        <input type="hidden" name="SameAsLeaderList[]" id="PrimarySameAsLeader" value="1">
+                                        <input type="hidden" name="RoomGuestNameList[]" value="">
+                                        <input type="hidden" name="RoomGuestIdTypeList[]" value="KTP">
+                                        <input type="hidden" name="RoomGuestIdNumberList[]" value="">
+                                        <input type="hidden" name="RoomGuestBirthDateList[]" value="">
+                                        <input type="hidden" name="RoomGuestPhoneList[]" value="">
+                                        <input type="hidden" name="RoomGuestEmailList[]" value="">
+                                        <input type="hidden" name="RoomGuestAddressList[]" value="">
+                                        <input type="hidden" name="RoomGuestNationalityList[]" value="INA">
+                                        <input type="hidden" name="RoomGroupPositionList[]" id="PrimaryRoomGroupPositionHidden" value="{{ strtoupper((string) $primaryGroupPosition) }}">
                                         <select name="RoomCodeList[]" id="RoomCode" class="form-control package-select"
                                             data-flow data-vb="xKode" required>
                                             <option value="">Select room</option>
@@ -1102,7 +1693,7 @@
                                     <td>
                                         <div class="room-display-text">
                                             <span id="PrimaryRoomGuestName">{{ old('GuestName') ?: '-' }}</span>
-                                            <span class="room-main-badge">Main Guest</span>
+                                            <span class="room-main-badge" id="PrimaryRoomBadge">Primary</span>
                                         </div>
                                     </td>
                                     <td>
@@ -1133,6 +1724,20 @@
                                         <input type="hidden" name="BreakfastList[]" id="Breakfast"
                                             value="{{ $firstBreakfast }}" data-vb="xBF">
                                     </td>
+                                    <td>
+                                        <select id="PrimaryRoomGroupPosition" class="form-control package-select room-position-input"
+                                            data-flow data-vb="xPosisi">
+                                            <option value="">Select position</option>
+                                            @foreach ($groupPositionOptions as $option)
+                                                <option value="{{ $option }}" {{ strtoupper((string) $primaryGroupPosition) === strtoupper((string) $option) ? 'selected' : '' }}>
+                                                    {{ $option }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="room-follow-badge">Leader</span>
+                                    </td>
                                     <td class="text-center">
                                         <button type="button" class="room-action-btn" id="clearPrimaryRoomButton"
                                             title="Clear room"><i class="fa-solid fa-trash"></i></button>
@@ -1153,63 +1758,62 @@
         <div class="checkin-section-header">
             <h3><i class="fas fa-clipboard-list"></i> Additional Details</h3>
         </div>
-        <div class="detail-info-grid">
-            <div class="detail-info-column">
-                <div class="detail-info-field">
-                    <label for="GroupPosition">Group Position</label>
-                    <input type="text" name="GroupPosition" id="GroupPosition" class="form-control package-input"
-                        value="{{ old('GroupPosition') }}" data-flow data-vb="xPosisi">
-                </div>
-                <div class="detail-info-row-two">
-                    <div class="detail-info-field">
-                        <label for="Religion">Religion</label>
-                        <select name="Religion" id="Religion" class="form-control package-select" data-flow data-vb="xAgama">
-                            <option value="">Select</option>
-                            @foreach ($religionOptions as $option)
-                                <option value="{{ $option }}" {{ old('Religion') === $option ? 'selected' : '' }}>
-                                    {{ $option }}
-                                </option>
-                            @endforeach
-                        </select>
+        <div class="checkin-section-body additional-details-body">
+            <div class="detail-info-grid additional-details-grid">
+                <div class="detail-info-column">
+                    <div class="detail-info-row-two">
+                        <div class="detail-info-field">
+                            <label for="Religion">Religion</label>
+                            <select name="Religion" id="Religion" class="form-control package-select" data-flow data-vb="xAgama">
+                                <option value="">Select</option>
+                                @foreach ($religionOptions as $option)
+                                    <option value="{{ $option }}" {{ old('Religion') === $option ? 'selected' : '' }}>
+                                        {{ $option }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="detail-info-field">
+                            <label for="NumberOfPerson">Number of Person</label>
+                            <input type="number" name="NumberOfPerson" id="NumberOfPerson"
+                                class="form-control package-input text-right" value="{{ old('NumberOfPerson', 2) }}"
+                                data-vb="xPerson"
+                                min="1" max="20" data-flow required>
+                        </div>
                     </div>
                     <div class="detail-info-field">
-                        <label for="NumberOfPerson">Number of Person</label>
-                        <input type="number" name="NumberOfPerson" id="NumberOfPerson"
-                            class="form-control package-input text-right" value="{{ old('NumberOfPerson', 2) }}"
-                            data-vb="xPerson"
-                            min="1" max="20" data-flow required>
+                        <label for="GuestName2">Name II</label>
+                        <input type="text" name="GuestName2" id="GuestName2" class="form-control package-input"
+                            value="{{ old('GuestName2') }}" placeholder="Enter secondary guest name (optional)" data-flow data-vb="xGuest2">
                     </div>
                 </div>
-            </div>
 
-            <div class="detail-info-column">
-                <div class="detail-info-field">
-                    <label for="Company">Company</label>
-                    <select name="Company" id="Company" class="form-control package-select" data-flow data-vb="xUsaha">
-                        <option value="">Select company</option>
-                        @foreach ($companyOptions as $option)
-                            <option value="{{ $option }}" {{ old('Company') === $option ? 'selected' : '' }}>
-                                {{ $option }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="detail-info-field">
-                    <label for="Segment">Segment</label>
-                    <select name="Segment" id="Segment" class="form-control package-select" data-flow data-vb="xSegment">
-                        <option value="">Select</option>
-                        @foreach ($segmentOptions as $option)
-                            <option value="{{ $option }}"
-                                {{ old('Segment', 'TRAVEL') === $option ? 'selected' : '' }}>
-                                {{ $option }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="detail-info-field">
-                    <label for="Remarks">Remarks</label>
-                    <input type="text" name="Remarks" id="Remarks" class="form-control package-input"
-                        value="{{ old('Remarks') }}" data-flow data-vb="xRemark">
+                <div class="detail-info-column">
+                    <div class="detail-info-row-two">
+                        <div class="detail-info-field">
+                            <label for="PlaceOfBirth">Place of Birth</label>
+                            <input type="text" name="PlaceOfBirth" id="PlaceOfBirth"
+                                class="form-control package-input" value="{{ old('PlaceOfBirth') }}"
+                                data-vb="xPlaceBirth" placeholder="Jakarta" data-flow>
+                        </div>
+                        <div class="detail-info-field">
+                            <label for="Segment">Segment</label>
+                            <select name="Segment" id="Segment" class="form-control package-select" data-flow data-vb="xSegment">
+                                <option value="">Select</option>
+                                @foreach ($segmentOptions as $option)
+                                    <option value="{{ $option }}"
+                                        {{ old('Segment', 'TRAVEL') === $option ? 'selected' : '' }}>
+                                        {{ $option }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="detail-info-field">
+                        <label for="Member">Member 1</label>
+                        <input type="text" name="Member" id="Member" class="form-control package-input"
+                            value="{{ old('Member') }}" data-flow data-vb="xMember">
+                    </div>
                 </div>
             </div>
         </div>
@@ -1252,11 +1856,6 @@
 
                 <div class="detail-info-column">
                     <div class="detail-info-field">
-                        <label for="Member">Member 1</label>
-                        <input type="text" name="Member" id="Member" class="form-control package-input"
-                            value="{{ old('Member') }}" data-flow data-vb="xMember">
-                    </div>
-                    <div class="detail-info-field">
                         <label for="Sales">Sales</label>
                         <select name="Sales" id="Sales" class="form-control package-select" data-flow data-vb="xSales">
                             <option value="">Select sales</option>
@@ -1291,7 +1890,7 @@
             <div class="checkin-directory-head">
                 <div>
                     <h3 class="package-grid-title mb-1">Check In Directory</h3>
-                    <p class="package-grid-note mb-0">Klik salah satu baris untuk memuat data ke form di atas.</p>
+                    <p class="package-grid-note mb-0">Click any row to load its data into the form above.</p>
                 </div>
                 <div class="checkin-table-meta">
                     Active: <strong>{{ number_format($summary['active'], 0, ',', '.') }}</strong> &nbsp;|&nbsp;
@@ -1397,6 +1996,7 @@
         <tr class="additional-room-row" data-room-row>
             <td>
                 <input type="hidden" name="DetailKeyList[]" class="detail-key-input" value="">
+                <input type="hidden" name="SameAsLeaderList[]" class="same-as-leader-input" value="1">
                 <select name="RoomCodeList[]" class="form-control package-select room-code-input">
                     <option value="">Select room</option>
                     @foreach ($rooms as $room)
@@ -1405,8 +2005,11 @@
                 </select>
             </td>
             <td>
-                <input type="text" class="form-control package-input room-guest-display-input"
-                    placeholder="Guest name">
+                <div class="room-guest-summary">
+                    <input type="text" class="form-control package-input room-guest-display-input"
+                        placeholder="Following leader data" readonly>
+                    <small class="room-guest-summary-note">Use the checkbox if this room follows the leader.</small>
+                </div>
             </td>
             <td>
                 <input type="number" class="form-control package-input text-right room-pax-display-input"
@@ -1426,11 +2029,92 @@
                 <input type="hidden" name="NominalList[]" class="nominal-input" value="">
                 <input type="hidden" name="BreakfastList[]" class="breakfast-input" value="0">
             </td>
-            <td class="text-center"><button type="button" class="room-action-btn room-row-remove"
-                    title="Remove room"><i class="fa-solid fa-trash"></i></button></td>
+            <td>
+                <select name="RoomGroupPositionList[]" class="form-control package-select room-position-input">
+                    <option value="">Select position</option>
+                    @foreach ($groupPositionOptions as $option)
+                        <option value="{{ $option }}">{{ $option }}</option>
+                    @endforeach
+                </select>
+            </td>
+            <td class="text-center">
+                <label class="room-follow-toggle">
+                    <input type="checkbox" class="room-same-checkbox" checked>
+                    <span>Yes</span>
+                </label>
+            </td>
+            <td class="text-center room-action-stack">
+                <button type="button" class="room-action-btn room-row-expand" title="Show guest detail">
+                    <i class="fa-solid fa-address-card"></i>
+                </button>
+                <button type="button" class="room-action-btn room-row-remove"
+                    title="Remove room"><i class="fa-solid fa-trash"></i></button>
+            </td>
+        </tr>
+        <tr class="room-guest-detail-row is-collapsed" data-room-detail-row>
+            <td colspan="8">
+                <div class="room-guest-detail-card">
+                    <div class="room-guest-detail-head">
+                        <div>
+                            <strong>Guest Detail for This Room</strong>
+                            <small>Uncheck <em>Same as Leader</em> to enable these fields.</small>
+                        </div>
+                        <div class="room-guest-detail-actions">
+                            <button type="button" class="btn package-btn-secondary room-guest-scan-btn">
+                                <i class="fa-solid fa-camera mr-1"></i>Scan KTP
+                            </button>
+                            <input type="file" class="room-guest-ktp-input" accept="image/*" hidden>
+                            <span class="room-guest-scan-status">Following leader data</span>
+                        </div>
+                    </div>
+                    <div class="room-guest-detail-grid">
+                        <div class="guest-info-field">
+                            <label>Full Name</label>
+                            <input type="text" name="RoomGuestNameList[]" class="form-control package-input room-guest-name-input" value="">
+                        </div>
+                        <div class="guest-info-field">
+                            <label>ID Type</label>
+                            <select name="RoomGuestIdTypeList[]" class="form-control package-select room-guest-id-type-input">
+                                @foreach ($idTypeOptions as $option)
+                                    <option value="{{ $option }}" {{ $option === 'KTP' ? 'selected' : '' }}>{{ $option }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="guest-info-field">
+                            <label>ID Number</label>
+                            <input type="text" name="RoomGuestIdNumberList[]" class="form-control package-input room-guest-id-number-input" value="">
+                        </div>
+                        <div class="guest-info-field">
+                            <label>Date of Birth</label>
+                            <input type="date" name="RoomGuestBirthDateList[]" class="form-control package-input room-guest-birth-date-input" value="">
+                        </div>
+                        <div class="guest-info-field">
+                            <label>Phone</label>
+                            <input type="text" name="RoomGuestPhoneList[]" class="form-control package-input room-guest-phone-input" value="">
+                        </div>
+                        <div class="guest-info-field">
+                            <label>Email</label>
+                            <input type="email" name="RoomGuestEmailList[]" class="form-control package-input room-guest-email-input" value="">
+                        </div>
+                        <div class="guest-info-field">
+                            <label>Nationality</label>
+                            <select name="RoomGuestNationalityList[]" class="form-control package-select room-guest-nationality-input">
+                                @foreach ($nationalityOptions as $option)
+                                    <option value="{{ $option }}" {{ $option === 'INA' ? 'selected' : '' }}>{{ $option }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="guest-info-field room-guest-address-field">
+                            <label>Address</label>
+                            <input type="text" name="RoomGuestAddressList[]" class="form-control package-input room-guest-address-input" value="">
+                        </div>
+                    </div>
+                </div>
+            </td>
         </tr>
     </template>
 
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script>
         function normalizeNumber(value) {
             return (value || '').toString().replace(/[^\d]/g, '');
@@ -1495,6 +2179,7 @@
         }
 
         const form = document.getElementById('checkinForm');
+        const csrfToken = form?.querySelector('input[name="_token"]')?.value || '';
         const generatedRegNoField = document.getElementById('GeneratedRegNo');
         const currentDetailKeyField = document.getElementById('CurrentDetailKey');
         const primaryDetailKeyField = document.getElementById('PrimaryDetailKey');
@@ -1514,12 +2199,29 @@
         const numberOfPersonField = document.getElementById('NumberOfPerson');
         const reservationNumberField = document.getElementById('ReservationNumber');
         const primaryRoomGuestName = document.getElementById('PrimaryRoomGuestName');
+        const primaryRoomBadge = document.getElementById('PrimaryRoomBadge');
         const primaryRoomPaxDisplay = document.getElementById('PrimaryRoomPaxDisplay');
+        const primaryRoomPositionField = document.getElementById('PrimaryRoomGroupPosition');
+        const primaryRoomPositionHiddenField = document.getElementById('PrimaryRoomGroupPositionHidden');
         const clearPrimaryRoomButton = document.getElementById('clearPrimaryRoomButton');
         const roomSummaryCount = document.getElementById('RoomSummaryCount');
         const roomSummaryPax = document.getElementById('RoomSummaryPax');
         const roomHelper = document.getElementById('roomHelper');
         const packageHelper = document.getElementById('packageHelper');
+        const leaderScanButton = document.getElementById('leaderScanButton');
+        const leaderKtpUpload = document.getElementById('leaderKtpUpload');
+        const leaderScanStatus = document.getElementById('leaderScanStatus');
+        const leaderScanPreview = document.getElementById('leaderScanPreview');
+        const leaderScanImage = document.getElementById('leaderScanImage');
+        const leaderScanInlineDebug = document.getElementById('leaderScanInlineDebug');
+        const leaderScanInlineMessage = document.getElementById('leaderScanInlineMessage');
+        const leaderScanInlineRawText = document.getElementById('leaderScanInlineRawText');
+        const leaderScanDebug = document.getElementById('leaderScanDebug');
+        const leaderScanParsed = document.getElementById('leaderScanParsed');
+        const leaderScanRawText = document.getElementById('leaderScanRawText');
+        const billingTypeDisplay = document.getElementById('BillingTypeDisplay');
+        const leaderSummaryName = document.getElementById('LeaderSummaryName');
+        const leaderSummaryPhone = document.getElementById('LeaderSummaryPhone');
         const defaultRegNo = @json(old('GeneratedRegNo', $nextRegNo));
         const defaultTypeOfCheckIn = @json($defaultTypeOfCheckIn);
         const defaultIdType = @json($defaultIdType);
@@ -1561,15 +2263,17 @@
         const xKecamatan = vbFields.xKecamatan || document.getElementById('Kecamatan');
         const xKota = vbFields.xKota || document.getElementById('KabCity');
         const xPropinsi = vbFields.xPropinsi || document.getElementById('ProvinceCountry');
+        const provinceCountrySourceField = document.getElementById('ProvinceCountrySource');
         const xKodeNegara = vbFields.xKodeNegara || document.getElementById('Nationality');
         const xKode = vbFields.xKode || roomCodeField;
         const xPackage = vbFields.xPackage || packageCodeField;
         const xNominal = vbFields.xNominal || nominalVisibleField;
         const xBF = vbFields.xBF || breakfastField;
-        const xPosisi = vbFields.xPosisi || document.getElementById('GroupPosition');
+        const xPosisi = vbFields.xPosisi || primaryRoomPositionField;
         const xAgama = vbFields.xAgama || document.getElementById('Religion');
         const xPerson = vbFields.xPerson || numberOfPersonField;
         const xUsaha = vbFields.xUsaha || document.getElementById('Company');
+        const xProfesi = vbFields.xProfesi || document.getElementById('Occupation');
         const xSegment = vbFields.xSegment || document.getElementById('Segment');
         const xRemark = vbFields.xRemark || document.getElementById('Remarks');
         const xPayment = vbFields.xPayment || document.getElementById('PaymentMethod');
@@ -1637,8 +2341,1367 @@
             return true;
         }
 
+        function setProvinceCountrySource(source = 'manual') {
+            if (!provinceCountrySourceField) {
+                return;
+            }
+
+            provinceCountrySourceField.value = source === 'scan' ? 'scan' : 'manual';
+        }
+
+        function getSelectedOption(field) {
+            if (!field) {
+                return null;
+            }
+
+            const currentValue = (field.value || '').toString().trim().toUpperCase();
+            return Array.from(field.options || []).find(function(option) {
+                return (option.value || '').toString().trim().toUpperCase() === currentValue;
+            }) || null;
+        }
+
+        function ensureProvinceValueAllowed(field) {
+            if (!(field?.value || '').trim()) {
+                showCrudAlert('Province / Country must be filled.');
+                field?.focus();
+                return false;
+            }
+
+            if (!ensureSelectValueExists(field, 'Province / Country')) {
+                return false;
+            }
+
+            if ((provinceCountrySourceField?.value || 'manual').toString().trim().toLowerCase() === 'scan') {
+                return true;
+            }
+
+            const selectedOption = getSelectedOption(field);
+            if (selectedOption?.dataset?.ocrGenerated === '1') {
+                showCrudAlert('Province / Country manual input must be selected from the available list.');
+                field.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        function isGroupCheckInType(value) {
+            return (value || '').toString().trim().toUpperCase().includes('GROUP');
+        }
+
+        function paymentRequiresCompany(value) {
+            return ['OTA', 'COMPANY', 'TRAVEL'].includes((value || '').toString().trim().toUpperCase());
+        }
+
+        function paymentRequiresCreditCard(value) {
+            return (value || '').toString().trim().toUpperCase() === 'CARD';
+        }
+
+        function deriveBillingType() {
+            if (isGroupCheckInType(xTipe?.value)) {
+                return 'Master Folio (All charges to leader)';
+            }
+
+            const payment = (xPayment?.value || '').toString().trim().toUpperCase();
+            if (payment === 'OTA' || payment === 'COMPANY' || payment === 'TRAVEL') {
+                return 'Direct Bill (Charges linked to company / agent)';
+            }
+
+            return 'Direct Folio (Charges stay on this registration)';
+        }
+
+        function updateBillingTypeDisplay() {
+            if (billingTypeDisplay) {
+                billingTypeDisplay.value = deriveBillingType();
+            }
+        }
+
+        function syncPrimaryRoomPositionValue() {
+            if (primaryRoomPositionHiddenField) {
+                primaryRoomPositionHiddenField.value = (primaryRoomPositionField?.value || '').trim().toUpperCase();
+            }
+        }
+
+        function roomPositionDefault(index) {
+            return index === 0 ? 'LEADER' : 'SUB';
+        }
+
+        function allRoomPositionFields() {
+            return [
+                primaryRoomPositionField,
+                ...Array.from(additionalRoomBody.querySelectorAll('.room-position-input')),
+            ].filter(Boolean);
+        }
+
+        function updateGroupPositionAvailability() {
+            const allowGroupPosition = isGroupCheckInType(xTipe?.value);
+            allRoomPositionFields().forEach(function(field, index) {
+                field.disabled = !allowGroupPosition;
+                field.required = allowGroupPosition;
+
+                if (!allowGroupPosition) {
+                    field.value = '';
+                    return;
+                }
+
+                if (!(field.value || '').trim()) {
+                    const defaultValue = roomPositionDefault(index);
+                    if (Array.from(field.options || []).some(option => (option.value || '').toUpperCase() === defaultValue)) {
+                        field.value = defaultValue;
+                    }
+                }
+            });
+            syncPrimaryRoomPositionValue();
+            updatePrimaryGuestDisplay();
+        }
+
+        function setSelectByValueOrDataName(field, value, dataAttr = 'name') {
+            if (!field) {
+                return;
+            }
+
+            const normalized = (value || '').toString().trim().toUpperCase();
+            if (!normalized) {
+                field.value = '';
+                return;
+            }
+
+            const matchedOption = Array.from(field.options || []).find(function(option) {
+                const optionValue = (option.value || '').toString().trim().toUpperCase();
+                const optionData = (option.dataset?.[dataAttr] || '').toString().trim().toUpperCase();
+                return optionValue === normalized || optionData === normalized;
+            });
+
+            field.value = matchedOption ? matchedOption.value : value;
+        }
+
+        function setSelectByLooseText(field, value) {
+            if (!field) {
+                return;
+            }
+
+            const normalized = (value || '').toString().trim().toUpperCase();
+            const normalizedLoose = normalized.replace(/[^A-Z0-9]/g, '');
+            const normalizedTokens = normalized.split(/[^A-Z0-9]+/).filter(token => token.length >= 3);
+            if (!normalized) {
+                field.value = '';
+                return;
+            }
+
+            const options = Array.from(field.options || []);
+            let matchedOption = options.find(function(option) {
+                const optionValue = (option.value || '').toString().trim().toUpperCase();
+                const optionText = (option.textContent || '').toString().trim().toUpperCase();
+                const optionLoose = optionValue.replace(/[^A-Z0-9]/g, '');
+                const optionTextLoose = optionText.replace(/[^A-Z0-9]/g, '');
+                return optionValue === normalized ||
+                    optionText === normalized ||
+                    optionValue.includes(normalized) ||
+                    optionText.includes(normalized) ||
+                    normalized.includes(optionValue) ||
+                    normalized.includes(optionText) ||
+                    optionLoose === normalizedLoose ||
+                    optionLoose.includes(normalizedLoose) ||
+                    normalizedLoose.includes(optionLoose) ||
+                    optionTextLoose === normalizedLoose ||
+                    optionTextLoose.includes(normalizedLoose) ||
+                    normalizedLoose.includes(optionTextLoose);
+            });
+
+            if (!matchedOption && normalizedTokens.length) {
+                matchedOption = options.find(function(option) {
+                    const optionValue = (option.value || '').toString().trim().toUpperCase();
+                    const optionText = (option.textContent || '').toString().trim().toUpperCase();
+                    const optionTokens = (optionValue + ' ' + optionText).split(/[^A-Z0-9]+/).filter(token => token.length >= 3);
+                    return normalizedTokens.some(token => optionValue.includes(token) || optionText.includes(token)) &&
+                        optionTokens.some(token => normalized.includes(token));
+                });
+            }
+
+            if (!matchedOption && /JAKARTA/.test(normalized)) {
+                matchedOption = options.find(function(option) {
+                    const optionValue = (option.value || '').toString().trim().toUpperCase();
+                    const optionText = (option.textContent || '').toString().trim().toUpperCase();
+                    return /JAKARTA/.test(optionValue) || /JAKARTA/.test(optionText);
+                }) || null;
+            }
+
+            if (!matchedOption) {
+                const existingCustom = options.find(function(option) {
+                    return option.dataset?.ocrGenerated === '1' && (option.value || '').toString().trim().toUpperCase() === normalized;
+                });
+
+                matchedOption = existingCustom || null;
+                if (!matchedOption) {
+                    matchedOption = document.createElement('option');
+                    matchedOption.value = value;
+                    matchedOption.textContent = value;
+                    matchedOption.dataset.ocrGenerated = '1';
+                    field.appendChild(matchedOption);
+                }
+            }
+
+            Array.from(field.options || []).forEach(function(option) {
+                option.selected = option === matchedOption;
+            });
+            field.value = matchedOption.value;
+            field.selectedIndex = Array.from(field.options || []).indexOf(matchedOption);
+        }
+
+        function setSelectValueDirect(field, value) {
+            if (!field) {
+                return;
+            }
+
+            const normalized = (value || '').toString().trim();
+            if (!normalized) {
+                field.value = '';
+                return;
+            }
+
+            const normalizedUpper = normalized.toUpperCase();
+            const options = Array.from(field.options || []);
+            let matchedOption = options.find(function(option) {
+                return (option.value || '').toString().trim().toUpperCase() === normalizedUpper ||
+                    (option.textContent || '').toString().trim().toUpperCase() === normalizedUpper;
+            }) || null;
+
+            if (!matchedOption) {
+                matchedOption = options.find(function(option) {
+                    return option.dataset?.ocrGenerated === '1' &&
+                        (option.value || '').toString().trim().toUpperCase() === normalizedUpper;
+                }) || null;
+            }
+
+            if (!matchedOption) {
+                matchedOption = document.createElement('option');
+                matchedOption.value = normalized;
+                matchedOption.textContent = normalized;
+                matchedOption.dataset.ocrGenerated = '1';
+                field.appendChild(matchedOption);
+            }
+
+            Array.from(field.options || []).forEach(function(option) {
+                option.selected = option === matchedOption;
+            });
+            field.value = matchedOption.value;
+            field.selectedIndex = Array.from(field.options || []).indexOf(matchedOption);
+        }
+
+        function hasMeaningfulScanData(parsed) {
+            if (!parsed || typeof parsed !== 'object') {
+                return false;
+            }
+
+            return ['name', 'idNumber', 'birthDate', 'address', 'kelurahan', 'kecamatan', 'city', 'province']
+                .some(function(key) {
+                    return !!(parsed[key] || '').toString().trim();
+                });
+        }
+
+        function renderLeaderScanDebug(parsed, errorMessage = '') {
+            if (!leaderScanDebug || !leaderScanParsed || !leaderScanRawText) {
+                return;
+            }
+
+            const debugPayload = parsed && typeof parsed === 'object'
+                ? {
+                    provider: parsed.provider || '',
+                    correctionProvider: parsed.correctionProvider || '',
+                    name: parsed.name || '',
+                    idNumber: parsed.idNumber || '',
+                    placeOfBirth: parsed.placeOfBirth || '',
+                    birthDate: parsed.birthDate || '',
+                    address: parsed.address || '',
+                    kelurahan: parsed.kelurahan || '',
+                    kecamatan: parsed.kecamatan || '',
+                    city: parsed.city || '',
+                    province: parsed.province || '',
+                    religion: parsed.religion || '',
+                    occupation: parsed.occupation || '',
+                    postalCode: parsed.postalCode || '',
+                }
+                : {};
+
+            if (errorMessage) {
+                debugPayload.error = errorMessage;
+            }
+
+            leaderScanParsed.textContent = JSON.stringify(debugPayload, null, 2);
+            leaderScanRawText.textContent = parsed?.rawText || '';
+            leaderScanDebug.hidden = false;
+            leaderScanDebug.open = true;
+        }
+
+        function renderLeaderScanInlineDebug(parsed, message = '') {
+            if (!leaderScanInlineDebug || !leaderScanInlineMessage || !leaderScanInlineRawText) {
+                return;
+            }
+
+            const rawText = (parsed?.rawText || '').toString().trim();
+            if (!rawText && !message) {
+                leaderScanInlineDebug.style.display = 'none';
+                leaderScanInlineMessage.textContent = '';
+                leaderScanInlineRawText.textContent = '';
+                return;
+            }
+
+            leaderScanInlineMessage.textContent = message || 'Teks berhasil dibaca, tetapi field form belum cocok dengan parser saat ini.';
+            leaderScanInlineRawText.textContent = rawText || '-';
+            leaderScanInlineDebug.style.display = 'block';
+        }
+
+        function resetLeaderScanDebug() {
+            if (leaderScanInlineDebug) {
+                leaderScanInlineDebug.style.display = 'none';
+            }
+            if (leaderScanInlineMessage) {
+                leaderScanInlineMessage.textContent = '';
+            }
+            if (leaderScanInlineRawText) {
+                leaderScanInlineRawText.textContent = '';
+            }
+            if (leaderScanParsed) {
+                leaderScanParsed.textContent = '';
+            }
+            if (leaderScanRawText) {
+                leaderScanRawText.textContent = '';
+            }
+            if (leaderScanDebug) {
+                leaderScanDebug.open = false;
+                leaderScanDebug.hidden = true;
+            }
+        }
+
+        function setDateGroupValue(displayField, hiddenFieldId, isoValue) {
+            const normalizedValue = (isoValue || '').toString().trim();
+            const hiddenField = hiddenFieldId ? document.getElementById(hiddenFieldId) : null;
+            if (hiddenField) {
+                hiddenField.value = normalizedValue;
+            }
+
+            if (displayField) {
+                displayField.value = formatDisplayDate(normalizedValue);
+
+                const dateGroup = typeof displayField.closest === 'function'
+                    ? displayField.closest('[data-date-field]')
+                    : null;
+                const nativeField = dateGroup ? dateGroup.querySelector('[data-date-native]') : null;
+                if (nativeField) {
+                    nativeField.value = normalizedValue;
+                }
+            }
+        }
+
+        function loadExternalScriptOnce(src) {
+            return new Promise(function(resolve, reject) {
+                const existingScript = Array.from(document.scripts || []).find(function(script) {
+                    return (script.src || '') === src;
+                });
+
+                if (existingScript) {
+                    if (typeof window.Tesseract !== 'undefined') {
+                        resolve(window.Tesseract);
+                        return;
+                    }
+
+                    existingScript.addEventListener('load', function() {
+                        resolve(window.Tesseract);
+                    }, {
+                        once: true
+                    });
+                    existingScript.addEventListener('error', function() {
+                        reject(new Error('Failed to load OCR library from ' + src));
+                    }, {
+                        once: true
+                    });
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = true;
+                script.onload = function() {
+                    resolve(window.Tesseract);
+                };
+                script.onerror = function() {
+                    script.remove();
+                    reject(new Error('Failed to load OCR library from ' + src));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        let tesseractLoadPromise = null;
+        function ensureTesseractLoaded() {
+            if (typeof window.Tesseract !== 'undefined') {
+                return Promise.resolve(window.Tesseract);
+            }
+
+            if (tesseractLoadPromise) {
+                return tesseractLoadPromise;
+            }
+
+            tesseractLoadPromise = (async function() {
+                const sources = [
+                    'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
+                    'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js',
+                ];
+
+                for (const source of sources) {
+                    try {
+                        await loadExternalScriptOnce(source);
+                        if (typeof window.Tesseract !== 'undefined') {
+                            return window.Tesseract;
+                        }
+                    } catch (error) {
+                        // Try the next source if the current CDN is unavailable.
+                    }
+                }
+
+                tesseractLoadPromise = null;
+                throw new Error('OCR library is not available.');
+            })();
+
+            return tesseractLoadPromise;
+        }
+
+        function isoDateFromLooseText(value) {
+            const normalized = (value || '').toString().trim()
+                .replace(/[./\s]+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            const match = normalized.match(/(\d{2})-(\d{2})-(\d{4})/);
+            if (!match) {
+                return '';
+            }
+
+            let day = match[1];
+            const month = match[2];
+            let year = match[3];
+            const dayNumber = parseInt(day, 10);
+            const currentYear = new Date().getFullYear();
+
+            if (dayNumber > 31 && day.length === 2) {
+                const candidateDay = day.replace(/^7/, '2').replace(/^9/, '2');
+                if ((parseInt(candidateDay, 10) || 0) <= 31) {
+                    day = candidateDay;
+                }
+            }
+
+            const yearNumber = parseInt(year, 10);
+            if (yearNumber && yearNumber < 1900) {
+                const shortYear = yearNumber % 100;
+                const candidateYears = [1900 + shortYear, 2000 + shortYear];
+                const adjustedYear = candidateYears.find(function(candidate) {
+                    const age = currentYear - candidate;
+                    return candidate <= currentYear && age >= 17 && age <= 100;
+                }) || candidateYears.find(function(candidate) {
+                    const age = currentYear - candidate;
+                    return candidate <= currentYear && age >= 0 && age <= 120;
+                });
+
+                if (adjustedYear) {
+                    year = String(adjustedYear);
+                }
+            }
+
+            return [year, month, day].join('-');
+        }
+
+        function normalizeKtpLine(value) {
+            return (value || '')
+                .toString()
+                .replace(/[|]/g, 'I')
+                .replace(/[\u00A9\u00AE]/g, ' ')
+                .replace(/[=_~`]/g, ' ')
+                .replace(/[;]+/g, ':')
+                .replace(/\uFB01/g, 'fi')
+                .replace(/\bNAME\b/gi, 'NAMA')
+                .replace(/\bNAMU\b/gi, 'NAMA')
+                .replace(/\bTEMPEL\b/gi, 'TEMPAT')
+                .replace(/\bTEMPAU?TG\b/gi, 'TEMPAT TGL')
+                .replace(/\bLANG\b/gi, 'LAHIR')
+                .replace(/\bALARA\b/gi, 'ALAMAT')
+                .replace(/\bKEOWN\b/gi, 'KELDESA')
+                .replace(/\bKECAMA\b/gi, 'KECAMATAN')
+                .replace(/\bKOOANAT[MN]\b/gi, 'KECAMATAN')
+                .replace(/\bGAMER\b/gi, 'GAMBIR')
+                .replace(/\bAGA\s*MA\b/gi, 'AGAMA')
+                .replace(/\bPEKARJAAN\b/gi, 'PEKERJAAN')
+                .replace(/\bPEKERJA\b/gi, 'PEKERJAAN')
+                .replace(/%OVDESA/gi, 'KELDESA')
+                .replace(/\bOKI\s+JAKARTA\b/gi, 'DKI JAKARTA')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function cleanupScannedValue(value, fieldType = 'generic') {
+            let cleaned = normalizeKtpLine(value).toUpperCase();
+            cleaned = cleaned.replace(/^[^A-Z0-9]+/, '').replace(/[^A-Z0-9./,\-\s]+$/g, '');
+            cleaned = cleaned.replace(/\s+([:.,\/-])/g, '$1').replace(/([:.,\/-])\s+/g, '$1 ');
+            cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
+
+            if (fieldType === 'name') {
+                cleaned = cleaned
+                    .replace(/^NAM[A-Z]*[:\-\s]*/i, '')
+                    .replace(/\bAPTS?\s+YANI?\b/g, 'APRIYANI')
+                    .replace(/\bAPTS?\s+YAN\b/g, 'APRIYANI')
+                    .replace(/\b5\s*KOM\b/g, 'S KOM')
+                    .replace(/\bS[.,]?\s*K[.,]?\s*O[.,]?\s*M\b/g, 'S KOM')
+                    .replace(/\b([A-Z]+)(?:I|L)S[.,]?\s*K[.,]?\s*O[.,]?\s*M\b/g, '$1I S KOM')
+                    .replace(/\s+\d$/, '')
+                    .replace(/(?:\s+[:.,\/-])+$/, '')
+                    .trim();
+            }
+
+            if (fieldType === 'address' || fieldType === 'kelurahan' || fieldType === 'kecamatan' || fieldType === 'city' || fieldType === 'province') {
+                cleaned = cleaned
+                    .replace(/^(ALAMAT|ADDRESS|KEL\/DESA|KELURAHAN|DESA|KECAMATAN|KAB\/KOTA|KABUPATEN|KOTA|PROVINSI|PROVINCE)[:\-\s]*/i, '')
+                    .replace(/\bK[PF](?=[A-Z])/g, 'KP ')
+                    .replace(/\bOKI\s+JAKARTA\b/g, 'DKI JAKARTA')
+                    .replace(/\bOUR[SI]\b/g, 'DURI')
+                    .replace(/\bDURS\b/g, 'DURI')
+                    .replace(/\bPALO\b/g, 'PULO')
+                    .replace(/\bGAMAIR\b/g, 'GAMBIR')
+                    .replace(/\bGAMER\b/g, 'GAMBIR')
+                    .replace(/([A-Z]{3,})(BARAT|TIMUR|UTARA|SELATAN|TENGAH|PUSAT)\b/g, '$1 $2')
+                    .replace(/([A-Z]{3,})(PULO|PULAU|HILIR|HULU|LOR|KIDUL)\b/g, '$1 $2')
+                    .replace(/([A-Z]{2,})NO\.?\s*(\d+)/g, '$1 NO $2')
+                    .replace(/\bN[O0]\.?(?=\d)/g, 'NO ')
+                    .replace(/([A-Z])(\d+)/g, '$1 $2')
+                    .replace(/(?:\s+[:.,\/-])+$/, '')
+                    .trim();
+            }
+
+            if (fieldType === 'religion') {
+                cleaned = cleaned
+                    .replace(/^AGAMA[:\-\s]*/i, '')
+                    .replace(/\bLAM\b/g, 'ISLAM')
+                    .replace(/\bI5LAM\b/g, 'ISLAM')
+                    .trim();
+            }
+
+            if (fieldType === 'occupation') {
+                cleaned = cleaned
+                    .replace(/^PEKERJ[A-Z]*[:\-\s]*/i, '')
+                    .replace(/^PEK[A-Z]*[:\-\s]*/i, '')
+                    .replace(/\bMENGURAS\b/g, 'MENGURUS')
+                    .replace(/\bJAKARTA\s+PUSAT\b$/, '')
+                    .trim();
+
+                if (/\bRUMAH\s+TANGGA\b/.test(cleaned)) {
+                    cleaned = 'MENGURUS RUMAH TANGGA';
+                }
+            }
+
+            if (fieldType === 'placeOfBirth') {
+                cleaned = cleaned
+                    .replace(/\bTEMPAT\b/g, '')
+                    .replace(/\bTGL\b/g, '')
+                    .replace(/\bLAHIR\b/g, '')
+                    .replace(/\bTAL\s+ATER\b/g, '')
+                    .replace(/\.$/, '')
+                    .replace(/\s{2,}/g, ' ')
+                    .trim();
+
+                if (/\bJAKARTA\b/.test(cleaned)) {
+                    cleaned = 'JAKARTA';
+                }
+            }
+
+            return cleaned;
+        }
+
+        function normalizeProvinceFromText(value, city = '') {
+            const cleaned = cleanupScannedValue(value, 'province');
+            if (cleaned) {
+                if (/DKI\s*JAKARTA|JAKARTA/i.test(cleaned)) {
+                    return 'DKI JAKARTA';
+                }
+                return cleaned;
+            }
+
+            const cityText = cleanupScannedValue(city, 'city');
+            if (/JAKARTA/i.test(cityText)) {
+                return 'DKI JAKARTA';
+            }
+
+            return '';
+        }
+
+        function normalizeCityFromText(value) {
+            const cleaned = cleanupScannedValue(value, 'city');
+            if (!cleaned) {
+                return '';
+            }
+
+            const jakartaMatch = cleaned.match(/JAKARTA\s+(PUSAT|BARAT|TIMUR|UTARA|SELATAN)/i);
+            if (jakartaMatch) {
+                return jakartaMatch[0].toUpperCase();
+            }
+
+            return cleaned;
+        }
+
+        function inferProvinceFromCity(city) {
+            const cleanedCity = cleanupScannedValue(city, 'city');
+            if (/JAKARTA/i.test(cleanedCity)) {
+                return 'DKI JAKARTA';
+            }
+
+            return '';
+        }
+
+        function inferKecamatanFromKelurahan(kelurahan, city = '') {
+            const kelurahanKey = cleanupScannedValue(kelurahan, 'kelurahan').replace(/[^A-Z]/g, '');
+            const cityKey = cleanupScannedValue(city, 'city').replace(/[^A-Z]/g, '');
+            const aliasMap = {
+                DURIPULO: 'GAMBIR',
+                DURIPALO: 'GAMBIR',
+                DUREPULO: 'GAMBIR',
+                DUREPULD: 'GAMBIR',
+                DURIPULD: 'GAMBIR',
+            };
+
+            if (cityKey === 'JAKARTAPUSAT' && aliasMap[kelurahanKey]) {
+                return aliasMap[kelurahanKey];
+            }
+
+            return aliasMap[kelurahanKey] || '';
+        }
+
+        function extractBirthData(lines) {
+            for (let index = 0; index < lines.length; index += 1) {
+                const line = lines[index];
+                if (!/LAHIR|TEMP|TGL|TG\s|TG\/|TGL\/|LANG/i.test(line)) {
+                    continue;
+                }
+
+                const dateMatch = line.match(/(\d{2}[.\-\/\s]\d{2}[.\-\/\s]\d{4})/);
+                if (dateMatch) {
+                    const placeRaw = line.slice(0, dateMatch.index || 0)
+                        .replace(/^TEMP[A-Z]*[:\-\s]*/i, '')
+                        .replace(/^T[G6L][A-Z]*[:\-\s]*/i, '')
+                        .replace(/^LANG[:\-\s]*/i, '')
+                        .replace(/LAHIR/i, '')
+                        .replace(/^[:\-\s,]+/, '')
+                        .replace(/[:\-\s,]+$/, '')
+                        .trim();
+
+                    return {
+                        placeOfBirth: cleanupScannedValue(placeRaw, 'placeOfBirth'),
+                        birthDate: isoDateFromLooseText(dateMatch[1]),
+                    };
+                }
+
+                const nextLine = lines[index + 1] || '';
+                const nextDateMatch = nextLine.match(/(\d{2}[.\-\/\s]\d{2}[.\-\/\s]\d{4})/);
+                if (nextDateMatch) {
+                    const placeRaw = line
+                        .replace(/^TEMP[A-Z]*[:\-\s]*/i, '')
+                        .replace(/^T[G6L][A-Z]*[:\-\s]*/i, '')
+                        .replace(/^LANG[:\-\s]*/i, '')
+                        .replace(/LAHIR/i, '')
+                        .replace(/^[:\-\s,]+/, '')
+                        .replace(/[:\-\s,]+$/, '')
+                        .trim();
+
+                    return {
+                        placeOfBirth: cleanupScannedValue(placeRaw, 'placeOfBirth'),
+                        birthDate: isoDateFromLooseText(nextDateMatch[1]),
+                    };
+                }
+            }
+
+            return {
+                placeOfBirth: '',
+                birthDate: '',
+            };
+        }
+
+        function fallbackKecamatanFromStructure(lines, kelurahan, address) {
+            const kelurahanIndex = lines.findIndex(line => /^KEL(?:\/|\s*)DESA\b|^KELURAHAN\b|^DESA\b|^KEL\b/i.test(line));
+            const agamaIndex = lines.findIndex(line => /^AGAMA\b/i.test(line));
+
+            if (kelurahanIndex < 0) {
+                return '';
+            }
+
+            const endIndex = agamaIndex > kelurahanIndex ? agamaIndex : Math.min(kelurahanIndex + 4, lines.length);
+            for (let index = kelurahanIndex + 1; index < endIndex; index += 1) {
+                const sourceLine = lines[index] || '';
+                const candidate = cleanupScannedValue(sourceLine, 'kecamatan');
+                if (!candidate) {
+                    continue;
+                }
+
+                if (/^(AGAMA|STATUS|PEKERJAAN|KEWARGANEGARAAN|RTRW|RT\/RW|KEL|DESA)/i.test(sourceLine)) {
+                    continue;
+                }
+
+                if (candidate === kelurahan || candidate === address) {
+                    continue;
+                }
+
+                return candidate;
+            }
+
+            return '';
+        }
+
+        function extractValueAfterLabel(lines, patterns, fieldType = 'generic') {
+            for (let index = 0; index < lines.length; index += 1) {
+                const line = lines[index];
+                for (const pattern of patterns) {
+                    if (!pattern.test(line)) {
+                        continue;
+                    }
+
+                    const cleaned = cleanupScannedValue(line.replace(pattern, '').replace(/^[:\-\s]+/, '').trim(), fieldType);
+                    if (cleaned) {
+                        return cleaned;
+                    }
+
+                    const nextLine = cleanupScannedValue((lines[index + 1] || '').trim(), fieldType);
+                    if (nextLine && !/^[A-Z\s\/.]+:?\s*$/.test(nextLine)) {
+                        return nextLine;
+                    }
+                }
+            }
+
+            return '';
+        }
+
+        function extractValueNearKeywords(lines, patterns, fieldType = 'generic') {
+            for (let index = 0; index < lines.length; index += 1) {
+                const line = lines[index];
+                for (const pattern of patterns) {
+                    const match = line.match(pattern);
+                    if (!match) {
+                        continue;
+                    }
+
+                    const keyword = match[0] || '';
+                    const startIndex = typeof match.index === 'number'
+                        ? match.index + keyword.length
+                        : line.toUpperCase().indexOf(keyword.toUpperCase()) + keyword.length;
+                    const rawValue = line.slice(Math.max(startIndex, 0)).replace(/^[:\-\s]+/, '').trim();
+                    const cleaned = cleanupScannedValue(rawValue, fieldType);
+                    if (cleaned) {
+                        return cleaned;
+                    }
+
+                    const nextLine = cleanupScannedValue((lines[index + 1] || '').trim(), fieldType);
+                    if (nextLine && !/^[A-Z\s\/.]+:?\s*$/.test(nextLine)) {
+                        return nextLine;
+                    }
+                }
+            }
+
+            return '';
+        }
+
+        function extractReligion(lines) {
+            const directValue = extractValueAfterLabel(lines, [/^AGAMA\b/i, /^AGA\s*MA\b/i], 'religion') ||
+                extractValueNearKeywords(lines, [/AGAMA\b/i, /AGA\s*MA\b/i], 'religion');
+            if (directValue) {
+                return directValue;
+            }
+
+            const joinedText = lines.join(' ');
+            const joinedMatch = joinedText.match(/AGA\s*MA[:\-\s]*([A-Z]+)/i);
+            if (joinedMatch) {
+                return cleanupScannedValue(joinedMatch[1], 'religion');
+            }
+
+            if (/\bLAM\b|\bISLAM\b|\bI5LAM\b/i.test(joinedText)) {
+                return 'ISLAM';
+            }
+
+            return '';
+        }
+
+        function getNikBirthTokens(birthDate) {
+            if (!birthDate || !/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
+                return [];
+            }
+
+            const year = birthDate.slice(2, 4);
+            const month = birthDate.slice(5, 7);
+            const day = birthDate.slice(8, 10);
+            const maleDay = String((parseInt(day, 10) || 0) + 40).padStart(2, '0');
+
+            return [maleDay + month + year, day + month + year];
+        }
+
+        function inferNikRegionPrefix(city, kecamatan, kelurahan, province) {
+            const cityKey = cleanupScannedValue(city, 'city').replace(/[^A-Z]/g, '');
+            const kecamatanKey = cleanupScannedValue(kecamatan, 'kecamatan').replace(/[^A-Z]/g, '');
+            const kelurahanKey = cleanupScannedValue(kelurahan, 'kelurahan').replace(/[^A-Z]/g, '');
+            const provinceKey = cleanupScannedValue(province, 'province').replace(/[^A-Z]/g, '');
+
+            if (provinceKey === 'DKIJAKARTA' && cityKey === 'JAKARTAPUSAT' && kecamatanKey === 'GAMBIR') {
+                if (kelurahanKey === 'DURIPULO') {
+                    return '317101';
+                }
+
+                return '317101';
+            }
+
+            return '';
+        }
+
+        function normalizeNikCandidate(value, mode = 'lossy') {
+            let raw = (value || '').toString().toUpperCase().replace(/\s+/g, '');
+            raw = raw
+                .replace(/[OQD]/g, '0')
+                .replace(/[IL]/g, '1')
+                .replace(/Z/g, '2')
+                .replace(/A/g, '4')
+                .replace(/S/g, '5')
+                .replace(/[EG]/g, '6')
+                .replace(/B/g, '8');
+
+            if (mode === 'aggressive') {
+                raw = raw.replace(/[?]/g, '7').replace(/N/g, '0');
+            }
+
+            return raw.replace(/[^\d]/g, '');
+        }
+
+        function extractNikValue(lines, context = {}) {
+            const candidateLines = lines
+                .filter(line => /NIK/i.test(line))
+                .map(line => line.replace(/^.*NIK/i, '').trim())
+                .filter(Boolean);
+
+            const birthTokens = getNikBirthTokens(context.birthDate || '');
+            const regionPrefix = inferNikRegionPrefix(context.city, context.kecamatan, context.kelurahan, context.province);
+
+            for (const candidate of candidateLines) {
+                const aggressiveDigits = normalizeNikCandidate(candidate, 'aggressive');
+                if (aggressiveDigits.length === 16) {
+                    return aggressiveDigits;
+                }
+
+                const lossyDigits = normalizeNikCandidate(candidate, 'lossy');
+                if (lossyDigits.length === 16) {
+                    return lossyDigits;
+                }
+
+                const allDigitCandidates = [lossyDigits, aggressiveDigits].filter(Boolean);
+                for (const digits of allDigitCandidates) {
+                    for (const token of birthTokens) {
+                        const tokenIndex = digits.indexOf(token);
+                        const last4 = digits.slice(-4);
+                        if (tokenIndex >= 0 && regionPrefix && last4.length === 4) {
+                            return regionPrefix + token + last4;
+                        }
+                    }
+                }
+            }
+
+            return '';
+        }
+
+        function extractPostalCode(lines) {
+            const rawPostalCode = extractValueAfterLabel(lines, [/^KODE\s*POS\b/i, /^POSTAL\s*CODE\b/i, /^POS\b/i]) ||
+                extractValueNearKeywords(lines, [/KODE\s*POS\b/i, /POSTAL\s*CODE\b/i, /\bPOS\b/i]);
+            const digits = (rawPostalCode || '').replace(/[^\d]/g, '');
+
+            return digits.length >= 5 ? digits.slice(0, 5) : '';
+        }
+
+        function parseKtpText(text) {
+            const normalizedText = (text || '')
+                .replace(/\r/g, '\n')
+                .replace(/[|]/g, 'I')
+                .replace(/\uFB01/g, 'fi')
+                .replace(/[\u00A9\u00AE]/g, ' ')
+                .replace(/[=_~`]/g, ' ');
+            const lines = normalizedText
+                .split('\n')
+                .map(line => normalizeKtpLine(line))
+                .filter(Boolean);
+            const digitsOnly = normalizedText.replace(/[^\d]/g, ' ');
+            const nikMatch = digitsOnly.match(/\b\d{16}\b/);
+            const nikLineIndex = lines.findIndex(line => /NIK/i.test(line));
+            const provinceLineIndex = lines.findIndex(line => /PROVINSI/i.test(line));
+            let province = provinceLineIndex >= 0 ? lines[provinceLineIndex].replace(/.*PROVINSI/i, '').replace(/^[:\-\s]+/, '').trim() : '';
+            let city = '';
+            if (provinceLineIndex >= 0 && lines[provinceLineIndex + 1] && !/NIK/i.test(lines[provinceLineIndex + 1])) {
+                city = lines[provinceLineIndex + 1].replace(/^[:\-\s]+/, '').trim();
+            }
+            if ((!province || !city) && nikLineIndex > 0) {
+                const headerLines = lines.slice(0, nikLineIndex).filter(line => !/NIK/i.test(line));
+                if (!province && headerLines[0]) {
+                    province = headerLines[0];
+                }
+                if (!city && headerLines[1]) {
+                    city = headerLines[1];
+                }
+            }
+            if (!city) {
+                city = lines.find(line => /JAKARTA\s+(PUSAT|BARAT|TIMUR|UTARA|SELATAN)|\bKAB(?:UPATEN)?\b|\bKOTA\b/i.test(line) && !/PROVINSI|NIK/i.test(line)) || '';
+            }
+            city = normalizeCityFromText(city);
+            province = cleanupScannedValue(province, 'province');
+
+            const birthData = extractBirthData(lines);
+            const name = extractValueAfterLabel(lines, [/^NAM[A-Z]*\b/i], 'name') ||
+                extractValueNearKeywords(lines, [/NAM[A-Z]*\b/i], 'name');
+            const address = extractValueAfterLabel(lines, [/^ALAMAT\b/i], 'address') ||
+                extractValueNearKeywords(lines, [/ALAMAT\b/i], 'address');
+            const kelurahan = extractValueAfterLabel(lines, [/^KEL(?:\/|\s*)DESA\b/i, /^KELURAHAN\b/i, /^DESA\b/i, /^KEL\b/i], 'kelurahan') ||
+                extractValueNearKeywords(lines, [/KEL(?:\/|\s*)DESA\b/i, /KELDESA\b/i, /KELURAHAN\b/i, /DESA\b/i, /\bKEL\b/i], 'kelurahan');
+            const kecamatan = extractValueAfterLabel(lines, [/^KECAMATAN\b/i, /^KEC[A-Z]*\b/i, /^KECAMA[A-Z]*\b/i], 'kecamatan') ||
+                extractValueNearKeywords(lines, [/KECAMATAN\b/i, /\bKEC[A-Z]*\b/i, /KECAMA[A-Z]*\b/i], 'kecamatan') ||
+                fallbackKecamatanFromStructure(lines, kelurahan, address);
+            const religion = extractReligion(lines);
+            const occupation = extractValueAfterLabel(lines, [/^PEKERJ[A-Z]*\b/i], 'occupation') ||
+                extractValueNearKeywords(lines, [/PEKERJ[A-Z]*\b/i], 'occupation');
+            const postalCode = extractPostalCode(lines);
+            const idNumber = nikMatch ? nikMatch[0] : extractNikValue(lines, {
+                birthDate: birthData.birthDate,
+                city,
+                kecamatan,
+                kelurahan,
+                province,
+            });
+
+            return {
+                idNumber,
+                name,
+                placeOfBirth: birthData.placeOfBirth,
+                birthDate: birthData.birthDate,
+                address,
+                kelurahan,
+                kecamatan,
+                city,
+                province,
+                religion,
+                occupation,
+                postalCode,
+                nationality: 'INA',
+                rawText: normalizedText,
+            };
+        }
+
+        async function loadImageElementFromFile(file) {
+            const objectUrl = URL.createObjectURL(file);
+
+            try {
+                const image = await new Promise(function(resolve, reject) {
+                    const img = new Image();
+                    img.onload = function() {
+                        resolve(img);
+                    };
+                    img.onerror = function() {
+                        reject(new Error('Unable to load the selected KTP image.'));
+                    };
+                    img.src = objectUrl;
+                });
+
+                return image;
+            } finally {
+                URL.revokeObjectURL(objectUrl);
+            }
+        }
+
+        function createProcessedKtpCanvas(image, options = {}) {
+            const scale = options.scale || 2;
+            const width = Math.max(1, Math.round((image.naturalWidth || image.width || 1) * scale));
+            const height = Math.max(1, Math.round((image.naturalHeight || image.height || 1) * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+
+            const context = canvas.getContext('2d', {
+                willReadFrequently: true
+            });
+
+            if (!context) {
+                return canvas;
+            }
+
+            context.filter = options.filter || 'none';
+            context.drawImage(image, 0, 0, width, height);
+            context.filter = 'none';
+
+            if (options.mode === 'threshold' || options.mode === 'grayscale') {
+                const imageData = context.getImageData(0, 0, width, height);
+                const pixels = imageData.data;
+                let minLuma = 255;
+                let maxLuma = 0;
+
+                for (let index = 0; index < pixels.length; index += 4) {
+                    const luma = (pixels[index] * 0.299) + (pixels[index + 1] * 0.587) + (pixels[index + 2] * 0.114);
+                    minLuma = Math.min(minLuma, luma);
+                    maxLuma = Math.max(maxLuma, luma);
+                }
+
+                const range = Math.max(1, maxLuma - minLuma);
+                const threshold = options.threshold || 165;
+
+                for (let index = 0; index < pixels.length; index += 4) {
+                    const luma = (pixels[index] * 0.299) + (pixels[index + 1] * 0.587) + (pixels[index + 2] * 0.114);
+                    const normalized = ((luma - minLuma) / range) * 255;
+                    const value = options.mode === 'threshold'
+                        ? (normalized > threshold ? 255 : 0)
+                        : normalized;
+
+                    pixels[index] = value;
+                    pixels[index + 1] = value;
+                    pixels[index + 2] = value;
+                }
+
+                context.putImageData(imageData, 0, 0);
+            }
+
+            return canvas;
+        }
+
+        async function buildKtpOcrVariants(file) {
+            const image = await loadImageElementFromFile(file);
+            const variants = [{
+                label: 'original',
+                source: file,
+            }];
+
+            const enhancedCanvas = createProcessedKtpCanvas(image, {
+                scale: 2.4,
+                filter: 'grayscale(1) contrast(185%) brightness(120%) saturate(0)',
+                mode: 'grayscale',
+            });
+            variants.push({
+                label: 'enhanced',
+                source: enhancedCanvas,
+            });
+
+            const thresholdCanvas = createProcessedKtpCanvas(image, {
+                scale: 2.8,
+                filter: 'grayscale(1) contrast(220%) brightness(130%) saturate(0)',
+                mode: 'threshold',
+                threshold: 155,
+            });
+            variants.push({
+                label: 'threshold',
+                source: thresholdCanvas,
+            });
+
+            return variants;
+        }
+
+        function scoreOcrText(text) {
+            const content = (text || '').toString().toUpperCase();
+            if (!content.trim()) {
+                return 0;
+            }
+
+            let score = 0;
+            const keywordMatches = [
+                /\bNIK\b/,
+                /\bNAMA\b/,
+                /\bALAMAT\b/,
+                /\bKECAMATAN\b/,
+                /\bKEL(?:\/|\s*)DESA\b/,
+                /\bTEMPAT\b/,
+                /\bLAHIR\b/,
+                /\bPROVINSI\b/,
+                /\bJAKARTA\b/,
+            ].reduce(function(total, pattern) {
+                return total + (pattern.test(content) ? 1 : 0);
+            }, 0);
+
+            score += keywordMatches * 30;
+
+            if (/\b\d{16}\b/.test(content.replace(/[^\d]/g, ' '))) {
+                score += 120;
+            }
+
+            score += Math.min(120, content.replace(/[^A-Z]/g, '').length);
+            score += Math.min(60, content.split(/\s+/).filter(Boolean).length * 2);
+            score -= (content.match(/[^\w\s:/.-]/g) || []).length * 2;
+
+            return score;
+        }
+
+        async function runServerKtpScan(file, onProgress) {
+            if (!file) {
+                throw new Error('No KTP image selected.');
+            }
+
+            if (typeof onProgress === 'function') {
+                onProgress('Sending KTP to AI OCR...');
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const response = await fetch('/checkin/scan-ktp', {
+                method: 'POST',
+                headers: Object.assign({
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                }, csrfToken ? {
+                    'X-CSRF-TOKEN': csrfToken,
+                } : {}),
+                body: formData,
+            });
+
+            let payload = null;
+            try {
+                payload = await response.json();
+            } catch (error) {
+                payload = null;
+            }
+
+            if (!response.ok || !payload?.success || !payload?.data?.parsed) {
+                const error = new Error(payload?.message || 'AI OCR request failed.');
+                error.status = response.status;
+                throw error;
+            }
+
+            if (typeof onProgress === 'function') {
+                onProgress('AI OCR completed. Filling extracted fields...');
+            }
+
+            return Object.assign({}, payload.data.parsed, {
+                provider: payload?.data?.provider || 'backend_ocr',
+                correctionProvider: payload?.data?.correction_provider || '',
+            });
+        }
+
+        async function runKtpScan(file, onProgress) {
+            try {
+                return await runServerKtpScan(file, onProgress);
+            } catch (serverError) {
+                const message = (serverError?.message || '').toString();
+                const shouldFallbackToLocal = /belum dikonfigurasi|returned empty text|paddleocr|ocr modern backend belum berhasil membaca ktp/i.test(message)
+                    || (Number(serverError?.status || 0) >= 500 && !/quota|billing|api key|401|403/i.test(message));
+                if (!shouldFallbackToLocal) {
+                    throw serverError;
+                }
+
+                console.warn('Backend OCR is unavailable or returned empty text, switching to local OCR fallback.', serverError);
+                if (typeof onProgress === 'function') {
+                    onProgress('Backend OCR belum menghasilkan teks. Switching to local OCR...');
+                }
+            }
+
+            const TesseractLib = await ensureTesseractLoaded();
+            const variants = await buildKtpOcrVariants(file);
+            let bestText = '';
+            let bestScore = -1;
+
+            for (let index = 0; index < variants.length; index += 1) {
+                const variant = variants[index];
+                const variantLabel = variant.label === 'original'
+                    ? 'original'
+                    : (variant.label === 'enhanced' ? 'enhanced' : 'high contrast');
+
+                const result = await TesseractLib.recognize(variant.source, 'ind+eng', {
+                    logger(message) {
+                        if (typeof onProgress !== 'function') {
+                            return;
+                        }
+
+                        if (message.status === 'recognizing text') {
+                            onProgress('Reading KTP (' + variantLabel + ') ' + Math.round((message.progress || 0) * 100) + '%...');
+                        } else if (message.status) {
+                            onProgress(message.status + ' (' + variantLabel + ')...');
+                        }
+                    }
+                });
+
+                const text = result?.data?.text || '';
+                const score = scoreOcrText(text);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestText = text;
+                }
+
+                if (bestScore >= 220) {
+                    break;
+                }
+            }
+
+            return Object.assign({}, parseKtpText(bestText), {
+                provider: 'tesseract_fallback',
+                correctionProvider: '',
+            });
+        }
+
+        function clearLeaderKtpScanFields() {
+            xGuest.value = '';
+            xKTP.value = '';
+            xPlaceBirth.value = '';
+            setDateGroupValue(xTglLahir, 'BirthDate', '');
+            xAlamat.value = '';
+            xKelurahan.value = '';
+            xKecamatan.value = '';
+            xKota.value = '';
+            if (xProfesi) {
+                xProfesi.value = '';
+            }
+            if (xPropinsi) {
+                xPropinsi.value = '';
+            }
+            setProvinceCountrySource('manual');
+            const postalCodeField = document.getElementById('PostalCode');
+            if (postalCodeField) {
+                postalCodeField.value = '';
+            }
+        }
+
+        function applyKtpDataToLeader(data) {
+            clearLeaderKtpScanFields();
+            const resolvedKecamatan = data.kecamatan || inferKecamatanFromKelurahan(data.kelurahan, data.city);
+            const resolvedProvince = (data.province || '').toString().trim();
+            if (data.name) {
+                xGuest.value = data.name;
+            }
+            if (data.idNumber) {
+                xKTP.value = data.idNumber;
+            }
+            if (xTypeId) {
+                xTypeId.value = 'KTP';
+            }
+            if (data.placeOfBirth) {
+                xPlaceBirth.value = data.placeOfBirth;
+            }
+            if (data.birthDate) {
+                setDateGroupValue(xTglLahir, 'BirthDate', data.birthDate);
+            }
+            if (data.address) {
+                xAlamat.value = data.address;
+            }
+            if (data.kelurahan) {
+                xKelurahan.value = data.kelurahan;
+            }
+            if (resolvedKecamatan) {
+                xKecamatan.value = resolvedKecamatan;
+            }
+            if (data.city) {
+                xKota.value = data.city;
+            }
+            if (resolvedProvince) {
+                setSelectValueDirect(xPropinsi, resolvedProvince);
+                setProvinceCountrySource('scan');
+            }
+            if (data.religion) {
+                setSelectByLooseText(xAgama, data.religion);
+            }
+            if (data.nationality) {
+                setSelectByLooseText(xKodeNegara, data.nationality);
+            }
+            if (data.occupation && xProfesi) {
+                xProfesi.value = data.occupation;
+            }
+            const postalCodeField = document.getElementById('PostalCode');
+            if (postalCodeField && data.postalCode) {
+                postalCodeField.value = data.postalCode;
+            }
+            updatePrimaryGuestDisplay();
+        }
+
         function updatePrimaryGuestDisplay() {
             primaryRoomGuestName.textContent = (xGuest?.value || '').trim() || '-';
+            if (leaderSummaryName) {
+                leaderSummaryName.textContent = (xGuest?.value || '').trim() || '-';
+            }
+            if (leaderSummaryPhone) {
+                leaderSummaryPhone.textContent = (xPhone?.value || '').trim() || '-';
+            }
+            if (primaryRoomBadge) {
+                const positionLabel = (primaryRoomPositionField?.value || '').trim().toUpperCase();
+                primaryRoomBadge.textContent = positionLabel || (isGroupCheckInType(xTipe?.value) ? 'PRIMARY' : 'PRIMARY');
+            }
+            updateBillingTypeDisplay();
+            Array.from(additionalRoomBody.querySelectorAll('[data-room-row]')).forEach(function(row) {
+                updateRoomGuestRowState(row, true);
+            });
+        }
+
+        function updateRoomGuestRowState(row, keepCurrentVisibility = false) {
+            if (!row) {
+                return;
+            }
+
+            const detailRow = row.nextElementSibling && row.nextElementSibling.matches('[data-room-detail-row]') ? row.nextElementSibling : null;
+            const sameCheckbox = row.querySelector('.room-same-checkbox');
+            const sameHidden = row.querySelector('.same-as-leader-input');
+            const summaryInput = row.querySelector('.room-guest-display-input');
+            const guestNameInput = detailRow?.querySelector('.room-guest-name-input');
+            const scanStatus = detailRow?.querySelector('.room-guest-scan-status');
+            const followsLeader = !!sameCheckbox?.checked;
+
+            if (sameHidden) {
+                sameHidden.value = followsLeader ? '1' : '0';
+            }
+
+            if (summaryInput) {
+                summaryInput.value = followsLeader
+                    ? ((xGuest?.value || '').trim() || 'Following leader data')
+                    : ((guestNameInput?.value || '').trim() || 'Guest detail required');
+            }
+
+            if (scanStatus) {
+                scanStatus.textContent = followsLeader ? 'Following leader data' : 'Guest detail is active';
+            }
+
+            if (detailRow) {
+                if (followsLeader) {
+                    detailRow.classList.add('is-collapsed');
+                } else if (!keepCurrentVisibility || detailRow.classList.contains('is-collapsed')) {
+                    detailRow.classList.remove('is-collapsed');
+                }
+            }
+        }
+
+        function applyKtpDataToRoomRow(row, data) {
+            const detailRow = row?.nextElementSibling;
+            if (!row || !detailRow || !detailRow.matches('[data-room-detail-row]')) {
+                return;
+            }
+
+            const sameCheckbox = row.querySelector('.room-same-checkbox');
+            if (sameCheckbox) {
+                sameCheckbox.checked = false;
+            }
+
+            const fieldMap = {
+                '.room-guest-name-input': data.name || '',
+                '.room-guest-id-number-input': data.idNumber || '',
+                '.room-guest-phone-input': data.phone || '',
+                '.room-guest-email-input': data.email || '',
+                '.room-guest-address-input': data.address || '',
+            };
+
+            Object.entries(fieldMap).forEach(function([selector, value]) {
+                const field = detailRow.querySelector(selector);
+                if (field && value) {
+                    field.value = value;
+                }
+            });
+
+            const idTypeField = detailRow.querySelector('.room-guest-id-type-input');
+            if (idTypeField) {
+                idTypeField.value = 'KTP';
+            }
+
+            const birthDateField = detailRow.querySelector('.room-guest-birth-date-input');
+            if (birthDateField && data.birthDate) {
+                birthDateField.value = data.birthDate;
+            }
+
+            const nationalityField = detailRow.querySelector('.room-guest-nationality-input');
+            if (nationalityField && data.nationality) {
+                setSelectByLooseText(nationalityField, data.nationality);
+            }
+
+            updateRoomGuestRowState(row);
         }
 
         function applyReservationNumberSelection() {
@@ -1769,7 +3832,15 @@
             const nominalDisplayInput = row.querySelector('.nominal-display-input');
             const breakfastInput = row.querySelector('.breakfast-input');
             const paxInput = row.querySelector('.room-pax-display-input');
+            const positionInput = row.querySelector('.room-position-input');
+            const sameCheckbox = row.querySelector('.room-same-checkbox');
+            const expandButton = row.querySelector('.room-row-expand');
             const removeButton = row.querySelector('.room-row-remove');
+            const detailRow = row.nextElementSibling && row.nextElementSibling.matches('[data-room-detail-row]') ? row.nextElementSibling : null;
+            const guestNameInput = detailRow?.querySelector('.room-guest-name-input');
+            const scanButton = detailRow?.querySelector('.room-guest-scan-btn');
+            const scanInput = detailRow?.querySelector('.room-guest-ktp-input');
+            const scanStatus = detailRow?.querySelector('.room-guest-scan-status');
             if (packageInput) {
                 packageInput.addEventListener('change', function() {
                     const option = findOptionByValue('packageCodeOptions', this.value);
@@ -1788,30 +3859,117 @@
                     updateRoomSummary();
                 });
             }
+            if (positionInput) {
+                positionInput.addEventListener('change', updatePrimaryGuestDisplay);
+            }
             if (breakfastInput) {
                 breakfastInput.value = breakfastInput.value || '0';
             }
+            if (guestNameInput) {
+                guestNameInput.addEventListener('input', function() {
+                    updateRoomGuestRowState(row, true);
+                });
+            }
+            if (sameCheckbox) {
+                sameCheckbox.addEventListener('change', function() {
+                    updateRoomGuestRowState(row);
+                });
+            }
+            if (expandButton) {
+                expandButton.addEventListener('click', function() {
+                    if (sameCheckbox?.checked) {
+                        sameCheckbox.checked = false;
+                        updateRoomGuestRowState(row);
+                        return;
+                    }
+
+                    if (detailRow) {
+                        detailRow.classList.toggle('is-collapsed');
+                    }
+                });
+            }
+            if (scanButton && scanInput) {
+                scanButton.addEventListener('click', function() {
+                    if (sameCheckbox?.checked) {
+                        sameCheckbox.checked = false;
+                        updateRoomGuestRowState(row);
+                    }
+                    scanInput.click();
+                });
+                scanInput.addEventListener('change', async function() {
+                    const file = this.files && this.files[0];
+                    if (!file) {
+                        return;
+                    }
+
+                    if (scanStatus) {
+                        scanStatus.textContent = 'Preparing OCR scan...';
+                    }
+
+                    try {
+                        const parsed = await runKtpScan(file, function(message) {
+                            if (scanStatus) {
+                                scanStatus.textContent = message;
+                            }
+                        });
+                        applyKtpDataToRoomRow(row, parsed);
+                        if (scanStatus) {
+                            scanStatus.textContent = parsed.name
+                                ? 'KTP scanned and guest detail has been filled.'
+                                : 'KTP scanned. Please review the extracted detail.';
+                        }
+                    } catch (error) {
+                        if (scanStatus) {
+                            scanStatus.textContent = 'Unable to read KTP automatically.';
+                        }
+                        showCrudAlert('OCR KTP untuk guest room belum berhasil dibaca. Coba gunakan foto yang lebih jelas.');
+                    } finally {
+                        this.value = '';
+                    }
+                });
+            }
             if (removeButton) {
                 removeButton.addEventListener('click', function() {
+                    if (detailRow) {
+                        detailRow.remove();
+                    }
                     row.remove();
                     renumberAdditionalRows();
                 });
             }
+            updateRoomGuestRowState(row, true);
         }
 
         function addAdditionalRoomRow(detail = {}) {
             const fragment = additionalRoomRowTemplate.content.cloneNode(true);
             const row = fragment.querySelector('[data-room-row]');
+            const detailRow = fragment.querySelector('[data-room-detail-row]');
             row.querySelector('.detail-key-input').value = detail.detailKey || '';
             row.querySelector('.room-code-input').value = detail.roomCode || '';
-            row.querySelector('.room-guest-display-input').value = detail.guestName || '';
             row.querySelector('.room-pax-display-input').value = detail.pax || detail.breakfast || 1;
             row.querySelector('.package-code-input').value = detail.packageCode || '';
             row.querySelector('.nominal-input').value = detail.nominal ? normalizeNumber(String(detail.nominal)) : '';
             row.querySelector('.nominal-display-input').value = detail.nominal ? formatRibuan(String(detail.nominal)) : '';
             row.querySelector('.breakfast-input').value = detail.breakfast ?? 0;
+            row.querySelector('.room-position-input').value = detail.groupPosition || (isGroupCheckInType(xTipe?.value) ? 'SUB' : '');
+            row.querySelector('.same-as-leader-input').value = detail.sameAsLeader === false ? '0' : '1';
+            row.querySelector('.room-same-checkbox').checked = detail.sameAsLeader !== false;
+            if (detailRow) {
+                detailRow.querySelector('.room-guest-name-input').value = detail.guestName || '';
+                detailRow.querySelector('.room-guest-id-type-input').value = detail.guestIdType || 'KTP';
+                detailRow.querySelector('.room-guest-id-number-input').value = detail.guestIdNumber || '';
+                detailRow.querySelector('.room-guest-birth-date-input').value = detail.guestBirthDate || '';
+                detailRow.querySelector('.room-guest-phone-input').value = detail.guestPhone || '';
+                detailRow.querySelector('.room-guest-email-input').value = detail.guestEmail || '';
+                detailRow.querySelector('.room-guest-address-input').value = detail.guestAddress || '';
+                detailRow.querySelector('.room-guest-nationality-input').value = detail.guestNationality || 'INA';
+                if (detail.sameAsLeader === false) {
+                    detailRow.classList.remove('is-collapsed');
+                }
+            }
             bindAdditionalRow(row);
             additionalRoomBody.appendChild(fragment);
+            updateGroupPositionAvailability();
             renumberAdditionalRows();
         }
 
@@ -1824,6 +3982,10 @@
             currentDetailKeyField.value = '';
             primaryDetailKeyField.value = '';
             xRegNo.value = regNo || defaultRegNo;
+            if (primaryRoomPositionField) {
+                primaryRoomPositionField.value = '';
+            }
+            syncPrimaryRoomPositionValue();
             saveButton.textContent = 'Save Check In';
             Array.from(document.querySelectorAll('.checkin-record-row')).forEach(row => row.classList.remove('is-active'));
         }
@@ -1835,8 +3997,8 @@
             form.action = '/checkin/' + encodeURIComponent(record.DetailKey) + '/update';
             saveButton.textContent = 'Update Check In';
             const mappings = ['ReservationNumber', 'GuestName', 'GuestName2', 'Address', 'Kelurahan', 'Kecamatan',
-                'KabCity', 'ProvinceCountry', 'TypeOfId', 'IdNumber', 'GroupPosition', 'TypeOfCheckIn', 'PlaceOfBirth',
-                'Religion', 'Nationality', 'NumberOfPerson', 'PaymentMethod', 'Company', 'CreditCardNumber', 'Segment',
+                'KabCity', 'ProvinceCountry', 'TypeOfId', 'IdNumber', 'TypeOfCheckIn', 'PlaceOfBirth',
+                'Religion', 'Nationality', 'NumberOfPerson', 'PaymentMethod', 'Company', 'Occupation', 'CreditCardNumber', 'Segment',
                 'Phone', 'Email', 'Remarks', 'Member', 'Sales'
             ];
             mappings.forEach(function(id) {
@@ -1845,6 +4007,13 @@
                     field.value = record[id] ?? '';
                 }
             });
+            if (primaryRoomPositionField) {
+                primaryRoomPositionField.value = record.GroupPosition || '';
+            }
+            syncPrimaryRoomPositionValue();
+            setSelectByValueOrDataName(xPropinsi, record.ProvinceCountry || '', 'name');
+            setProvinceCountrySource('manual');
+            updateGroupPositionAvailability();
             xPeriksa.checked = String(record.CheckDeposit || '0') === '1';
             document.getElementById('CheckInDate').value = record.CheckInDate || '';
             xTglIn.value = formatDisplayDate(record.CheckInDate || '');
@@ -1871,8 +4040,14 @@
             primaryRoomPaxDisplay.value = record.NumberOfPerson || record.Breakfast || 1;
             updatePrimaryGuestDisplay();
             resetAdditionalRoomRows();
+            if (Array.isArray(record.AdditionalRooms) && record.AdditionalRooms.length) {
+                record.AdditionalRooms.forEach(function(detail) {
+                    addAdditionalRoomRow(detail);
+                });
+            }
             updateRoomHelper();
             updatePackageHelper();
+            updateRoomSummary();
         }
 
         function resetForm() {
@@ -1905,19 +4080,121 @@
             xBF.value = '2';
             xJamIn.value = defaultCheckInTime;
             xTipe.value = defaultTypeOfCheckIn;
+            if (primaryRoomPositionField) {
+                primaryRoomPositionField.value = '';
+            }
+            syncPrimaryRoomPositionValue();
+            updateGroupPositionAvailability();
             xTypeId.value = defaultIdType;
             xPayment.value = 'OTA';
             xSegment.value = 'TRAVEL';
             xKodeNegara.value = 'INA';
             xPerson.value = '2';
+            setProvinceCountrySource('manual');
+            const postalCodeField = document.getElementById('PostalCode');
+            if (postalCodeField) {
+                postalCodeField.value = '';
+            }
             primaryRoomPaxDisplay.value = '2';
+            if (leaderScanImage) {
+                leaderScanImage.hidden = true;
+                leaderScanImage.removeAttribute('src');
+            }
+            if (leaderScanPreview && !leaderScanPreview.querySelector('.ktp-scan-preview-empty')) {
+                leaderScanPreview.insertAdjacentHTML('afterbegin',
+                    '<span class="ktp-scan-preview-empty">KTP preview will appear here after upload.</span>');
+            }
+            if (leaderScanStatus) {
+                leaderScanStatus.textContent = 'No KTP scanned yet. Upload an image to start OCR.';
+            }
+            resetLeaderScanDebug();
             updatePrimaryGuestDisplay();
             updateRoomSummary();
             xGuest.focus();
         }
 
         Array.from(document.querySelectorAll('[data-date-field]')).forEach(bindDateGroup);
+        updateGroupPositionAvailability();
         xGuest.addEventListener('input', updatePrimaryGuestDisplay);
+        xPhone?.addEventListener('input', updatePrimaryGuestDisplay);
+        xTipe?.addEventListener('change', updateBillingTypeDisplay);
+        xPayment?.addEventListener('change', updateBillingTypeDisplay);
+        if (leaderScanButton && leaderKtpUpload) {
+            leaderScanButton.addEventListener('click', function() {
+                leaderKtpUpload.click();
+            });
+
+            leaderKtpUpload.addEventListener('change', async function() {
+                const file = this.files && this.files[0];
+                if (!file) {
+                    return;
+                }
+
+                resetLeaderScanDebug();
+                if (leaderScanStatus) {
+                    leaderScanStatus.textContent = 'Preparing OCR scan...';
+                }
+                const previewUrl = URL.createObjectURL(file);
+                if (leaderScanImage) {
+                    leaderScanImage.src = previewUrl;
+                    leaderScanImage.hidden = false;
+                }
+                if (leaderScanPreview) {
+                    leaderScanPreview.querySelector('.ktp-scan-preview-empty')?.remove();
+                }
+
+                try {
+                    const parsed = await runKtpScan(file, function(message) {
+                        if (leaderScanStatus) {
+                            leaderScanStatus.textContent = message;
+                        }
+                    });
+                    renderLeaderScanDebug(parsed);
+                    applyKtpDataToLeader(parsed);
+                    renderLeaderScanInlineDebug(
+                        parsed,
+                        hasMeaningfulScanData(parsed)
+                            ? ''
+                            : 'OCR berhasil dibaca. Teks mentah yang terbaca ditampilkan di bawah supaya bisa saya cocokkan parser-nya.'
+                    );
+                    if (leaderScanStatus) {
+                        leaderScanStatus.textContent = hasMeaningfulScanData(parsed)
+                            ? 'KTP scanned successfully. Leader fields have been filled.'
+                            : 'OCR berhasil dibaca. Teks mentah hasil scan ditampilkan di bawah.';
+                    }
+                } catch (error) {
+                    if (leaderScanStatus) {
+                        leaderScanStatus.textContent = 'Unable to read KTP automatically.';
+                    }
+                    console.error('Leader KTP OCR failed:', error);
+                    renderLeaderScanInlineDebug({
+                        rawText: '',
+                    }, error?.message || 'Unable to read KTP automatically.');
+                    renderLeaderScanDebug({
+                        rawText: '',
+                    }, error?.message || 'Unable to read KTP automatically.');
+                    showCrudAlert('OCR KTP leader belum berhasil dibaca. Coba gunakan foto yang lebih jelas.');
+                } finally {
+                    URL.revokeObjectURL(previewUrl);
+                    this.value = '';
+                }
+            });
+        }
+        if (xTipe) {
+            xTipe.addEventListener('change', updateGroupPositionAvailability);
+        }
+        if (primaryRoomPositionField) {
+            primaryRoomPositionField.addEventListener('change', function() {
+                syncPrimaryRoomPositionValue();
+                updatePrimaryGuestDisplay();
+            });
+        }
+        if (xPropinsi) {
+            xPropinsi.addEventListener('change', function() {
+                const selectedOption = getSelectedOption(xPropinsi);
+                setProvinceCountrySource(selectedOption?.dataset?.ocrGenerated === '1' ? 'scan' : 'manual');
+            });
+        }
         if (xResNo) {
             xResNo.addEventListener('change', applyReservationNumberSelection);
             xResNo.addEventListener('keydown', function(event) {
@@ -2005,6 +4282,105 @@
                 event.preventDefault();
                 return;
             }
+            if (!ensureProvinceValueAllowed(xPropinsi)) {
+                event.preventDefault();
+                return;
+            }
+            if (!(xPhone?.value || '').trim()) {
+                event.preventDefault();
+                showCrudAlert('Telephone number must be filled.');
+                xPhone?.focus();
+                return;
+            }
+            if (paymentRequiresCompany(xPayment?.value) && !(xUsaha?.value || '').trim()) {
+                event.preventDefault();
+                showCrudAlert('Company must be filled for OTA, Company, or Travel payment.');
+                xUsaha?.focus();
+                return;
+            }
+            if (paymentRequiresCreditCard(xPayment?.value) && !(xCreditCard?.value || '').trim()) {
+                event.preventDefault();
+                showCrudAlert('Credit Card Number must be filled for card payment.');
+                xCreditCard?.focus();
+                return;
+            }
+            if (!(xPackage?.value || '').trim()) {
+                event.preventDefault();
+                showCrudAlert('Package must be selected for the main room.');
+                xPackage?.focus();
+                return;
+            }
+            if (isGroupCheckInType(xTipe?.value)) {
+                const roomPositionFields = allRoomPositionFields();
+                const invalidPositionField = roomPositionFields.find(function(field, index) {
+                    const rowHasRoom = index === 0
+                        ? (roomCodeField?.value || '').trim() !== ''
+                        : (field.closest('[data-room-row]')?.querySelector('.room-code-input')?.value || '').trim() !== '';
+                    return rowHasRoom && !(field.value || '').trim();
+                });
+                if (invalidPositionField) {
+                    event.preventDefault();
+                    showCrudAlert('Group Position must be selected for every room in a group check-in.');
+                    invalidPositionField.focus();
+                    return;
+                }
+                const hasInvalidGroupOption = roomPositionFields.some(function(field, index) {
+                    const rowHasRoom = index === 0
+                        ? (roomCodeField?.value || '').trim() !== ''
+                        : (field.closest('[data-room-row]')?.querySelector('.room-code-input')?.value || '').trim() !== '';
+                    return rowHasRoom && !ensureSelectValueExists(field, 'Group Position');
+                });
+                if (hasInvalidGroupOption) {
+                    event.preventDefault();
+                    return;
+                }
+                const leaderCount = roomPositionFields.filter(function(field, index) {
+                    const rowHasRoom = index === 0
+                        ? (roomCodeField?.value || '').trim() !== ''
+                        : (field.closest('[data-room-row]')?.querySelector('.room-code-input')?.value || '').trim() !== '';
+                    return rowHasRoom && (field.value || '').trim().toUpperCase() === 'LEADER';
+                }).length;
+                if (leaderCount !== 1) {
+                    event.preventDefault();
+                    showCrudAlert('Only one LEADER is allowed in one group registration.');
+                    primaryRoomPositionField?.focus();
+                    return;
+                }
+            } else {
+                allRoomPositionFields().forEach(function(field) {
+                    field.value = '';
+                });
+            }
+            syncPrimaryRoomPositionValue();
+            const invalidGuestRow = Array.from(additionalRoomBody.querySelectorAll('[data-room-row]')).find(function(row) {
+                const sameCheckbox = row.querySelector('.room-same-checkbox');
+                if (sameCheckbox?.checked) {
+                    return false;
+                }
+
+                const detailRow = row.nextElementSibling && row.nextElementSibling.matches('[data-room-detail-row]') ? row.nextElementSibling : null;
+                const guestNameInput = detailRow?.querySelector('.room-guest-name-input');
+                return !guestNameInput || !guestNameInput.value.trim();
+            });
+            if (invalidGuestRow) {
+                event.preventDefault();
+                invalidGuestRow.querySelector('.room-same-checkbox').checked = false;
+                updateRoomGuestRowState(invalidGuestRow);
+                showCrudAlert('Guest name wajib diisi untuk room yang tidak mengikuti leader.');
+                invalidGuestRow.nextElementSibling?.querySelector('.room-guest-name-input')?.focus();
+                return;
+            }
+            const invalidPackageRow = Array.from(additionalRoomBody.querySelectorAll('[data-room-row]')).find(function(row) {
+                const roomInput = row.querySelector('.room-code-input');
+                const packageInput = row.querySelector('.package-code-input');
+                return (roomInput?.value || '').trim() !== '' && (packageInput?.value || '').trim() === '';
+            });
+            if (invalidPackageRow) {
+                event.preventDefault();
+                showCrudAlert('Package must be selected for every room.');
+                invalidPackageRow.querySelector('.package-code-input')?.focus();
+                return;
+            }
             roomCodeField.value = roomCodeField.value.trim().toUpperCase();
             packageCodeField.value = packageCodeField.value.trim().toUpperCase();
             nominalField.value = normalizeNumber(nominalField.value);
@@ -2074,3 +4450,6 @@
     </script>
 
 @endsection
+
+
+

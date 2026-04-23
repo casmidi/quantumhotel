@@ -35,4 +35,30 @@ return [
         ],
     ],
 
+    'paddle_ocr' => [
+        'python_path' => env('PADDLE_OCR_PYTHON_PATH'),
+        'script_path' => env('PADDLE_OCR_SCRIPT_PATH'),
+        'lang' => env('PADDLE_OCR_LANG', 'en'),
+    ],
+
+    'google_document_ai' => [
+        'project_id' => env('GOOGLE_DOCUMENT_AI_PROJECT_ID'),
+        'location' => env('GOOGLE_DOCUMENT_AI_LOCATION', 'us'),
+        'processor_id' => env('GOOGLE_DOCUMENT_AI_PROCESSOR_ID'),
+        'processor_version' => env('GOOGLE_DOCUMENT_AI_PROCESSOR_VERSION'),
+        'endpoint' => env('GOOGLE_DOCUMENT_AI_ENDPOINT', 'https://documentai.googleapis.com'),
+        'credentials_path' => env('GOOGLE_DOCUMENT_AI_CREDENTIALS_PATH'),
+        'credentials_json' => env('GOOGLE_DOCUMENT_AI_CREDENTIALS_JSON'),
+        'language_hints' => array_values(array_filter(array_map(
+            static fn ($value) => trim((string) $value),
+            explode(',', (string) env('GOOGLE_DOCUMENT_AI_LANGUAGE_HINTS', 'id,en'))
+        ))),
+    ],
+
+    'openai_ocr' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_OCR_MODEL', 'gpt-5.4'),
+        'detail' => env('OPENAI_OCR_DETAIL', 'high'),
+    ],
+
 ];

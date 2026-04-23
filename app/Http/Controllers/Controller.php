@@ -121,6 +121,13 @@ abstract class Controller
 
     protected function legacyIdSelect(string $table, string $alias = 'id'): string
     {
+        $column = $this->legacyIdColumn($table);
+
+        return $column ? sprintf('%s as %s', $column, $alias) : sprintf('NULL as %s', $alias);
+    }
+
+    protected function legacyIdColumn(string $table): ?string
+    {
         static $columnCache = [];
 
         if (!array_key_exists($table, $columnCache)) {
@@ -129,8 +136,6 @@ abstract class Controller
                 : (Schema::hasColumn($table, 'ID') ? 'ID' : null);
         }
 
-        $column = $columnCache[$table];
-
-        return $column ? sprintf('%s as %s', $column, $alias) : sprintf('NULL as %s', $alias);
+        return $columnCache[$table];
     }
 }

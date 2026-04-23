@@ -209,6 +209,11 @@ Route::post('/checkin', function () {
     return app(CheckinController::class)->store(request());
 });
 
+Route::post('/checkin/scan-ktp', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(CheckinController::class)->scanKtp(request());
+});
+
 Route::post('/checkin/{regNo2}/update', function ($regNo2) {
     if ($response = ensureSessionAccess()) return $response;
     return app(CheckinController::class)->update(request(), $regNo2);
