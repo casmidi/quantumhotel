@@ -2813,6 +2813,7 @@
             return (value || '')
                 .toString()
                 .replace(/[|]/g, 'I')
+                .replace(/[—–]/g, '-')
                 .replace(/[\u00A9\u00AE]/g, ' ')
                 .replace(/[=_~`]/g, ' ')
                 .replace(/[;]+/g, ':')
@@ -2830,7 +2831,13 @@
                 .replace(/\bAGA\s*MA\b/gi, 'AGAMA')
                 .replace(/\bPEKARJAAN\b/gi, 'PEKERJAAN')
                 .replace(/\bPEKERJA\b/gi, 'PEKERJAAN')
+                .replace(/\bPEBERUAN\b/gi, 'PEKERJAAN')
                 .replace(/%OVDESA/gi, 'KELDESA')
+                .replace(/\bPROVING[!I]?\b/gi, 'PROVINSI')
+                .replace(/\bAGARAN\b/gi, 'AGAMA')
+                .replace(/\bSLAM\b/gi, 'ISLAM')
+                .replace(/\bHAN\s+PETS\b/gi, 'STATUS')
+                .replace(/\bTUG\s+LON\b/gi, 'TEMPAT TGL')
                 .replace(/\bOKI\s+JAKARTA\b/gi, 'DKI JAKARTA')
                 .replace(/\s+/g, ' ')
                 .trim();
@@ -2858,8 +2865,11 @@
             if (fieldType === 'address' || fieldType === 'kelurahan' || fieldType === 'kecamatan' || fieldType === 'city' || fieldType === 'province') {
                 cleaned = cleaned
                     .replace(/^(ALAMAT|ADDRESS|KEL\/DESA|KELURAHAN|DESA|KECAMATAN|KAB\/KOTA|KABUPATEN|KOTA|PROVINSI|PROVINCE)[:\-\s]*/i, '')
+                    .replace(/\bPROVINSI([A-Z])/g, '$1')
                     .replace(/\bK[PF](?=[A-Z])/g, 'KP ')
                     .replace(/\bOKI\s+JAKARTA\b/g, 'DKI JAKARTA')
+                    .replace(/\bJAWABAB[A-Z]*\b/g, 'JAWA BARAT')
+                    .replace(/\bN?KUNINGAN\b/g, 'KUNINGAN')
                     .replace(/\bOUR[SI]\b/g, 'DURI')
                     .replace(/\bDURS\b/g, 'DURI')
                     .replace(/\bPALO\b/g, 'PULO')
@@ -2869,6 +2879,9 @@
                     .replace(/([A-Z]{3,})(PULO|PULAU|HILIR|HULU|LOR|KIDUL)\b/g, '$1 $2')
                     .replace(/([A-Z]{2,})NO\.?\s*(\d+)/g, '$1 NO $2')
                     .replace(/\bN[O0]\.?(?=\d)/g, 'NO ')
+                    .replace(/\s+[A-Z]{1,2}\s*\d+$/, '')
+                    .replace(/\s*-\s*\d+$/, '')
+                    .replace(/\s*-\s*$/, '')
                     .replace(/([A-Z])(\d+)/g, '$1 $2')
                     .replace(/(?:\s+[:.,\/-])+$/, '')
                     .trim();
@@ -2878,6 +2891,7 @@
                 cleaned = cleaned
                     .replace(/^AGAMA[:\-\s]*/i, '')
                     .replace(/\bLAM\b/g, 'ISLAM')
+                    .replace(/\bSLAM\b/g, 'ISLAM')
                     .replace(/\bI5LAM\b/g, 'ISLAM')
                     .trim();
             }
@@ -2888,6 +2902,7 @@
                     .replace(/^PEK[A-Z]*[:\-\s]*/i, '')
                     .replace(/\bMENGURAS\b/g, 'MENGURUS')
                     .replace(/\bJAKARTA\s+PUSAT\b$/, '')
+                    .replace(/\bKUNINGAN\b$/, '')
                     .trim();
 
                 if (/\bRUMAH\s+TANGGA\b/.test(cleaned)) {
@@ -2919,12 +2934,21 @@
                 if (/DKI\s*JAKARTA|JAKARTA/i.test(cleaned)) {
                     return 'DKI JAKARTA';
                 }
+                if (/JAWA.*BAR/i.test(cleaned)) {
+                    return 'JAWA BARAT';
+                }
+                if (/JAWA.*TEN/i.test(cleaned)) {
+                    return 'JAWA TENGAH';
+                }
                 return cleaned;
             }
 
             const cityText = cleanupScannedValue(city, 'city');
             if (/JAKARTA/i.test(cityText)) {
                 return 'DKI JAKARTA';
+            }
+            if (/KUNINGAN/i.test(cityText)) {
+                return 'JAWA BARAT';
             }
 
             return '';
@@ -2940,6 +2964,9 @@
             if (jakartaMatch) {
                 return jakartaMatch[0].toUpperCase();
             }
+            if (/KUNINGAN/i.test(cleaned)) {
+                return 'KUNINGAN';
+            }
 
             return cleaned;
         }
@@ -2948,6 +2975,9 @@
             const cleanedCity = cleanupScannedValue(city, 'city');
             if (/JAKARTA/i.test(cleanedCity)) {
                 return 'DKI JAKARTA';
+            }
+            if (/KUNINGAN/i.test(cleanedCity)) {
+                return 'JAWA BARAT';
             }
 
             return '';
@@ -3010,6 +3040,23 @@
                     return {
                         placeOfBirth: cleanupScannedValue(placeRaw, 'placeOfBirth'),
                         birthDate: isoDateFromLooseText(nextDateMatch[1]),
+                    };
+                }
+
+                const placeOnlyRaw = line
+                    .replace(/^TEMP[A-Z]*[:\-\s]*/i, '')
+                    .replace(/^T[G6L][A-Z]*[:\-\s]*/i, '')
+                    .replace(/^LANG[:\-\s]*/i, '')
+                    .replace(/LAHIR/i, '')
+                    .replace(/[,:]?\s*\d.*$/, '')
+                    .replace(/^[:\-\s,]+/, '')
+                    .replace(/[:\-\s,]+$/, '')
+                    .trim();
+
+                if (placeOnlyRaw) {
+                    return {
+                        placeOfBirth: cleanupScannedValue(placeOnlyRaw, 'placeOfBirth'),
+                        birthDate: '',
                     };
                 }
             }
@@ -3133,6 +3180,41 @@
             const maleDay = String((parseInt(day, 10) || 0) + 40).padStart(2, '0');
 
             return [maleDay + month + year, day + month + year];
+        }
+
+        function inferBirthDataFromNik(idNumber, birthData = {}) {
+            const normalizedNik = normalizeNikCandidate(idNumber, 'aggressive');
+            if (normalizedNik.length !== 16) {
+                return {
+                    placeOfBirth: birthData.placeOfBirth || '',
+                    birthDate: birthData.birthDate || '',
+                };
+            }
+
+            let birthDate = birthData.birthDate || '';
+            if (!birthDate) {
+                const rawDay = parseInt(normalizedNik.slice(6, 8), 10);
+                const rawMonth = parseInt(normalizedNik.slice(8, 10), 10);
+                const rawYear = parseInt(normalizedNik.slice(10, 12), 10);
+
+                if (rawDay && rawMonth >= 1 && rawMonth <= 12 && !Number.isNaN(rawYear)) {
+                    const actualDay = rawDay > 40 ? rawDay - 40 : rawDay;
+                    if (actualDay >= 1 && actualDay <= 31) {
+                        const currentTwoDigitYear = new Date().getFullYear() % 100;
+                        const fullYear = rawYear > currentTwoDigitYear ? 1900 + rawYear : 2000 + rawYear;
+                        birthDate = [
+                            String(fullYear),
+                            String(rawMonth).padStart(2, '0'),
+                            String(actualDay).padStart(2, '0'),
+                        ].join('-');
+                    }
+                }
+            }
+
+            return {
+                placeOfBirth: birthData.placeOfBirth || '',
+                birthDate,
+            };
         }
 
         function inferNikRegionPrefix(city, kecamatan, kelurahan, province) {
@@ -3269,12 +3351,13 @@
                 kelurahan,
                 province,
             });
+            const resolvedBirthData = inferBirthDataFromNik(idNumber, birthData);
 
             return {
                 idNumber,
                 name,
-                placeOfBirth: birthData.placeOfBirth,
-                birthDate: birthData.birthDate,
+                placeOfBirth: resolvedBirthData.placeOfBirth,
+                birthDate: resolvedBirthData.birthDate,
                 address,
                 kelurahan,
                 kecamatan,

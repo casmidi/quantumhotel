@@ -1168,16 +1168,39 @@ class CheckinController extends Controller
     {
         $pythonPath = trim((string) config('services.paddle_ocr.python_path', ''));
         $scriptPath = trim((string) config('services.paddle_ocr.script_path', ''));
-        $lang = trim((string) config('services.paddle_ocr.lang', 'en')) ?: 'en';
+        $primaryLang = trim((string) config('services.paddle_ocr.lang', 'en')) ?: 'en';
 
         if ($pythonPath === '' || $scriptPath === '') {
             throw new \RuntimeException('PaddleOCR local runtime is not configured.');
         }
 
+        $candidateLangs = array_values(array_unique(array_filter([
+            $primaryLang,
+            'id',
+            'en',
+        ])));
+
+        $lastException = null;
+        foreach ($candidateLangs as $lang) {
+            try {
+                $rawText = $this->runLocalPaddleOcrProcess($pythonPath, $scriptPath, $image->getRealPath(), $lang);
+                if ($rawText !== '') {
+                    return $rawText;
+                }
+            } catch (\Throwable $exception) {
+                $lastException = $exception;
+            }
+        }
+
+        throw $lastException ?: new \RuntimeException('PaddleOCR local returned empty text.');
+    }
+
+    private function runLocalPaddleOcrProcess(string $pythonPath, string $scriptPath, string $imagePath, string $lang): string
+    {
         $process = new Process([
             $pythonPath,
             $scriptPath,
-            $image->getRealPath(),
+            $imagePath,
             $lang,
         ], base_path(), $this->buildPaddleOcrProcessEnvironment($pythonPath), null, 180);
 
