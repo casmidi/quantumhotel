@@ -762,6 +762,7 @@
     .room-allocation-table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed;
     }
 
     .room-allocation-table thead th {
@@ -790,6 +791,67 @@
         border-radius: 10px;
         border-color: #e2e8f0;
         background: #fff;
+    }
+
+    .room-column-room {
+        width: 11%;
+    }
+
+    .room-column-guest {
+        width: 23%;
+    }
+
+    .room-column-pax {
+        width: 7%;
+    }
+
+    .room-column-package {
+        width: 19%;
+    }
+
+    .room-column-nominal {
+        width: 15%;
+    }
+
+    .room-column-position {
+        width: 10%;
+    }
+
+    .room-column-same {
+        width: 8%;
+    }
+
+    .room-column-action {
+        width: 6%;
+    }
+
+    .room-allocation-table .room-code-cell .package-select,
+    .room-allocation-table .room-code-cell .package-input {
+        max-width: 7rem;
+    }
+
+    .room-allocation-table .room-package-cell .package-select,
+    .room-allocation-table .room-package-cell .package-input {
+        width: 100%;
+        min-width: 11rem;
+    }
+
+    .room-allocation-table .room-pax-cell {
+        text-align: center;
+    }
+
+    .room-allocation-table .room-pax-cell .package-input {
+        width: 4.25rem;
+        min-width: 4.25rem;
+        margin: 0 auto;
+        padding-left: 0.45rem;
+        padding-right: 0.45rem;
+        text-align: center;
+    }
+
+    .room-allocation-table .room-nominal-cell .package-input {
+        width: 100%;
+        min-width: 8rem;
     }
 
     .room-display-text {
@@ -1826,19 +1888,19 @@
                                 <table class="room-allocation-table">
                             <thead>
                                 <tr>
-                                    <th width="15%">Room Number</th>
-                                    <th width="23%">Guest Summary</th>
-                                    <th width="8%">Pax</th>
-                                    <th width="14%">Package Code</th>
-                                    <th width="16%">Nominal</th>
-                                    <th width="10%">Group Position</th>
-                                    <th width="8%" class="text-center">Same as Leader</th>
-                                    <th width="6%" class="text-center">Action</th>
+                                    <th class="room-column-room">Room Number</th>
+                                    <th class="room-column-guest">Guest Summary</th>
+                                    <th class="room-column-pax">Pax</th>
+                                    <th class="room-column-package">Package Code</th>
+                                    <th class="room-column-nominal">Nominal</th>
+                                    <th class="room-column-position">Group Position</th>
+                                    <th class="room-column-same text-center">Same as Leader</th>
+                                    <th class="room-column-action text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>
+                                    <td class="room-code-cell">
                                         <input type="hidden" name="DetailKeyList[]" id="PrimaryDetailKey"
                                             value="{{ $firstDetailKey }}">
                                         <input type="hidden" name="SameAsLeaderList[]" id="PrimarySameAsLeader" value="1">
@@ -1868,12 +1930,12 @@
                                             <span class="room-main-badge" id="PrimaryRoomBadge">Primary</span>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="room-pax-cell">
                                         <input type="number" id="PrimaryRoomPaxDisplay"
                                             class="form-control package-input text-right" value="{{ old('NumberOfPerson', 2) }}"
                                             min="1" max="20">
                                     </td>
-                                    <td>
+                                    <td class="room-package-cell">
                                         <select name="PackageCodeList[]" id="PackageCode"
                                             class="form-control package-select" data-flow data-vb="xPackage">
                                             <option value="">Select package</option>
@@ -1885,7 +1947,7 @@
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td>
+                                    <td class="room-nominal-cell">
                                         <input type="text" id="NominalDisplayVisible"
                                             class="form-control package-input text-right room-muted-display"
                                             data-vb="xNominal"

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Support\HotelBranding;
 use Carbon\Carbon;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -21,8 +22,7 @@ class CheckinController extends Controller
             $perPage = 10;
         }
 
-        $records = $this->loadActiveCheckins($search);
-        $checkins = $this->paginateCollection($records, $perPage, $request);
+        $checkins = $this->loadActiveCheckins($search, $perPage, $request);
         $rooms = $this->loadRoomOptions();
         $packages = $this->loadPackageOptions();
         $typeOptions = $this->loadTypeOptions();
@@ -108,7 +108,7 @@ class CheckinController extends Controller
             'groupPositionOptions' => $groupPositionOptions,
             'salesOptions' => $salesOptions,
             'summary' => [
-                'active' => $this->countActiveCheckins($search),
+                'active' => $checkins->total(),
                 'rooms_ready' => collect($rooms)->where('available', true)->count(),
                 'packages' => count($packages),
             ],
@@ -970,7 +970,7 @@ class CheckinController extends Controller
             ]);
     }
 
-    private function loadActiveCheckins(string $search)
+    private function loadActiveCheckins(string $search, int $perPage, Request $request): LengthAwarePaginator
     {
         $idSelect = $this->legacyIdSelect('DATA2');
         $query = DB::table('DATA2')
@@ -989,99 +989,127 @@ class CheckinController extends Controller
             });
         }
 
-        $rows = $query
+        $paginator = $query
             ->orderByDesc('TglIn')
             ->orderByDesc('RegNo2')
-            ->get();
+            ->paginate($perPage, ['*'], 'page', max((int) $request->query('page', 1), 1))
+            ->appends($request->query());
 
-        $groupedRows = $rows->groupBy(fn ($row) => trim((string) ($row->RegNo ?? '')));
+        $pageRows = collect($paginator->items());
+        $regNos = $pageRows
+            ->pluck('RegNo')
+            ->map(fn ($value) => trim((string) $value))
+            ->filter()
+            ->unique()
+            ->values();
 
-        return $rows->map(function ($row) use ($groupedRows) {
-                $registrationRows = $groupedRows->get(trim((string) ($row->RegNo ?? '')), collect())->values();
-                $primaryRow = $registrationRows->first() ?: $row;
-                $row->check_in_date = !empty($row->TglIn) ? Carbon::parse($row->TglIn)->format('d-m-Y') : '';
-                $row->check_out_date = !empty($row->TglKeluar) ? Carbon::parse($row->TglKeluar)->format('d-m-Y') : '';
-                $row->birth_date_iso = !empty($row->TglLahir) ? Carbon::parse($row->TglLahir)->format('Y-m-d') : '';
-                $row->expired_date_iso = !empty($row->Expired) ? Carbon::parse($row->Expired)->format('Y-m-d') : '';
-                $row->check_in_date_iso = !empty($row->TglIn) ? Carbon::parse($row->TglIn)->format('Y-m-d') : '';
-                $row->check_out_date_iso = !empty($row->TglKeluar) ? Carbon::parse($row->TglKeluar)->format('Y-m-d') : '';
-                $row->check_in_time = $this->displayTime($row->JamIn ?? null);
-                $row->nominal_display = number_format((float) ($row->Nominal ?? 0), 0, ',', '.');
-                $row->guest_status = 'STAY';
-                $additionalRooms = $registrationRows->slice(1)->map(function ($detail) use ($primaryRow) {
-                    $detailBirthDate = !empty($detail->TglLahir) ? Carbon::parse($detail->TglLahir)->format('Y-m-d') : '';
-                    $sameAsLeader = strtoupper(trim((string) ($detail->Guest ?? ''))) === strtoupper(trim((string) ($primaryRow->Guest ?? '')))
-                        && strtoupper(trim((string) ($detail->KTP ?? ''))) === strtoupper(trim((string) ($primaryRow->KTP ?? '')))
-                        && strtoupper(trim((string) ($detail->Alamat ?? ''))) === strtoupper(trim((string) ($primaryRow->Alamat ?? '')))
-                        && trim((string) ($detail->Phone ?? '')) === trim((string) ($primaryRow->Phone ?? ''))
-                        && trim((string) ($detail->Email ?? '')) === trim((string) ($primaryRow->Email ?? ''))
-                        && strtoupper(trim((string) ($detail->KodeNegara ?? ''))) === strtoupper(trim((string) ($primaryRow->KodeNegara ?? '')))
-                        && strtoupper(trim((string) ($detail->TypeOfId ?? ''))) === strtoupper(trim((string) ($primaryRow->TypeOfId ?? '')))
-                        && $detailBirthDate === (!empty($primaryRow->TglLahir) ? Carbon::parse($primaryRow->TglLahir)->format('Y-m-d') : '');
+        $groupedRows = collect();
+        if ($regNos->isNotEmpty()) {
+            $allRelatedRows = DB::table('DATA2')
+                ->selectRaw("$idSelect, Pst, RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode, RTRIM(Guest) as Guest, RTRIM(Guest2) as Guest2, RTRIM(Tipe) as Tipe, RTRIM(Payment) as Payment, RTRIM(Segment) as Segment, RTRIM(Package) as Package, RTRIM(Receipt) as Receipt, RTRIM(TypeId) as TypeOfId, RTRIM(KTP) as KTP, RTRIM(Alamat) as Alamat, RTRIM(Kelurahan) as Kelurahan, RTRIM(Kecamatan) as Kecamatan, RTRIM(Kota) as Kota, RTRIM(Propinsi) as Propinsi, RTRIM(PlaceBirth) as PlaceBirth, RTRIM(Agama) as Agama, RTRIM(KodeNegara) as KodeNegara, RTRIM(Usaha) as Usaha, RTRIM(Profesi) as Profesi, RTRIM(CardNumber) as CardNumber, RTRIM(Remark) as Remark, RTRIM(Posisi) as Posisi, RTRIM(Phone) as Phone, RTRIM(Email) as Email, RTRIM(Member) as Member, RTRIM(Sales) as Sales, TglIn, JamIn, JamOut, TglKeluar, TglLahir, Expired, Person, BF, Nominal, SafeDeposit")
+                ->where('Pst', '=', ' ')
+                ->whereRaw("RTRIM(Kode) <> '999'")
+                ->whereIn(DB::raw('RTRIM(RegNo)'), $regNos->all())
+                ->orderByDesc('TglIn')
+                ->orderByDesc('RegNo2')
+                ->get();
 
-                    return [
-                        'detailKey' => trim((string) ($detail->RegNo2 ?? '')),
-                        'roomCode' => trim((string) ($detail->Kode ?? '')),
-                        'packageCode' => trim((string) ($detail->Package ?? '')),
-                        'nominal' => (string) ((float) ($detail->Nominal ?? 0)),
-                        'breakfast' => (int) ($detail->BF ?? 0),
-                        'groupPosition' => trim((string) ($detail->Posisi ?? '')),
-                        'guestName' => trim((string) ($detail->Guest ?? '')),
-                        'guestIdType' => trim((string) ($detail->TypeOfId ?? 'KTP')),
-                        'guestIdNumber' => trim((string) ($detail->KTP ?? '')),
-                        'guestBirthDate' => $detailBirthDate,
-                        'guestPhone' => trim((string) ($detail->Phone ?? '')),
-                        'guestEmail' => trim((string) ($detail->Email ?? '')),
-                        'guestAddress' => trim((string) ($detail->Alamat ?? '')),
-                        'guestNationality' => trim((string) ($detail->KodeNegara ?? 'INA')),
-                        'sameAsLeader' => $sameAsLeader,
-                    ];
-                })->values()->all();
-                $row->record_json = $this->encodeRecordPayload([
-                    'Id' => $primaryRow->id,
-                    'DetailKey' => $primaryRow->RegNo2,
-                    'RegNo' => $primaryRow->RegNo,
-                    'RoomCode' => $primaryRow->Kode,
-                    'GuestName' => $primaryRow->Guest,
-                    'GuestName2' => $primaryRow->Guest2,
-                    'ReservationNumber' => $primaryRow->Receipt,
-                    'TypeOfCheckIn' => $primaryRow->Tipe,
-                    'CheckInDate' => !empty($primaryRow->TglIn) ? Carbon::parse($primaryRow->TglIn)->format('Y-m-d') : '',
-                    'CheckInTime' => $this->displayTime($primaryRow->JamIn ?? null),
-                    'EstimationOut' => !empty($primaryRow->TglKeluar) ? Carbon::parse($primaryRow->TglKeluar)->format('Y-m-d') : '',
-                    'PlaceOfBirth' => $primaryRow->PlaceBirth,
-                    'BirthDate' => !empty($primaryRow->TglLahir) ? Carbon::parse($primaryRow->TglLahir)->format('Y-m-d') : '',
-                    'Religion' => $primaryRow->Agama,
-                    'Nationality' => $primaryRow->KodeNegara,
-                    'NumberOfPerson' => (int) ($primaryRow->Person ?? 1),
-                    'PaymentMethod' => $primaryRow->Payment,
-                    'Company' => $primaryRow->Usaha,
-                    'CreditCardNumber' => $primaryRow->CardNumber,
-                    'Occupation' => $primaryRow->Profesi,
-                    'Segment' => $primaryRow->Segment,
-                    'Phone' => $primaryRow->Phone,
-                    'Email' => $primaryRow->Email,
-                    'Breakfast' => (int) ($primaryRow->BF ?? 0),
-                    'Remarks' => $primaryRow->Remark,
-                    'Member' => $primaryRow->Member,
-                    'Sales' => $primaryRow->Sales,
-                    'Address' => $primaryRow->Alamat,
-                    'Kelurahan' => $primaryRow->Kelurahan,
-                    'Kecamatan' => $primaryRow->Kecamatan,
-                    'KabCity' => $primaryRow->Kota,
-                    'ProvinceCountry' => $primaryRow->Propinsi,
-                    'TypeOfId' => $primaryRow->TypeOfId,
-                    'IdNumber' => $primaryRow->KTP,
-                    'ExpiredDate' => !empty($primaryRow->Expired) ? Carbon::parse($primaryRow->Expired)->format('Y-m-d') : '',
-                    'GroupPosition' => $primaryRow->Posisi,
-                    'PackageCode' => $primaryRow->Package,
-                    'Nominal' => (float) ($primaryRow->Nominal ?? 0),
-                    'CheckDeposit' => (int) ($primaryRow->SafeDeposit ?? 0),
-                    'AdditionalRooms' => $additionalRooms,
-                ]);
+            $groupedRows = $allRelatedRows->groupBy(fn ($row) => trim((string) ($row->RegNo ?? '')));
+        }
 
-                return $row;
-            });
+        $processedRows = $pageRows->map(function ($row) use ($groupedRows) {
+            return $this->hydrateActiveCheckinRow($row, $groupedRows);
+        });
+
+        return $paginator->setCollection($processedRows);
+    }
+
+    private function hydrateActiveCheckinRow(object $row, $groupedRows): object
+    {
+        $registrationRows = $groupedRows->get(trim((string) ($row->RegNo ?? '')), collect())->values();
+        $primaryRow = $registrationRows->first() ?: $row;
+        $row->check_in_date = !empty($row->TglIn) ? Carbon::parse($row->TglIn)->format('d-m-Y') : '';
+        $row->check_out_date = !empty($row->TglKeluar) ? Carbon::parse($row->TglKeluar)->format('d-m-Y') : '';
+        $row->birth_date_iso = !empty($row->TglLahir) ? Carbon::parse($row->TglLahir)->format('Y-m-d') : '';
+        $row->expired_date_iso = !empty($row->Expired) ? Carbon::parse($row->Expired)->format('Y-m-d') : '';
+        $row->check_in_date_iso = !empty($row->TglIn) ? Carbon::parse($row->TglIn)->format('Y-m-d') : '';
+        $row->check_out_date_iso = !empty($row->TglKeluar) ? Carbon::parse($row->TglKeluar)->format('Y-m-d') : '';
+        $row->check_in_time = $this->displayTime($row->JamIn ?? null);
+        $row->nominal_display = number_format((float) ($row->Nominal ?? 0), 0, ',', '.');
+        $row->guest_status = 'STAY';
+        $additionalRooms = $registrationRows->slice(1)->map(function ($detail) use ($primaryRow) {
+            $detailBirthDate = !empty($detail->TglLahir) ? Carbon::parse($detail->TglLahir)->format('Y-m-d') : '';
+            $sameAsLeader = strtoupper(trim((string) ($detail->Guest ?? ''))) === strtoupper(trim((string) ($primaryRow->Guest ?? '')))
+                && strtoupper(trim((string) ($detail->KTP ?? ''))) === strtoupper(trim((string) ($primaryRow->KTP ?? '')))
+                && strtoupper(trim((string) ($detail->Alamat ?? ''))) === strtoupper(trim((string) ($primaryRow->Alamat ?? '')))
+                && trim((string) ($detail->Phone ?? '')) === trim((string) ($primaryRow->Phone ?? ''))
+                && trim((string) ($detail->Email ?? '')) === trim((string) ($primaryRow->Email ?? ''))
+                && strtoupper(trim((string) ($detail->KodeNegara ?? ''))) === strtoupper(trim((string) ($primaryRow->KodeNegara ?? '')))
+                && strtoupper(trim((string) ($detail->TypeOfId ?? ''))) === strtoupper(trim((string) ($primaryRow->TypeOfId ?? '')))
+                && $detailBirthDate === (!empty($primaryRow->TglLahir) ? Carbon::parse($primaryRow->TglLahir)->format('Y-m-d') : '');
+
+            return [
+                'detailKey' => trim((string) ($detail->RegNo2 ?? '')),
+                'roomCode' => trim((string) ($detail->Kode ?? '')),
+                'packageCode' => trim((string) ($detail->Package ?? '')),
+                'nominal' => (string) ((float) ($detail->Nominal ?? 0)),
+                'breakfast' => (int) ($detail->BF ?? 0),
+                'groupPosition' => trim((string) ($detail->Posisi ?? '')),
+                'guestName' => trim((string) ($detail->Guest ?? '')),
+                'guestIdType' => trim((string) ($detail->TypeOfId ?? 'KTP')),
+                'guestIdNumber' => trim((string) ($detail->KTP ?? '')),
+                'guestBirthDate' => $detailBirthDate,
+                'guestPhone' => trim((string) ($detail->Phone ?? '')),
+                'guestEmail' => trim((string) ($detail->Email ?? '')),
+                'guestAddress' => trim((string) ($detail->Alamat ?? '')),
+                'guestNationality' => trim((string) ($detail->KodeNegara ?? 'INA')),
+                'sameAsLeader' => $sameAsLeader,
+            ];
+        })->values()->all();
+        $row->record_json = $this->encodeRecordPayload([
+            'Id' => $primaryRow->id,
+            'DetailKey' => $primaryRow->RegNo2,
+            'RegNo' => $primaryRow->RegNo,
+            'RoomCode' => $primaryRow->Kode,
+            'GuestName' => $primaryRow->Guest,
+            'GuestName2' => $primaryRow->Guest2,
+            'ReservationNumber' => $primaryRow->Receipt,
+            'TypeOfCheckIn' => $primaryRow->Tipe,
+            'CheckInDate' => !empty($primaryRow->TglIn) ? Carbon::parse($primaryRow->TglIn)->format('Y-m-d') : '',
+            'CheckInTime' => $this->displayTime($primaryRow->JamIn ?? null),
+            'EstimationOut' => !empty($primaryRow->TglKeluar) ? Carbon::parse($primaryRow->TglKeluar)->format('Y-m-d') : '',
+            'PlaceOfBirth' => $primaryRow->PlaceBirth,
+            'BirthDate' => !empty($primaryRow->TglLahir) ? Carbon::parse($primaryRow->TglLahir)->format('Y-m-d') : '',
+            'Religion' => $primaryRow->Agama,
+            'Nationality' => $primaryRow->KodeNegara,
+            'NumberOfPerson' => (int) ($primaryRow->Person ?? 1),
+            'PaymentMethod' => $primaryRow->Payment,
+            'Company' => $primaryRow->Usaha,
+            'CreditCardNumber' => $primaryRow->CardNumber,
+            'Occupation' => $primaryRow->Profesi,
+            'Segment' => $primaryRow->Segment,
+            'Phone' => $primaryRow->Phone,
+            'Email' => $primaryRow->Email,
+            'Breakfast' => (int) ($primaryRow->BF ?? 0),
+            'Remarks' => $primaryRow->Remark,
+            'Member' => $primaryRow->Member,
+            'Sales' => $primaryRow->Sales,
+            'Address' => $primaryRow->Alamat,
+            'Kelurahan' => $primaryRow->Kelurahan,
+            'Kecamatan' => $primaryRow->Kecamatan,
+            'KabCity' => $primaryRow->Kota,
+            'ProvinceCountry' => $primaryRow->Propinsi,
+            'TypeOfId' => $primaryRow->TypeOfId,
+            'IdNumber' => $primaryRow->KTP,
+            'ExpiredDate' => !empty($primaryRow->Expired) ? Carbon::parse($primaryRow->Expired)->format('Y-m-d') : '',
+            'GroupPosition' => $primaryRow->Posisi,
+            'PackageCode' => $primaryRow->Package,
+            'Nominal' => (float) ($primaryRow->Nominal ?? 0),
+            'CheckDeposit' => (int) ($primaryRow->SafeDeposit ?? 0),
+            'AdditionalRooms' => $additionalRooms,
+        ]);
+
+        return $row;
     }
 
     private function encodeRecordPayload(array $payload): string
@@ -2189,15 +2217,19 @@ class CheckinController extends Controller
         return DB::table('Book')
             ->join('Book2', 'Book.ResNo', '=', 'Book2.ResNo')
             ->selectRaw("
-                RTRIM(Book2.ResNo) as ResNo,
                 RTRIM(Book2.TelPhone) as TelPhone,
                 RTRIM(Book2.Remark) as Remark,
                 RTRIM(Book2.OriginalGuest) as OriginalGuest,
+                RTRIM(Book2.ResNo) as ResNo,
                 Book2.TglIn as TglIn,
                 RTRIM(Book2.Alamat) as Alamat,
+                RTRIM(Book2.Kode) as Kode,
+                RTRIM(Book2.Kelas) as Kelas,
+                RTRIM(Book2.AcceptBy) as AcceptBy,
                 CASE WHEN ISNULL(Book2.Batal, 0) = 0 THEN '' ELSE 'Cancel' END as Status
             ")
             ->whereRaw("LTRIM(RTRIM(ISNULL(Book2.ResNo, ''))) <> ''")
+            ->whereDate('Book2.TglIn', '>', Carbon::today()->format('Y-m-d'))
             ->orderByDesc('Book2.TglIn')
             ->orderByDesc('Book2.ResNo')
             ->get()
@@ -2208,9 +2240,9 @@ class CheckinController extends Controller
                     'remarks' => trim((string) ($row->Remark ?? '')),
                     'original_guest' => trim((string) ($row->OriginalGuest ?? '')),
                     'address' => trim((string) ($row->Alamat ?? '')),
-                    'room_code' => '',
-                    'room_class' => '',
-                    'accept_by' => '',
+                    'room_code' => trim((string) ($row->Kode ?? '')),
+                    'room_class' => trim((string) ($row->Kelas ?? '')),
+                    'accept_by' => trim((string) ($row->AcceptBy ?? '')),
                     'status' => trim((string) ($row->Status ?? '')),
                     'check_in_date' => !empty($row->TglIn) ? Carbon::parse($row->TglIn)->format('Y-m-d') : '',
                     'nationality' => 'INA',
