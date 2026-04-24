@@ -42,12 +42,15 @@ class NightAuditController extends Controller
             ? $this->loadBatchPayload($selectedBatch)
             : $this->buildPreviewPayload($auditDate);
 
+        $standardReports = $this->buildStandardReportCatalog($payload, $selectedBatch);
+
         $viewData = array_merge($payload, [
             'schemaReady' => $schemaReady,
             'auditDate' => $auditDate,
             'batches' => $batches,
             'selectedBatch' => $selectedBatch,
             'statusOptions' => ['Pending', 'Ready', 'Done', 'Blocked', 'Waived'],
+            'standardReports' => $standardReports,
         ]);
 
         return $this->respond($request, 'night-audit.index', $viewData, [
@@ -55,6 +58,33 @@ class NightAuditController extends Controller
             'audit_date' => $auditDate,
             'selected_batch' => $selectedBatch,
             'payload' => $payload,
+            'standard_reports' => $standardReports,
+        ]);
+    }
+
+    public function report(Request $request, int $batchId)
+    {
+        if (!$this->schemaReady()) {
+            return $this->respondError($request, 'Tabel night audit belum tersedia.', 422, [], '/night-audit', false);
+        }
+
+        $batch = $this->findBatch($batchId);
+        if (!$batch) {
+            return $this->respondError($request, 'Night audit batch tidak ditemukan.', 404, [], '/night-audit', false);
+        }
+
+        $payload = $this->loadBatchPayload($batch);
+        $standardReports = $this->buildStandardReportCatalog($payload, $batch);
+        $reportPack = $this->buildStandardReportPack($payload);
+
+        return $this->respond($request, 'night-audit.report', array_merge($payload, [
+            'batch' => $batch,
+            'standardReports' => $standardReports,
+            'reportPack' => $reportPack,
+        ]), [
+            'batch' => $batch,
+            'standard_reports' => $standardReports,
+            'report_pack' => $reportPack,
         ]);
     }
 
