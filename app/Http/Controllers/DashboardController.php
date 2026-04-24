@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
@@ -305,12 +306,206 @@ class DashboardController extends Controller
             ],
         ]);
 
+        $todaySnapshot = $this->buildTodaySnapshot(
+            $today->toDateString(),
+            $counts,
+            $totalRooms,
+            $operationalBase,
+            $complimentaryOnly
+        );
+
         return view('dashboard', [
             'metrics' => $metrics,
             'occupiedBreakdown' => $occupiedBreakdown,
             'statusRoomLists' => $statusRoomLists,
             'totalRooms' => $totalRooms,
             'operationalBase' => $operationalBase,
+            'todaySnapshot' => $todaySnapshot,
         ]);
+    }
+
+    private function buildTodaySnapshot(
+        string $businessDate,
+        array $counts,
+        int $totalRooms,
+        int $operationalBase,
+        int $complimentaryOnly
+    ): array {
+        $inHouseRooms = $counts['occupied'] + $complimentaryOnly + $counts['owner_unit'];
+        $roomsAvailable = $counts['vacant_ready'] + $counts['vacant_clean'];
+        $occupancyPercent = $operationalBase > 0 ? round(($inHouseRooms / $operationalBase) * 100, 2) : 0;
+        $activeData2 = $this->activeData2Stats($businessDate);
+
+        $summary = [
+            'source_label' => 'Live DATA2',
+            'business_date' => $businessDate,
+            'rooms_available' => $roomsAvailable,
+            'estimated_occupied' => $inHouseRooms,
+            'guest_in_house' => $activeData2['guest_in_house'],
+            'arrival_count' => $activeData2['arrival_count'],
+            'departure_count' => $activeData2['departure_count'],
+            'complimentary_rooms' => $complimentaryOnly,
+            'owner_unit' => $counts['owner_unit'],
+            'vacant_ready' => $counts['vacant_ready'],
+            'vacant_clean' => $counts['vacant_clean'],
+            'vacant_dirty' => $counts['vacant_dirty'],
+            'renovated' => $counts['renovated'],
+            'out_of_order' => $counts['out_of_order'],
+            'occupancy_percent' => $occupancyPercent,
+            'room_revenue' => $activeData2['room_revenue'],
+            'gross_revenue' => $activeData2['room_revenue'],
+            'deposit_total' => $activeData2['deposit_total'],
+            'exception_count' => 0,
+        ];
+
+        $nightAudit = $this->nightAuditSummary($businessDate);
+        if ($nightAudit !== null) {
+            $summary = array_merge($summary, $nightAudit);
+        }
+
+        return [
+            'source_label' => $summary['source_label'],
+            'business_date' => $summary['business_date'],
+            'rows' => [
+                ['label' => 'Rooms Available', 'value' => $summary['rooms_available'], 'tone' => 'ready', 'format' => 'number'],
+                ['label' => 'Estimated Occupied', 'value' => $summary['estimated_occupied'], 'tone' => 'occupied', 'format' => 'number'],
+                ['label' => 'Guests In House', 'value' => $summary['guest_in_house'], 'tone' => 'occupied', 'format' => 'number'],
+                ['label' => 'Arrival Today', 'value' => $summary['arrival_count'], 'tone' => 'primary', 'format' => 'number'],
+                ['label' => 'Departure Today', 'value' => $summary['departure_count'], 'tone' => 'primary', 'format' => 'number'],
+                ['label' => 'Complimentary Rooms', 'value' => $summary['complimentary_rooms'], 'tone' => 'complimentary', 'format' => 'number'],
+                ['label' => 'Owner Unit', 'value' => $summary['owner_unit'], 'tone' => 'owner', 'format' => 'number'],
+                ['label' => 'Vacant Ready', 'value' => $summary['vacant_ready'], 'tone' => 'ready', 'format' => 'number'],
+                ['label' => 'Vacant Clean', 'value' => $summary['vacant_clean'], 'tone' => 'clean', 'format' => 'number'],
+                ['label' => 'Vacant Dirty', 'value' => $summary['vacant_dirty'], 'tone' => 'dirty', 'format' => 'number'],
+                ['label' => 'Renovated', 'value' => $summary['renovated'], 'tone' => 'restricted', 'format' => 'number'],
+                ['label' => 'Out Of Order', 'value' => $summary['out_of_order'], 'tone' => 'restricted', 'format' => 'number'],
+                ['label' => '% Occupancy', 'value' => $summary['occupancy_percent'], 'tone' => 'occupied', 'format' => 'percent'],
+                ['label' => 'Room Revenue', 'value' => $summary['room_revenue'], 'tone' => 'primary', 'format' => 'money'],
+                ['label' => 'Total Revenue', 'value' => $summary['gross_revenue'], 'tone' => 'primary', 'format' => 'money'],
+                ['label' => 'Deposit Total', 'value' => $summary['deposit_total'], 'tone' => 'ready', 'format' => 'money'],
+                ['label' => 'Night Audit Exceptions', 'value' => $summary['exception_count'], 'tone' => 'restricted', 'format' => 'number'],
+            ],
+        ];
+    }
+
+    private function nightAuditSummary(string $businessDate): ?array
+    {
+        if (!Schema::hasTable('night_audit_batches')) {
+            return null;
+        }
+
+        $batch = DB::table('night_audit_batches')
+            ->whereDate('business_date', $businessDate)
+            ->orderByDesc('id')
+            ->first();
+
+        if (!$batch) {
+            return null;
+        }
+
+        $source = 'Night Audit';
+        if (!empty($batch->status)) {
+            $source .= ' ' . trim((string) $batch->status);
+        }
+
+        return [
+            'source_label' => $source,
+            'business_date' => Carbon::parse($batch->business_date)->format('Y-m-d'),
+            'rooms_available' => (int) ($batch->vacant_rooms ?? 0),
+            'estimated_occupied' => (int) ($batch->occupied_rooms ?? 0),
+            'guest_in_house' => (int) ($batch->in_house_count ?? 0),
+            'arrival_count' => (int) ($batch->arrival_count ?? 0),
+            'departure_count' => (int) ($batch->departure_count ?? 0),
+            'complimentary_rooms' => (int) ($batch->complimentary_rooms ?? 0),
+            'owner_unit' => (int) ($batch->house_use_rooms ?? 0),
+            'occupancy_percent' => (float) ($batch->occupancy_percent ?? 0),
+            'room_revenue' => (float) ($batch->room_revenue ?? 0),
+            'gross_revenue' => (float) ($batch->gross_revenue ?? 0),
+            'deposit_total' => (float) ($batch->deposit_total ?? 0),
+            'exception_count' => (int) ($batch->exception_count ?? 0),
+        ];
+    }
+
+    private function activeData2Stats(string $businessDate): array
+    {
+        return [
+            'arrival_count' => $this->countRowsByDate('DATA2', 'TglIn', $businessDate),
+            'departure_count' => $this->countRowsByDate('DATA2', 'TglKeluar', $businessDate),
+            'guest_in_house' => $this->sumActiveData2People(),
+            'room_revenue' => $this->sumActiveData2RoomRevenue(),
+            'deposit_total' => $this->sumActiveDeposit(),
+        ];
+    }
+
+    private function countRowsByDate(string $table, string $column, string $businessDate): int
+    {
+        if (!Schema::hasTable($table) || !Schema::hasColumn($table, $column)) {
+            return 0;
+        }
+
+        $query = DB::table($table)->whereDate($column, $businessDate);
+
+        if (Schema::hasColumn($table, 'Kode')) {
+            $query->whereRaw("RTRIM(Kode) <> '999'");
+        }
+
+        return (int) $query->count();
+    }
+
+    private function activeData2BaseQuery()
+    {
+        return DB::table('DATA2')
+            ->where('DATA2.Pst', '=', ' ')
+            ->whereRaw("RTRIM(DATA2.Kode) <> '999'");
+    }
+
+    private function sumActiveData2People(): int
+    {
+        if (!Schema::hasTable('DATA2') || !Schema::hasColumn('DATA2', 'Person')) {
+            return 0;
+        }
+
+        try {
+            return (int) $this->activeData2BaseQuery()
+                ->selectRaw('SUM(COALESCE(TRY_CONVERT(int, Person), 0)) as total')
+                ->value('total');
+        } catch (\Throwable $exception) {
+            return (int) $this->activeData2BaseQuery()->sum('Person');
+        }
+    }
+
+    private function sumActiveData2RoomRevenue(): float
+    {
+        if (!Schema::hasTable('DATA2') || !Schema::hasColumn('DATA2', 'Nominal')) {
+            return 0;
+        }
+
+        $discountExpression = Schema::hasColumn('DATA2', 'Disc')
+            ? 'COALESCE(Nominal, 0) * COALESCE(Disc, 0) / 100'
+            : '0';
+
+        $paymentExpression = Schema::hasColumn('DATA2', 'Payment')
+            ? "WHEN UPPER(RTRIM(Payment)) LIKE '%COMPLIMENT%' OR UPPER(RTRIM(Payment)) LIKE '%HOUSE%' THEN 0"
+            : '';
+
+        return (float) $this->activeData2BaseQuery()
+            ->selectRaw("
+                SUM(CASE
+                    {$paymentExpression}
+                    ELSE COALESCE(Nominal, 0) - {$discountExpression}
+                END) as total
+            ")
+            ->value('total');
+    }
+
+    private function sumActiveDeposit(): float
+    {
+        if (!Schema::hasTable('DATA') || !Schema::hasTable('DATA2') || !Schema::hasColumn('DATA', 'Deposit')) {
+            return 0;
+        }
+
+        return (float) $this->activeData2BaseQuery()
+            ->leftJoin('DATA', 'DATA2.RegNo', '=', 'DATA.RegNo')
+            ->sum('DATA.Deposit');
     }
 }
