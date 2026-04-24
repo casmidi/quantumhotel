@@ -479,6 +479,165 @@
         grid-column: span 2;
     }
 
+    .na-topbar-title {
+        color: var(--package-title);
+    }
+
+    .na-topbar-subtitle,
+    .na-batch-meta,
+    .na-report-card p,
+    .na-report-meta,
+    .na-checklist-title small {
+        color: var(--package-muted);
+    }
+
+    .na-page {
+        color: var(--package-text);
+    }
+
+    .na-topbar-pill,
+    .na-panel,
+    .na-stat,
+    .na-batch-link,
+    .na-empty,
+    .na-report-card,
+    .na-mini-panel {
+        background: var(--package-shell-bg);
+        border-color: var(--package-shell-border);
+        box-shadow: 0 12px 28px rgba(16, 35, 59, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .na-panel {
+        box-shadow: var(--package-shell-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .na-panel-header {
+        background: var(--package-header-bg);
+        border-bottom-color: var(--package-shell-border);
+    }
+
+    .na-panel-header h3,
+    .na-topbar-pill strong,
+    .na-stat strong,
+    .na-batch-link strong,
+    .na-report-card h4,
+    .na-mini-panel h4,
+    .na-checklist-title strong {
+        color: var(--package-title);
+    }
+
+    .na-topbar-pill small,
+    .na-stat small,
+    .na-field label,
+    .na-table thead th {
+        color: var(--package-label);
+    }
+
+    .na-page .form-control,
+    .na-page .custom-select {
+        min-height: 42px;
+        border-radius: 8px;
+        border: 1px solid var(--package-input-border);
+        background: var(--package-input-bg);
+        color: var(--package-text);
+        box-shadow: inset 0 1px 2px rgba(16, 35, 59, 0.04);
+        font-weight: 700;
+    }
+
+    .na-page .form-control:focus,
+    .na-page .custom-select:focus {
+        border-color: var(--package-input-focus);
+        box-shadow: var(--package-input-focus-shadow);
+    }
+
+    .na-page .form-control::placeholder {
+        color: var(--package-muted);
+        opacity: 0.78;
+    }
+
+    .na-page hr {
+        border-top-color: var(--package-shell-border);
+    }
+
+    .na-batch-link {
+        color: var(--package-text);
+    }
+
+    .na-batch-link:hover {
+        color: var(--package-text);
+        background: var(--package-heading-bg);
+        border-color: var(--package-input-focus);
+    }
+
+    .na-batch-link.is-active {
+        border-color: var(--package-input-focus);
+        box-shadow: inset 4px 0 0 var(--package-table-hover-accent), 0 12px 24px rgba(16, 35, 59, 0.08);
+    }
+
+    .na-tabs .nav-link {
+        border-color: var(--package-input-border);
+        background: var(--package-button-secondary-bg);
+        color: var(--package-button-secondary-text);
+    }
+
+    .na-tabs .nav-link:hover {
+        background: var(--package-badge-bg);
+        color: var(--package-badge-text);
+    }
+
+    .na-tabs .nav-link.active {
+        color: #fff;
+        background: var(--package-button-primary);
+        border-color: transparent;
+    }
+
+    .na-table thead th {
+        background: var(--package-table-head-bg);
+        color: var(--package-title);
+        border-bottom-color: var(--package-shell-border);
+    }
+
+    .na-table tbody td {
+        color: var(--package-text);
+        border-top-color: var(--package-shell-border);
+    }
+
+    .na-table tbody tr:nth-child(odd) {
+        background: var(--package-table-odd);
+    }
+
+    .na-table tbody tr:nth-child(even) {
+        background: var(--package-table-even);
+    }
+
+    .na-table tbody tr:hover {
+        background: var(--package-table-hover);
+    }
+
+    .na-empty {
+        background: var(--package-heading-bg);
+        border-style: dashed;
+        color: var(--package-muted);
+    }
+
+    .na-report-point,
+    .na-risk {
+        background: var(--package-badge-bg);
+        color: var(--package-badge-text);
+    }
+
+    .na-stat.is-money strong {
+        color: var(--package-table-hover-accent);
+    }
+
+    .na-page .alert-warning {
+        border: 1px solid var(--package-shell-border);
+        border-radius: 8px;
+        background: var(--package-heading-bg);
+        color: var(--package-text);
+        box-shadow: 0 12px 28px rgba(16, 35, 59, 0.06);
+    }
+
     @media (max-width: 1199.98px) {
         .na-grid,
         .na-mini-grid {
