@@ -868,6 +868,199 @@ class NightAuditController extends Controller
         ];
     }
 
+    private function buildStandardReportCatalog(array $payload, ?object $batch): Collection
+    {
+        $summary = $payload['summary'] ?? [];
+        $roomSnapshots = collect($payload['roomSnapshots'] ?? []);
+        $revenueLines = collect($payload['revenueLines'] ?? []);
+        $cashierSummaries = collect($payload['cashierSummaries'] ?? []);
+        $housekeepingExceptions = collect($payload['housekeepingExceptions'] ?? []);
+        $adjustments = collect($payload['adjustments'] ?? []);
+        $checklists = collect($payload['checklists'] ?? []);
+        $hasBatch = (bool) $batch;
+        $criticalExceptions = (int) ($summary['critical_exception_count'] ?? 0);
+        $blockedChecklist = $checklists->filter(fn ($row) => in_array((string) ($row->status ?? ''), ['Blocked', 'Pending'], true))->count();
+
+        return collect([
+            [
+                'code' => 'NA-01',
+                'title' => 'Executive Night Audit Summary',
+                'owner' => 'General Manager / Duty Manager',
+                'frequency' => 'Daily',
+                'status' => $hasBatch ? 'Ready' : 'Preview Only',
+                'purpose' => 'Ringkasan resmi business date, occupancy, revenue, cashier, exception, dan approval.',
+                'control_points' => ['Business date', 'Occupancy', 'Gross revenue', 'Cash/non-cash receipt', 'Exception count', 'Approval trail'],
+                'section' => 'summary',
+            ],
+            [
+                'code' => 'NA-02',
+                'title' => 'Occupancy & Room Statistics Report',
+                'owner' => 'Front Office Manager',
+                'frequency' => 'Daily',
+                'status' => $roomSnapshots->isNotEmpty() ? 'Ready' : 'No In-House Data',
+                'purpose' => 'Kontrol occupied, vacant, out of order, house use, complimentary, ADR dasar, dan room productivity.',
+                'control_points' => ['Total room', 'Occupied room', 'Vacant room', 'OOO/Reno', 'Complimentary', 'House use'],
+                'section' => 'rooms',
+            ],
+            [
+                'code' => 'NA-03',
+                'title' => 'Guest In-House / House Count Report',
+                'owner' => 'Front Office Supervisor',
+                'frequency' => 'Daily',
+                'status' => $roomSnapshots->isNotEmpty() ? 'Ready' : 'No In-House Data',
+                'purpose' => 'Daftar tamu aktif per kamar untuk mencocokkan room rack, security list, dan emergency list.',
+                'control_points' => ['Guest name', 'Room', 'RegNo', 'Payment', 'Market segment', 'Expected departure'],
+                'section' => 'rooms',
+            ],
+            [
+                'code' => 'NA-04',
+                'title' => 'Arrival, Departure, Stay-Over & No-Show Control',
+                'owner' => 'Front Office Supervisor',
+                'frequency' => 'Daily',
+                'status' => 'Manual Review',
+                'purpose' => 'Kontrol arrival/departure hari berjalan, stay-over, dan no-show/cancellation dari reservasi.',
+                'control_points' => ['Arrival count', 'Departure count', 'Stay-over', 'No-show', 'Cancellation', 'Walk-in'],
+                'section' => 'movement',
+            ],
+            [
+                'code' => 'NA-05',
+                'title' => 'Room Revenue & Rate Variance Report',
+                'owner' => 'Revenue Manager / Night Auditor',
+                'frequency' => 'Daily',
+                'status' => $revenueLines->where('department', 'ROOM')->isNotEmpty() ? 'Ready' : 'Manual Review',
+                'purpose' => 'Validasi room charge, zero rate, complimentary, house use, discount, package rate, dan variance.',
+                'control_points' => ['Room rate', 'Net room revenue', 'Zero rate', 'Discount', 'Complimentary', 'House use'],
+                'section' => 'revenue',
+            ],
+            [
+                'code' => 'NA-06',
+                'title' => 'Department Revenue Summary',
+                'owner' => 'Finance / Cost Control',
+                'frequency' => 'Daily',
+                'status' => $revenueLines->isNotEmpty() ? 'Ready' : 'Manual Review',
+                'purpose' => 'Ringkasan revenue per departemen seperti room, package, restaurant, minibar, laundry, spa, telephone, dan other.',
+                'control_points' => ['Department', 'Debit', 'Credit', 'Net revenue', 'Outlet interface'],
+                'section' => 'revenue',
+            ],
+            [
+                'code' => 'NA-07',
+                'title' => 'Cashier Audit & Payment Reconciliation',
+                'owner' => 'Night Auditor / Chief Cashier',
+                'frequency' => 'Daily',
+                'status' => $cashierSummaries->isNotEmpty() ? 'Ready' : 'No Cashier Data',
+                'purpose' => 'Rekonsiliasi pembayaran, cash drop, refund, void, settlement non-cash, dan variance.',
+                'control_points' => ['Cash', 'Card', 'OTA', 'Company', 'Refund', 'Cash drop', 'Variance'],
+                'section' => 'cashier',
+            ],
+            [
+                'code' => 'NA-08',
+                'title' => 'Guest Ledger, Deposit & City Ledger Report',
+                'owner' => 'Accounting / AR',
+                'frequency' => 'Daily',
+                'status' => 'Ready',
+                'purpose' => 'Kontrol saldo deposit, guest ledger exposure, city ledger, OTA, company, dan travel agent.',
+                'control_points' => ['Deposit total', 'City ledger', 'Guest balance', 'Company billing', 'OTA/travel agent'],
+                'section' => 'ledger',
+            ],
+            [
+                'code' => 'NA-09',
+                'title' => 'Housekeeping Discrepancy Report',
+                'owner' => 'Housekeeping Supervisor',
+                'frequency' => 'Daily',
+                'status' => $criticalExceptions > 0 ? 'Need Action' : 'Ready',
+                'purpose' => 'Menemukan mismatch status kamar antara PMS/front office dan housekeeping.',
+                'control_points' => ['Occupied/vacant mismatch', 'Vacant dirty', 'Phantom occupied', 'OOO/Reno'],
+                'section' => 'discrepancy',
+            ],
+            [
+                'code' => 'NA-10',
+                'title' => 'Adjustment, Allowance, Void & Refund Report',
+                'owner' => 'Finance Controller',
+                'frequency' => 'Daily',
+                'status' => $adjustments->isNotEmpty() ? 'Ready' : 'No Adjustment',
+                'purpose' => 'Audit semua koreksi, allowance, void, refund, reason, dan approval.',
+                'control_points' => ['Adjustment amount', 'Reason code', 'Requested by', 'Approval status', 'Refund/void'],
+                'section' => 'adjustment',
+            ],
+            [
+                'code' => 'NA-11',
+                'title' => 'Tax & Service Charge Summary',
+                'owner' => 'Finance / Tax',
+                'frequency' => 'Daily',
+                'status' => 'Setup Required',
+                'purpose' => 'Rekap pajak dan service charge per departemen sesuai regulasi dan setup hotel.',
+                'control_points' => ['Tax amount', 'Service amount', 'Taxable revenue', 'Non-tax revenue'],
+                'section' => 'tax',
+            ],
+            [
+                'code' => 'NA-12',
+                'title' => 'Exception, Checklist & Approval Sign-Off',
+                'owner' => 'Duty Manager / Financial Controller',
+                'frequency' => 'Daily',
+                'status' => ($criticalExceptions > 0 || $blockedChecklist > 0) ? 'Need Action' : 'Ready',
+                'purpose' => 'Kontrol akhir semua exception, checklist critical, dan approval audit.',
+                'control_points' => ['Critical exception', 'Pending checklist', 'Blocked checklist', 'Night auditor sign-off', 'Duty manager approval', 'Finance approval'],
+                'section' => 'signoff',
+            ],
+        ])->map(fn (array $row) => (object) $row);
+    }
+
+    private function buildStandardReportPack(array $payload): array
+    {
+        $roomSnapshots = collect($payload['roomSnapshots'] ?? []);
+        $revenueLines = collect($payload['revenueLines'] ?? []);
+        $cashierSummaries = collect($payload['cashierSummaries'] ?? []);
+        $housekeepingExceptions = collect($payload['housekeepingExceptions'] ?? []);
+        $adjustments = collect($payload['adjustments'] ?? []);
+        $checklists = collect($payload['checklists'] ?? []);
+        $approvals = collect($payload['approvals'] ?? []);
+
+        return [
+            'revenue_by_department' => $this->groupMoneyRows($revenueLines, 'department', ['debit', 'credit', 'net_amount']),
+            'payment_by_type' => $this->groupMoneyRows($cashierSummaries, 'payment_type', ['gross_receipt', 'refund_amount', 'cash_drop', 'variance_amount']),
+            'rooms_by_segment' => $this->groupCountRows($roomSnapshots, 'market_segment', 'UNKNOWN'),
+            'rooms_by_payment' => $this->groupCountRows($roomSnapshots, 'payment_method', 'UNKNOWN'),
+            'exceptions_by_severity' => $this->groupCountRows($housekeepingExceptions, 'severity', 'NONE'),
+            'checklist_by_status' => $this->groupCountRows($checklists, 'status', 'PENDING'),
+            'approvals_by_status' => $this->groupCountRows($approvals, 'status', 'PENDING'),
+            'rate_exception_rows' => $roomSnapshots
+                ->filter(fn ($row) => trim((string) ($row->risk_flag ?? '')) !== '' || (float) ($row->net_room_rate ?? 0) <= 0)
+                ->values(),
+            'adjustment_total' => round((float) $adjustments->sum('amount'), 2),
+            'adjustment_count' => $adjustments->count(),
+        ];
+    }
+
+    private function groupMoneyRows(Collection $rows, string $groupField, array $moneyFields): Collection
+    {
+        return $rows
+            ->groupBy(fn ($row) => strtoupper(trim((string) ($row->{$groupField} ?? 'UNKNOWN'))) ?: 'UNKNOWN')
+            ->map(function (Collection $group, string $key) use ($moneyFields) {
+                $row = [
+                    'label' => $key,
+                    'count' => $group->count(),
+                ];
+
+                foreach ($moneyFields as $field) {
+                    $row[$field] = round((float) $group->sum(fn ($item) => (float) ($item->{$field} ?? 0)), 2);
+                }
+
+                return (object) $row;
+            })
+            ->values();
+    }
+
+    private function groupCountRows(Collection $rows, string $groupField, string $emptyLabel): Collection
+    {
+        return $rows
+            ->groupBy(fn ($row) => strtoupper(trim((string) ($row->{$groupField} ?? ''))) ?: $emptyLabel)
+            ->map(fn (Collection $group, string $key) => (object) [
+                'label' => $key,
+                'count' => $group->count(),
+            ])
+            ->values();
+    }
+
     private function seedApprovalRows(int $batchId): void
     {
         foreach ($this->defaultApprovalRows($batchId) as $row) {

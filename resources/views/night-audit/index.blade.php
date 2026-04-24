@@ -36,6 +36,14 @@
             default => 'is-preview',
         };
     };
+    $reportStatusClass = function (?string $status) {
+        return match ($status) {
+            'Ready', 'No Adjustment' => 'is-approved',
+            'Need Action', 'Manual Review' => 'is-closed',
+            'Setup Required' => 'is-critical',
+            default => 'is-preview',
+        };
+    };
     $severityClass = function (?string $severity) {
         return match ($severity) {
             'Critical' => 'is-critical',
@@ -235,6 +243,11 @@
         background: #edf1f7;
     }
 
+    .na-status-badge.is-critical {
+        color: #9f1f1f;
+        background: #fde8e8;
+    }
+
     .na-severity.is-critical,
     .na-severity.is-high {
         color: #9f1f1f;
@@ -362,6 +375,68 @@
         gap: 0.75rem;
     }
 
+    .na-report-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+    }
+
+    .na-report-card {
+        display: grid;
+        gap: 0.65rem;
+        padding: 0.95rem;
+        border-radius: 8px;
+        background: #fbfdff;
+        border: 1px solid rgba(137, 167, 214, 0.24);
+    }
+
+    .na-report-card-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+
+    .na-report-card h4 {
+        margin: 0;
+        color: #173761;
+        font-size: 0.98rem;
+        font-weight: 900;
+    }
+
+    .na-report-card p {
+        margin: 0;
+        color: #5d6f88;
+        font-size: 0.88rem;
+        line-height: 1.45;
+        font-weight: 650;
+    }
+
+    .na-report-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        color: #637792;
+        font-size: 0.78rem;
+        font-weight: 800;
+    }
+
+    .na-report-points {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .na-report-point {
+        display: inline-flex;
+        padding: 0.28rem 0.5rem;
+        border-radius: 999px;
+        color: #31527a;
+        background: #edf5ff;
+        font-size: 0.72rem;
+        font-weight: 850;
+    }
+
     .na-mini-panel {
         border: 1px solid rgba(137, 167, 214, 0.24);
         background: #fbfdff;
@@ -415,7 +490,8 @@
         }
 
         .na-checklist-form,
-        .na-adjustment-form {
+        .na-adjustment-form,
+        .na-report-grid {
             grid-template-columns: 1fr;
         }
 
@@ -493,6 +569,9 @@
                     </form>
                 @else
                     <div class="na-action-row">
+                        <a href="/night-audit/{{ $selectedBatch->id }}/report" target="_blank" class="btn package-btn-secondary">
+                            <i class="fas fa-print mr-1"></i> Standard Report
+                        </a>
                         @if($selectedBatch->status === 'Draft')
                             <form method="POST" action="/night-audit/{{ $selectedBatch->id }}/refresh">
                                 @csrf
@@ -606,6 +685,7 @@
                 <div class="na-panel-body">
                     <ul class="nav na-tabs" role="tablist">
                         <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#audit-overview" role="tab"><i class="fas fa-gauge-high mr-1"></i>Overview</a></li>
+                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#standard-reports" role="tab"><i class="fas fa-file-signature mr-1"></i>Reports</a></li>
                         <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#room-snapshot" role="tab"><i class="fas fa-bed mr-1"></i>Rooms</a></li>
                         <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#revenue-lines" role="tab"><i class="fas fa-receipt mr-1"></i>Revenue</a></li>
                         <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#cashier-control" role="tab"><i class="fas fa-cash-register mr-1"></i>Cashier</a></li>
@@ -657,6 +737,43 @@
                                         <div class="na-stat"><small>Critical / High</small><strong>{{ $number($summary['critical_exception_count']) }}</strong></div>
                                     </div>
                                 </section>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="standard-reports" role="tabpanel">
+                            <div class="na-action-row mb-3">
+                                <div>
+                                    <strong>International Night Audit Report Pack</strong>
+                                    <div class="text-muted">Daftar laporan minimum yang umum dipakai hotel internasional untuk closing harian.</div>
+                                </div>
+                                @if($selectedBatch)
+                                    <a href="/night-audit/{{ $selectedBatch->id }}/report" target="_blank" class="btn package-btn-primary">
+                                        <i class="fas fa-print mr-1"></i> Print Report Pack
+                                    </a>
+                                @else
+                                    <span class="na-status-badge is-preview">Start Batch untuk print report</span>
+                                @endif
+                            </div>
+
+                            <div class="na-report-grid">
+                                @foreach($standardReports as $report)
+                                    <article class="na-report-card">
+                                        <div class="na-report-card-head">
+                                            <h4>{{ $report->code }} - {{ $report->title }}</h4>
+                                            <span class="na-status-badge {{ $reportStatusClass($report->status ?? null) }}">{{ $report->status }}</span>
+                                        </div>
+                                        <p>{{ $report->purpose }}</p>
+                                        <div class="na-report-meta">
+                                            <span><i class="fas fa-user-check mr-1"></i>{{ $report->owner }}</span>
+                                            <span><i class="fas fa-clock mr-1"></i>{{ $report->frequency }}</span>
+                                        </div>
+                                        <div class="na-report-points">
+                                            @foreach($report->control_points as $point)
+                                                <span class="na-report-point">{{ $point }}</span>
+                                            @endforeach
+                                        </div>
+                                    </article>
+                                @endforeach
                             </div>
                         </div>
 

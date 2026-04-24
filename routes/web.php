@@ -262,6 +262,11 @@ Route::post('/night-audit/start', function () {
     return app(NightAuditController::class)->start(request());
 });
 
+Route::get('/night-audit/{batchId}/report', function ($batchId) {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(NightAuditController::class)->report(request(), (int) $batchId);
+});
+
 Route::post('/night-audit/{batchId}/refresh', function ($batchId) {
     if ($response = ensureSessionAccess()) return $response;
     return app(NightAuditController::class)->refresh(request(), (int) $batchId);

@@ -47,6 +47,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/night-audit', [NightAuditController::class, 'index']);
         Route::post('/night-audit/start', [NightAuditController::class, 'start']);
+        Route::get('/night-audit/{batchId}/report', [NightAuditController::class, 'report']);
         Route::post('/night-audit/{batchId}/refresh', [NightAuditController::class, 'refresh']);
         Route::post('/night-audit/{batchId}/close', [NightAuditController::class, 'close']);
         Route::post('/night-audit/{batchId}/approve', [NightAuditController::class, 'approve']);
