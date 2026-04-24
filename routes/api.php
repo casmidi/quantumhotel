@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CheckinController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StockPackageController;
@@ -40,10 +41,8 @@ Route::prefix('v1')->group(function () {
         Route::match(['put', 'patch'], '/checkin/{regNo2}', [CheckinController::class, 'update']);
         Route::delete('/checkin/{regNo2}', [CheckinController::class, 'destroy']);
 
-        Route::get('/checkout', fn () => response()->json([
-            'success' => true,
-            'data' => ['message' => 'Checkout API placeholder'],
-        ]));
+        Route::get('/checkout', [CheckoutController::class, 'index']);
+        Route::post('/checkout', [CheckoutController::class, 'store']);
 
         Route::get('/guest-in-house', fn () => response()->json([
             'success' => true,

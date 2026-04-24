@@ -236,6 +236,16 @@ Route::get('/checkout', function () {
     return app(CheckoutController::class)->index(request());
 });
 
+Route::post('/checkout', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(CheckoutController::class)->store(request());
+});
+
+Route::get('/checkout/{regNo}/print-folio', function ($regNo) {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(CheckoutController::class)->printFolio(request(), $regNo);
+});
+
 Route::get('/settings/hotel-branding', function () {
     if ($response = ensureSessionAccess()) return $response;
     return app(HotelSettingsController::class)->edit(request());
