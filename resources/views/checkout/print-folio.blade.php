@@ -99,7 +99,7 @@
 
         .folio-top {
             display: grid;
-            grid-template-columns: 1.6fr 0.95fr;
+            grid-template-columns: 1.85fr 0.75fr;
             gap: 14px;
             padding-top: 8px;
         }
@@ -127,9 +127,40 @@
 
         .meta-double {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px;
+            gap: 2px;
             margin-top: 3px;
+        }
+
+        .meta-pair-row {
+            display: grid;
+            grid-template-columns: 68px 12px 124px 74px 12px minmax(0, 1fr);
+            gap: 0 6px;
+            align-items: start;
+            font-size: 0.86rem;
+            line-height: 1.15;
+        }
+
+        .meta-pair-row + .meta-pair-row {
+            margin-top: 2px;
+        }
+
+        .meta-pair-label {
+            white-space: nowrap;
+        }
+
+        .meta-pair-colon {
+            text-align: center;
+        }
+
+        .meta-pair-value {
+            min-width: 0;
+        }
+
+        .meta-pair-value.is-remark {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .folio-side {
@@ -204,8 +235,8 @@
 
         .folio-summary {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px 18px;
+            grid-template-columns: minmax(0, 1fr) 270px 280px;
+            gap: 8px 10px;
             align-items: start;
             margin-top: 8px;
         }
@@ -213,18 +244,20 @@
         .folio-note {
             font-size: 0.82rem;
             align-self: center;
+            grid-column: 1;
         }
 
         .folio-totals {
-            width: 100%;
+            width: 280px;
             font-size: 0.84rem;
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
             align-self: center;
+            grid-column: 3;
         }
 
         .folio-totals table {
-            width: 320px;
+            width: 280px;
             border-collapse: collapse;
         }
 
@@ -241,7 +274,7 @@
         }
 
         .folio-totals .amount {
-            width: 135px;
+            width: 115px;
             text-align: right;
             white-space: nowrap;
         }
@@ -252,7 +285,7 @@
         }
 
         .folio-balances {
-            width: 100%;
+            width: 270px;
             display: flex;
             justify-content: center;
             margin-top: 2px;
@@ -283,10 +316,19 @@
             white-space: nowrap;
         }
 
-        .folio-balances .balance-row .label,
-        .folio-balances .balance-row .amount {
-            border-top: 1px solid #000;
+        .folio-balances .balance-row .amount,
+        .folio-balances .balance-row .label {
+            position: relative;
             padding-top: 3px;
+        }
+
+        .folio-balances .balance-row .label::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -150px;
+            width: 222px;
+            border-top: 1px solid #000;
         }
 
         .folio-signatures {
@@ -329,6 +371,7 @@
             gap: 10px;
         }
 
+        .print-actions a,
         .print-actions button {
             border: none;
             border-radius: 999px;
@@ -336,11 +379,26 @@
             font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-decoration: none;
         }
 
         .close-btn {
             background: #dbe7fb;
             color: #1336a3;
+        }
+
+        .excel-btn {
+            background: #dcefe4;
+            color: #166534;
+        }
+
+        .pdf-btn {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
         .print-btn {
@@ -363,6 +421,21 @@
 
             .print-actions {
                 display: none;
+            }
+        }
+
+        @media screen and (max-width: 860px) {
+            .folio-summary {
+                grid-template-columns: minmax(0, 1fr) 270px;
+            }
+
+            .folio-totals {
+                grid-column: 2;
+                justify-content: center;
+            }
+
+            .folio-balances {
+                grid-column: 2;
             }
         }
     </style>
@@ -425,41 +498,30 @@
                 </table>
 
                 <div class="meta-double">
-                    <table class="meta-table">
-                        <tr>
-                            <td class="meta-label">Room</td>
-                            <td class="meta-colon">:</td>
-                            <td>{{ $registration['room_label'] }}</td>
-                        </tr>
-                        <tr>
-                            <td class="meta-label">C/I Date</td>
-                            <td class="meta-colon">:</td>
-                            <td>{{ $registration['check_in_date'] }}</td>
-                        </tr>
-                        <tr>
-                            <td class="meta-label">C/O Date</td>
-                            <td class="meta-colon">:</td>
-                            <td>{{ $checkOutAt->format('d-m-Y') }}</td>
-                        </tr>
-                    </table>
-
-                    <table class="meta-table">
-                        <tr>
-                            <td class="meta-label">Remark</td>
-                            <td class="meta-colon">:</td>
-                            <td>{{ $registration['remark'] ?: '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="meta-label">C/I Time</td>
-                            <td class="meta-colon">:</td>
-                            <td>{{ $registration['check_in_time'] }}</td>
-                        </tr>
-                        <tr>
-                            <td class="meta-label">C/O Time</td>
-                            <td class="meta-colon">:</td>
-                            <td>{{ $checkOutAt->format('H:i:s') }}</td>
-                        </tr>
-                    </table>
+                    <div class="meta-pair-row">
+                        <div class="meta-pair-label">Room</div>
+                        <div class="meta-pair-colon">:</div>
+                        <div class="meta-pair-value">{{ $registration['room_label'] }}</div>
+                        <div class="meta-pair-label">Remark</div>
+                        <div class="meta-pair-colon">:</div>
+                        <div class="meta-pair-value is-remark">{{ preg_replace('/\s+/', ' ', trim((string) ($registration['remark'] ?: '-'))) }}</div>
+                    </div>
+                    <div class="meta-pair-row">
+                        <div class="meta-pair-label">C/I Date</div>
+                        <div class="meta-pair-colon">:</div>
+                        <div class="meta-pair-value">{{ $registration['check_in_date'] }}</div>
+                        <div class="meta-pair-label">C/I Time</div>
+                        <div class="meta-pair-colon">:</div>
+                        <div class="meta-pair-value">{{ $registration['check_in_time'] }}</div>
+                    </div>
+                    <div class="meta-pair-row">
+                        <div class="meta-pair-label">C/O Date</div>
+                        <div class="meta-pair-colon">:</div>
+                        <div class="meta-pair-value">{{ $checkOutAt->format('d-m-Y') }}</div>
+                        <div class="meta-pair-label">C/O Time</div>
+                        <div class="meta-pair-colon">:</div>
+                        <div class="meta-pair-value">{{ $checkOutAt->format('H:i:s') }}</div>
+                    </div>
                 </div>
             </div>
 
@@ -548,6 +610,8 @@
     </div>
 
     <div class="print-actions">
+        <a href="{{ $excelUrl }}" class="excel-btn">Excel</a>
+        <a href="{{ $pdfUrl }}" class="pdf-btn" target="_blank" rel="noopener">PDF</a>
         <button type="button" class="close-btn" onclick="window.close()">Close</button>
         <button type="button" class="print-btn" onclick="window.print()">Print</button>
     </div>

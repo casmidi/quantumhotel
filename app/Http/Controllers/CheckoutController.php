@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Support\HotelBranding;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -13,6 +14,14 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class CheckoutController extends Controller
 {
@@ -23,6 +32,7 @@ class CheckoutController extends Controller
         $perPage = in_array($perPage, [10, 25, 50], true) ? $perPage : 10;
         $sortBy = $this->resolveCheckoutSortBy((string) $request->query('sort_by', 'check_in'));
         $sortDir = $this->resolveCheckoutSortDirection((string) $request->query('sort_dir', 'desc'));
+        $checkoutScope = $this->resolveCheckoutScope((string) $request->query('checkout_scope', 'all'));
         $selectedRegNo = strtoupper(trim((string) $request->query('reg_no', '')));
         $selectedRegNo2 = strtoupper(trim((string) $request->query('reg_no2', '')));
 
@@ -35,6 +45,7 @@ class CheckoutController extends Controller
                 'perPage' => $perPage,
                 'sortBy' => $sortBy,
                 'sortDir' => $sortDir,
+                'checkoutScope' => $checkoutScope,
                 'selectedRegNo' => $selectedRegNo,
                 'selectedRegNo2' => $selectedRegNo2,
             ])->render();
@@ -46,7 +57,16 @@ class CheckoutController extends Controller
             $selectedRegNo2 = trim((string) ($directoryItems->first()->RegNo2 ?? ''));
         }
 
-        $selectedRegistration = $selectedRegNo !== '' ? $this->loadCheckoutRegistration($selectedRegNo) : null;
+        if ($checkoutScope === 'room' && $selectedRegNo !== '' && $selectedRegNo2 === '') {
+            $selectedRoom = $directoryItems->first(fn ($row) => trim((string) ($row->RegNo ?? '')) === $selectedRegNo);
+            $selectedRegNo2 = trim((string) ($selectedRoom->RegNo2 ?? ''));
+        }
+
+        $selectedRegistration = $selectedRegNo !== '' ? $this->loadCheckoutRegistration(
+            $selectedRegNo,
+            true,
+            $checkoutScope === 'room' ? $selectedRegNo2 : null
+        ) : null;
         $checkoutDate = $request->query('checkout_date', now()->format('Y-m-d'));
         $checkoutTime = $request->query('checkout_time', now()->format('H:i:s'));
         $checkoutAt = $this->combineDateTime($checkoutDate, $checkoutTime);
@@ -59,6 +79,8 @@ class CheckoutController extends Controller
             'perPage' => $perPage,
             'sortBy' => $sortBy,
             'sortDir' => $sortDir,
+            'checkoutScope' => $checkoutScope,
+            'checkoutScopeLabel' => $checkoutScope === 'room' ? 'Checkout 1 Kamar' : 'Checkout Semua Kamar',
             'selectedRegNo' => $selectedRegNo,
             'selectedRegNo2' => $selectedRegNo2,
             'selectedRegistration' => $selectedRegistration,
@@ -73,6 +95,7 @@ class CheckoutController extends Controller
             'per_page' => $perPage,
             'sort_by' => $sortBy,
             'sort_dir' => $sortDir,
+            'checkout_scope' => $checkoutScope,
             'selected_reg_no' => $selectedRegNo,
             'selected_reg_no2' => $selectedRegNo2,
             'selected_registration' => $selectedRegistration,
@@ -98,16 +121,34 @@ class CheckoutController extends Controller
         return strtolower(trim($sortDir)) === 'asc' ? 'asc' : 'desc';
     }
 
+    private function resolveCheckoutScope(string $scope): string
+    {
+        return strtolower(trim($scope)) === 'room' ? 'room' : 'all';
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
             'reg_no' => ['required', 'string', 'max:30'],
+            'reg_no2' => ['nullable', 'string', 'max:30'],
+            'checkout_scope' => ['nullable', 'in:all,room'],
             'checkout_date' => ['required', 'date_format:Y-m-d'],
             'checkout_time' => ['required', 'string', 'max:20'],
         ]);
 
         $regNo = strtoupper(trim((string) $validated['reg_no']));
-        $registration = $this->loadCheckoutRegistration($regNo);
+        $selectedRegNo2 = strtoupper(trim((string) ($validated['reg_no2'] ?? '')));
+        $checkoutScope = $this->resolveCheckoutScope((string) ($validated['checkout_scope'] ?? 'all'));
+
+        if ($checkoutScope === 'room' && $selectedRegNo2 === '') {
+            return $this->respondError($request, 'Pilih kamar group yang akan di-checkout.', 422, [], '/checkout?checkout_scope=room&reg_no=' . rawurlencode($regNo), false);
+        }
+
+        $registration = $this->loadCheckoutRegistration(
+            $regNo,
+            true,
+            $checkoutScope === 'room' ? $selectedRegNo2 : null
+        );
 
         if (!$registration || $registration['active_details']->isEmpty()) {
             return $this->respondError($request, 'Data checkout aktif tidak ditemukan.', 404, [], '/checkout', false);
@@ -132,7 +173,8 @@ class CheckoutController extends Controller
             $primaryDetail,
             $statusLabel,
             $username,
-            $checkoutAt
+            $checkoutAt,
+            $checkoutScope
         ) {
             foreach ($registration['active_details'] as $detail) {
                 $hari = $this->calculateHariForDetail($detail, $checkoutAt);
@@ -151,6 +193,7 @@ class CheckoutController extends Controller
 
                 DB::table('DATA2')
                     ->whereRaw('RTRIM(RegNo) = ?', [$regNo])
+                    ->whereRaw('RTRIM(RegNo2) = ?', [trim((string) ($detail->RegNo2 ?? ''))])
                     ->whereRaw('RTRIM(Kode) = ?', [trim((string) ($detail->Kode ?? ''))])
                     ->where('Pst', '=', ' ')
                     ->update($payload);
@@ -179,49 +222,80 @@ class CheckoutController extends Controller
                 }
             }
 
-            $dataPayload = [
-                'strTglOut' => $checkoutStamp,
-                'TglOut' => $checkoutDate,
-                'UserOut' => $username,
-                'CONo' => $invoiceNo,
-                'Kode2' => trim((string) ($primaryDetail->Kode ?? '')),
-            ];
-
-            DB::table('DATA')
+            $hasRemainingActiveRooms = DB::table('DATA2')
                 ->whereRaw('RTRIM(RegNo) = ?', [$regNo])
-                ->update($dataPayload);
+                ->where('Pst', '=', ' ')
+                ->exists();
+
+            if ($checkoutScope === 'all' || !$hasRemainingActiveRooms) {
+                $dataPayload = [
+                    'strTglOut' => $checkoutStamp,
+                    'TglOut' => $checkoutDate,
+                    'UserOut' => $username,
+                    'CONo' => $invoiceNo,
+                    'Kode2' => trim((string) ($primaryDetail->Kode ?? '')),
+                ];
+
+                DB::table('DATA')
+                    ->whereRaw('RTRIM(RegNo) = ?', [$regNo])
+                    ->update($dataPayload);
+            }
         });
+
+        $printQuery = [
+            'mode' => 'checkout',
+            'checkout_date' => $checkoutDate,
+            'checkout_time' => $checkoutTime,
+            'checkout_scope' => $checkoutScope,
+        ];
+
+        if ($checkoutScope === 'room') {
+            $printQuery['reg_no2'] = $selectedRegNo2;
+        }
 
         $payload = [
             'reg_no' => $regNo,
+            'reg_no2' => $checkoutScope === 'room' ? $selectedRegNo2 : null,
+            'checkout_scope' => $checkoutScope,
             'invoice_no' => $invoiceNo,
             'checkout_at' => $checkoutAt->format('Y-m-d H:i:s'),
-            'print_url' => url('/checkout/' . rawurlencode($regNo) . '/print-folio?mode=checkout&checkout_date=' . rawurlencode($checkoutDate) . '&checkout_time=' . rawurlencode($checkoutTime)),
+            'print_url' => url('/checkout/' . rawurlencode($regNo) . '/print-folio?' . http_build_query($printQuery)),
         ];
 
         if ($this->isApiRequest($request)) {
             return response()->json([
                 'success' => true,
-                'message' => 'Checkout berhasil disimpan.',
+                'message' => $checkoutScope === 'room' ? 'Checkout kamar berhasil disimpan.' : 'Checkout berhasil disimpan.',
                 'data' => $payload,
             ]);
         }
 
-        return redirect('/checkout/' . rawurlencode($regNo) . '/print-folio?mode=checkout&checkout_date=' . rawurlencode($checkoutDate) . '&checkout_time=' . rawurlencode($checkoutTime))
-            ->with('success', 'Checkout berhasil disimpan.');
+        return redirect('/checkout/' . rawurlencode($regNo) . '/print-folio?' . http_build_query($printQuery))
+            ->with('success', $checkoutScope === 'room' ? 'Checkout kamar berhasil disimpan.' : 'Checkout berhasil disimpan.');
     }
 
     public function printFolio(Request $request, string $regNo)
     {
         $normalizedRegNo = strtoupper(trim((string) $regNo));
-        $registration = $this->loadCheckoutRegistration($normalizedRegNo, false);
+        $checkoutDate = (string) $request->query('checkout_date', now()->format('Y-m-d'));
+        $checkoutTime = (string) $request->query('checkout_time', now()->format('H:i:s'));
+        $checkoutScope = $this->resolveCheckoutScope((string) $request->query('checkout_scope', 'all'));
+        $selectedRegNo2 = strtoupper(trim((string) $request->query('reg_no2', '')));
+
+        if ($checkoutScope === 'room' && $selectedRegNo2 === '') {
+            return $this->respondError($request, 'Pilih kamar group yang akan ditampilkan.', 422, [], '/checkout?checkout_scope=room&reg_no=' . rawurlencode($normalizedRegNo), false);
+        }
+
+        $registration = $this->loadCheckoutRegistration(
+            $normalizedRegNo,
+            false,
+            $checkoutScope === 'room' ? $selectedRegNo2 : null
+        );
 
         if (!$registration) {
             return $this->respondError($request, 'Guest folio tidak ditemukan.', 404, [], '/checkout', false);
         }
 
-        $checkoutDate = (string) $request->query('checkout_date', now()->format('Y-m-d'));
-        $checkoutTime = (string) $request->query('checkout_time', now()->format('H:i:s'));
         $mode = strtolower(trim((string) $request->query('mode', 'preview'))) === 'checkout' ? 'CHECK OUT' : 'PREVIEW';
         $folio = $this->buildFolioPayload($registration, $this->combineDateTime($checkoutDate, $checkoutTime), $mode);
 
@@ -232,6 +306,8 @@ class CheckoutController extends Controller
             'mode' => $mode,
             'cashierName' => strtoupper(trim((string) session('user', 'SYSTEM'))),
             'qrCodeDataUri' => $this->buildCheckoutQrCodeDataUri($registration, $folio, $checkoutDate, $checkoutTime),
+            'excelUrl' => $this->folioExportUrl($registration['reg_no'], $checkoutDate, $checkoutTime, $mode, 'excel', $checkoutScope, $selectedRegNo2),
+            'pdfUrl' => $this->folioExportUrl($registration['reg_no'], $checkoutDate, $checkoutTime, $mode, 'pdf', $checkoutScope, $selectedRegNo2),
         ];
 
         return $this->respond($request, 'checkout.print-folio', $viewData, [
@@ -241,9 +317,344 @@ class CheckoutController extends Controller
         ]);
     }
 
+    public function exportFolio(Request $request, string $regNo, string $format)
+    {
+        $normalizedRegNo = strtoupper(trim((string) $regNo));
+        $checkoutDate = (string) $request->query('checkout_date', now()->format('Y-m-d'));
+        $checkoutTime = (string) $request->query('checkout_time', now()->format('H:i:s'));
+        $checkoutScope = $this->resolveCheckoutScope((string) $request->query('checkout_scope', 'all'));
+        $selectedRegNo2 = strtoupper(trim((string) $request->query('reg_no2', '')));
+
+        if ($checkoutScope === 'room' && $selectedRegNo2 === '') {
+            return $this->respondError($request, 'Pilih kamar group yang akan diexport.', 422, [], '/checkout?checkout_scope=room&reg_no=' . rawurlencode($normalizedRegNo), false);
+        }
+
+        $registration = $this->loadCheckoutRegistration(
+            $normalizedRegNo,
+            false,
+            $checkoutScope === 'room' ? $selectedRegNo2 : null
+        );
+
+        if (!$registration) {
+            return $this->respondError($request, 'Guest folio tidak ditemukan.', 404, [], '/checkout', false);
+        }
+
+        $mode = strtolower(trim((string) $request->query('mode', 'preview'))) === 'checkout' ? 'CHECK OUT' : 'PREVIEW';
+        $folio = $this->buildFolioPayload($registration, $this->combineDateTime($checkoutDate, $checkoutTime), $mode);
+        $format = strtolower(trim($format));
+        $profile = $this->loadHotelProfile();
+        $viewData = [
+            'profile' => $profile,
+            'registration' => $registration,
+            'folio' => $folio,
+            'mode' => $mode,
+            'cashierName' => strtoupper(trim((string) session('user', 'SYSTEM'))),
+            'qrCodeDataUri' => $this->buildCheckoutQrCodeDataUri($registration, $folio, $checkoutDate, $checkoutTime),
+            'logoDataUri' => $this->localImageDataUri($profile['logo_absolute_path'] ?? null),
+        ];
+
+        if ($format === 'pdf') {
+            $fileName = $this->folioExportFileName($registration['reg_no'], $folio, 'pdf');
+            $pdf = Pdf::loadView('checkout.export-folio-pdf', $viewData)
+                ->setPaper('a4', 'portrait')
+                ->setOption([
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => false,
+                    'defaultFont' => 'Arial',
+                ]);
+
+            return $pdf->stream($fileName);
+        }
+
+        if ($format !== 'excel') {
+            return $this->respondError($request, 'Format export folio tidak dikenal.', 404, [], '/checkout', false);
+        }
+
+        return $this->downloadFolioSpreadsheet(
+            $profile,
+            $registration,
+            $folio,
+            $viewData['cashierName'],
+            $viewData['qrCodeDataUri'],
+            $profile['logo_absolute_path'] ?? null
+        );
+    }
+
+    private function folioExportUrl(
+        string $regNo,
+        string $checkoutDate,
+        string $checkoutTime,
+        string $mode,
+        string $format,
+        string $checkoutScope = 'all',
+        ?string $regNo2 = null
+    ): string
+    {
+        $query = [
+            'mode' => $mode === 'CHECK OUT' ? 'checkout' : 'preview',
+            'checkout_date' => $checkoutDate,
+            'checkout_time' => $checkoutTime,
+            'checkout_scope' => $checkoutScope,
+        ];
+
+        if ($checkoutScope === 'room' && trim((string) $regNo2) !== '') {
+            $query['reg_no2'] = trim((string) $regNo2);
+        }
+
+        return url('/checkout/' . rawurlencode($regNo) . '/export-folio/' . $format) . '?' . http_build_query($query);
+    }
+
+    private function folioExportFileName(string $regNo, array $folio, string $extension): string
+    {
+        $safeRegNo = preg_replace('/[^A-Za-z0-9_-]+/', '-', trim($regNo)) ?: 'folio';
+        $checkoutAt = Carbon::createFromFormat('Y-m-d H:i:s', $folio['checkout_at']);
+
+        return 'guest-folio-' . $safeRegNo . '-' . $checkoutAt->format('Ymd-His') . '.' . $extension;
+    }
+
+    private function downloadFolioSpreadsheet(
+        array $profile,
+        array $registration,
+        array $folio,
+        string $cashierName,
+        string $qrCodeDataUri,
+        ?string $logoPath
+    ) {
+        $checkOutAt = Carbon::createFromFormat('Y-m-d H:i:s', $folio['checkout_at']);
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getProperties()
+            ->setCreator('Quantum Hotel')
+            ->setTitle('Guest Folio ' . $registration['reg_no'])
+            ->setSubject($folio['invoice_display']);
+
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Guest Folio');
+        $sheet->setShowGridlines(false);
+        $sheet->getPageSetup()
+            ->setPaperSize(PageSetup::PAPERSIZE_A4)
+            ->setOrientation(PageSetup::ORIENTATION_PORTRAIT)
+            ->setFitToWidth(1)
+            ->setFitToHeight(0);
+        $sheet->getPageMargins()
+            ->setTop(0.35)
+            ->setRight(0.25)
+            ->setBottom(0.35)
+            ->setLeft(0.25);
+
+        foreach ([
+            'A' => 13,
+            'B' => 15,
+            'C' => 31,
+            'D' => 14,
+            'E' => 14,
+            'F' => 16,
+        ] as $column => $width) {
+            $sheet->getColumnDimension($column)->setWidth($width);
+        }
+
+        foreach ([1 => 18, 2 => 18, 3 => 15, 4 => 15, 5 => 7] as $row => $height) {
+            $sheet->getRowDimension($row)->setRowHeight($height);
+        }
+
+        $this->addSpreadsheetImage($sheet, $qrCodeDataUri, 'A1', 76);
+        $this->addSpreadsheetImage($sheet, $logoPath, 'D1', 42, 52);
+
+        $sheet->mergeCells('A1:F1');
+        $sheet->mergeCells('A2:F2');
+        $sheet->mergeCells('A3:F3');
+        $sheet->mergeCells('A4:F4');
+        $sheet->setCellValue('A1', $profile['name']);
+        $sheet->setCellValue('A2', $profile['business']);
+        $sheet->setCellValue('A3', trim((string) $profile['address']) . ', ' . trim((string) $profile['phone']));
+        $sheet->setCellValue('A4', 'Email: ' . $profile['email'] . ' / Website: ' . $profile['website']);
+        $sheet->getStyle('A1:F4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1')->getFont()->setSize(14);
+        $sheet->getStyle('A2')->getFont()->setSize(13);
+        $sheet->getStyle('A3:A4')->getFont()->setSize(10);
+        $sheet->getStyle('A4:F4')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+
+        $sheet->setCellValueExplicit('A5', $registration['reg_no'], DataType::TYPE_STRING);
+        $sheet->getStyle('A5')->getFont()->setSize(8);
+
+        $sheet->setCellValue('A7', 'Invoice#');
+        $sheet->setCellValue('B7', ':');
+        $sheet->setCellValue('C7', $folio['invoice_display']);
+        $sheet->setCellValue('A8', 'Registration');
+        $sheet->setCellValue('B8', ':');
+        $sheet->setCellValue('C8', $registration['reg_no'] . ($registration['company'] !== '' ? ' Company : ' . $registration['company'] : ''));
+        $sheet->setCellValue('A9', 'Guest Name');
+        $sheet->setCellValue('B9', ':');
+        $sheet->setCellValue('C9', $registration['guest']);
+        $sheet->setCellValue('A10', 'Address');
+        $sheet->setCellValue('B10', ':');
+        $sheet->setCellValue('C10', $registration['address']);
+
+        $sheet->setCellValue('A12', 'Room');
+        $sheet->setCellValue('B12', ':');
+        $sheet->setCellValue('C12', $registration['room_label']);
+        $sheet->setCellValue('D12', 'Remark');
+        $sheet->setCellValue('E12', ':');
+        $sheet->setCellValue('F12', preg_replace('/\s+/', ' ', trim((string) ($registration['remark'] ?: '-'))));
+        $sheet->setCellValue('A13', 'C/I Date');
+        $sheet->setCellValue('B13', ':');
+        $sheet->setCellValue('C13', $registration['check_in_date']);
+        $sheet->setCellValue('D13', 'C/I Time');
+        $sheet->setCellValue('E13', ':');
+        $sheet->setCellValue('F13', $registration['check_in_time']);
+        $sheet->setCellValue('A14', 'C/O Date');
+        $sheet->setCellValue('B14', ':');
+        $sheet->setCellValue('C14', $checkOutAt->format('d-m-Y'));
+        $sheet->setCellValue('D14', 'C/O Time');
+        $sheet->setCellValue('E14', ':');
+        $sheet->setCellValue('F14', $checkOutAt->format('H:i:s'));
+
+        $sheet->mergeCells('E7:F7');
+        $sheet->setCellValue('E7', 'GUEST FOLIO');
+        $sheet->setCellValue('F8', number_format((int) ($registration['room_count'] ?? 1), 0, '.', ','));
+        $sheet->setCellValue('F9', $checkOutAt->format('n/j/Y'));
+        $sheet->setCellValue('F10', $checkOutAt->format('H:i'));
+        $sheet->getStyle('E7:F10')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('E7')->getFont()->getColor()->setARGB('FF0019A8');
+
+        $sheet->getStyle('A7:F14')->getFont()->setSize(10);
+        $sheet->getStyle('B7:B14')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A7:A14')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('F12:F14')->getAlignment()->setWrapText(true);
+
+        $headerRow = 16;
+        $sheet->fromArray(['Date', 'Invoice#', 'Description', 'Debit', 'Credit', 'Balance'], null, 'A' . $headerRow);
+        $sheet->getStyle('A' . $headerRow . ':F' . $headerRow)->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['argb' => 'FF0019A8'],
+            ],
+            'borders' => [
+                'top' => ['borderStyle' => Border::BORDER_MEDIUM],
+                'bottom' => ['borderStyle' => Border::BORDER_THIN],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'FFF8FAFC'],
+            ],
+        ]);
+        $sheet->getStyle('D' . $headerRow . ':F' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+        $row = $headerRow + 1;
+        $numberFormat = '#,##0;(#,##0);0';
+        foreach ($folio['lines'] as $line) {
+            $sheet->setCellValue('A' . $row, $line['date']);
+            $sheet->setCellValueExplicit('B' . $row, $line['invoice'], DataType::TYPE_STRING);
+            $sheet->setCellValue('C' . $row, $line['description']);
+
+            if ((float) $line['debit'] === 0.0) {
+                $sheet->setCellValue('D' . $row, '-');
+            } else {
+                $sheet->setCellValue('D' . $row, (float) $line['debit']);
+            }
+
+            if ((float) $line['credit'] === 0.0) {
+                $sheet->setCellValue('E' . $row, '-');
+            } else {
+                $sheet->setCellValue('E' . $row, (float) $line['credit']);
+            }
+
+            $sheet->setCellValue('F' . $row, (float) $line['balance']);
+            $row++;
+        }
+
+        $lastLineRow = max($headerRow, $row - 1);
+        $sheet->getStyle('A' . ($headerRow + 1) . ':F' . $lastLineRow)->getFont()->setSize(10);
+        $sheet->getStyle('D' . ($headerRow + 1) . ':F' . $lastLineRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('D' . ($headerRow + 1) . ':F' . $lastLineRow)->getNumberFormat()->setFormatCode($numberFormat);
+        $sheet->getStyle('A' . $headerRow . ':F' . $lastLineRow)->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+
+        $summaryRow = $row + 1;
+        $sheet->setCellValue('A' . $summaryRow, 'Note : ' . $folio['note']);
+        $sheet->setCellValue('D' . $summaryRow, 'Total Transaction :');
+        $sheet->setCellValue('F' . $summaryRow, (float) $folio['totals']['transaction']);
+        $sheet->getStyle('D' . $summaryRow . ':F' . $summaryRow)->getFont()->setBold(true);
+
+        $balanceStart = $summaryRow + 2;
+        $sheet->setCellValue('B' . $balanceStart, 'Debit');
+        $sheet->setCellValue('C' . $balanceStart, (float) $folio['totals']['debit']);
+        $sheet->setCellValue('B' . ($balanceStart + 1), 'Credit');
+        $sheet->setCellValue('C' . ($balanceStart + 1), (float) $folio['totals']['credit']);
+        $sheet->setCellValue('B' . ($balanceStart + 2), 'Balanced');
+        $sheet->setCellValue('C' . ($balanceStart + 2), (float) $folio['totals']['balance']);
+        $sheet->getStyle('B' . ($balanceStart + 2) . ':C' . ($balanceStart + 2))->getBorders()->getTop()->setBorderStyle(Border::BORDER_THIN);
+
+        $sheet->getStyle('B' . $balanceStart . ':C' . ($balanceStart + 2))->getFont()->setSize(10);
+        $sheet->getStyle('B' . $balanceStart . ':B' . ($balanceStart + 2))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('C' . $balanceStart . ':C' . ($balanceStart + 2))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('C' . $balanceStart . ':C' . ($balanceStart + 2))->getNumberFormat()->setFormatCode($numberFormat);
+        $sheet->getStyle('F' . $summaryRow)->getNumberFormat()->setFormatCode($numberFormat);
+
+        $signatureRow = $balanceStart + 5;
+        $sheet->setCellValue('A' . $signatureRow, '(' . $cashierName . ')');
+        $sheet->mergeCells('D' . $signatureRow . ':F' . $signatureRow);
+        $sheet->setCellValue('D' . $signatureRow, '(' . $registration['guest'] . ')');
+        $sheet->getStyle('D' . $signatureRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+        $thanksRow = $signatureRow + 2;
+        $sheet->mergeCells('A' . $thanksRow . ':F' . $thanksRow);
+        $sheet->setCellValue('A' . $thanksRow, 'Thank you for staying with us, We look forward to welcoming you again');
+        $sheet->getStyle('A' . $thanksRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A' . $thanksRow)->getFont()->setSize(10);
+
+        $sheet->freezePane('A' . ($headerRow + 1));
+        $sheet->getStyle('A1:F' . $thanksRow)->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+        $sheet->getStyle('A1:F' . $thanksRow)->getFont()->setName('Arial');
+
+        $fileName = $this->folioExportFileName($registration['reg_no'], $folio, 'xlsx');
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+            $spreadsheet->disconnectWorksheets();
+        }, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Cache-Control' => 'max-age=0, no-cache, no-store, must-revalidate',
+            'Pragma' => 'public',
+        ]);
+    }
+
+    private function addSpreadsheetImage($sheet, ?string $path, string $coordinates, int $height, int $offsetX = 0): void
+    {
+        if (!$path) {
+            return;
+        }
+
+        try {
+            $drawing = new Drawing();
+            $drawing->setPath($path);
+            $drawing->setCoordinates($coordinates);
+            $drawing->setHeight($height);
+            $drawing->setOffsetX($offsetX);
+            $drawing->setWorksheet($sheet);
+        } catch (\Throwable $exception) {
+        }
+    }
+
+    private function localImageDataUri(?string $path): ?string
+    {
+        if (!$path || !is_file($path) || !is_readable($path)) {
+            return null;
+        }
+
+        $mimeType = mime_content_type($path) ?: 'image/png';
+        $contents = file_get_contents($path);
+
+        if ($contents === false) {
+            return null;
+        }
+
+        return 'data:' . $mimeType . ';base64,' . base64_encode($contents);
+    }
+
     private function loadHotelProfile(): array
     {
         $profile = HotelBranding::profile();
+        $profile['logo_absolute_path'] = HotelBranding::logoAbsolutePath($profile);
         $profile['logo_url'] = !empty($profile['logo_path'])
             ? url('/settings/hotel-branding/logo?ts=' . rawurlencode((string) ($profile['updated_at'] ?? now()->timestamp)))
             : null;
@@ -330,7 +741,7 @@ class CheckoutController extends Controller
         return $this->paginateCollection($directoryRows, $perPage, $request);
     }
 
-    private function loadCheckoutRegistration(string $regNo, bool $activeOnly = true): ?array
+    private function loadCheckoutRegistration(string $regNo, bool $activeOnly = true, ?string $regNo2 = null): ?array
     {
         $header = DB::table('DATA')
             ->selectRaw("
@@ -418,12 +829,14 @@ class CheckoutController extends Controller
         $primary = $details->first();
         $roomCodes = $details->pluck('Kode')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
 
-        return [
+        $registration = [
             'header' => $header,
             'details' => $allDetails,
             'active_details' => $details,
             'primary' => $primary,
             'reg_no' => $regNo,
+            'selected_reg_no2' => '',
+            'checkout_scope' => 'all',
             'room_codes' => $roomCodes,
             'room_count' => count($roomCodes),
             'invoice_no' => $this->existingCheckoutInvoiceNo($regNo),
@@ -441,6 +854,50 @@ class CheckoutController extends Controller
             'check_out_time' => $this->displayTime($primary->JamOut ?? null),
             'nominal_total' => (float) $details->sum(fn ($row) => (float) ($row->Nominal ?? 0)),
         ];
+
+        $regNo2 = strtoupper(trim((string) $regNo2));
+
+        return $regNo2 !== '' ? $this->scopeCheckoutRegistrationToRoom($registration, $regNo2) : $registration;
+    }
+
+    private function scopeCheckoutRegistrationToRoom(array $registration, string $regNo2): ?array
+    {
+        $regNo2 = strtoupper(trim($regNo2));
+        $details = collect($registration['active_details'] ?? [])
+            ->filter(fn ($row) => strtoupper(trim((string) ($row->RegNo2 ?? ''))) === $regNo2)
+            ->values();
+
+        if ($details->isEmpty()) {
+            return null;
+        }
+
+        $allDetails = collect($registration['details'] ?? [])
+            ->filter(fn ($row) => strtoupper(trim((string) ($row->RegNo2 ?? ''))) === $regNo2)
+            ->values();
+        $primary = $details->first();
+        $roomCodes = $details->pluck('Kode')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
+
+        return array_merge($registration, [
+            'details' => $allDetails,
+            'active_details' => $details,
+            'primary' => $primary,
+            'selected_reg_no2' => $regNo2,
+            'checkout_scope' => 'room',
+            'room_codes' => $roomCodes,
+            'room_count' => count($roomCodes),
+            'guest' => trim((string) ($primary->Guest ?? '')),
+            'company' => trim((string) ($primary->Usaha ?? '')),
+            'address' => trim((string) ($primary->Alamat ?? $primary->Kota ?? '')),
+            'remark' => trim((string) ($primary->Remark ?? '')),
+            'payment' => trim((string) ($primary->Payment ?? '')),
+            'type' => trim((string) ($primary->Tipe ?? '')),
+            'room_label' => implode(', ', $roomCodes),
+            'check_in_date' => !empty($primary->TglIn) ? Carbon::parse($primary->TglIn)->format('d-m-Y') : '',
+            'check_out_date' => !empty($primary->TglKeluar) ? Carbon::parse($primary->TglKeluar)->format('d-m-Y') : '',
+            'check_in_time' => $this->displayTime($primary->JamIn ?? null),
+            'check_out_time' => $this->displayTime($primary->JamOut ?? null),
+            'nominal_total' => (float) $details->sum(fn ($row) => (float) ($row->Nominal ?? 0)),
+        ]);
     }
 
     private function buildFolioPayload(array $registration, Carbon $checkoutAt, string $mode): array
@@ -485,9 +942,12 @@ class CheckoutController extends Controller
 
         $activeDetails = $registration['active_details'];
         $primary = $registration['primary'];
+        $isRoomOnly = ($registration['checkout_scope'] ?? 'all') === 'room';
+        $roomCodes = collect($registration['room_codes'] ?? [])->map(fn ($value) => trim((string) $value))->filter()->values()->all();
+        $regNo2s = collect($activeDetails)->pluck('RegNo2')->map(fn ($value) => trim((string) $value))->filter()->values()->all();
 
         $headerDeposit = (float) ($registration['header']->Deposit ?? 0);
-        if ($headerDeposit !== 0.0) {
+        if (!$isRoomOnly && $headerDeposit !== 0.0) {
             $pushLine(
                 $primary->TglIn ?? $checkoutAt,
                 $this->crNofak($registration['reg_no']),
@@ -514,51 +974,59 @@ class CheckoutController extends Controller
             $roomDiscountTotal += $roomComputation['discount_total'];
         }
 
-        $extraBedRows = DB::table('EXTRABED')
+        $extraBedQuery = DB::table('EXTRABED')
             ->join('EXTRABEDD', 'EXTRABED.Nofak', '=', 'EXTRABEDD.Nofak')
             ->selectRaw("EXTRABED.Tgl as Tgl, RTRIM(EXTRABEDD.Nofak) as Nofak, RTRIM(EXTRABED.Kode) as Kode, RTRIM(EXTRABEDD.Ket) as Ket, EXTRABEDD.Nominal as Nominal")
-            ->whereRaw('RTRIM(EXTRABED.RegNo) = ?', [$registration['reg_no']])
-            ->orderBy('EXTRABED.Tgl')
-            ->get();
+            ->whereRaw('RTRIM(EXTRABED.RegNo) = ?', [$registration['reg_no']]);
+
+        if ($isRoomOnly) {
+            $extraBedQuery->whereIn(DB::raw('RTRIM(EXTRABED.Kode)'), $roomCodes);
+        }
+
+        $extraBedRows = $extraBedQuery->orderBy('EXTRABED.Tgl')->get();
         foreach ($extraBedRows as $row) {
             $pushLine($row->Tgl, $this->crNofak((string) $row->Nofak), $this->crJudul((string) $row->Ket, (string) $row->Kode), (float) ($row->Nominal ?? 0), 0, 'I2');
         }
 
-        foreach ($this->loadCategoryCharges('MINI', 'MINID', 'MINI', 'MINID', 'J', 'Mini Bar', $registration['reg_no']) as $row) {
+        foreach ($this->loadCategoryCharges('MINI', 'MINID', 'MINI', 'MINID', 'J', 'Mini Bar', $registration['reg_no'], $isRoomOnly ? $roomCodes : []) as $row) {
             $pushLine($row['date'], $row['invoice'], $row['description'], $row['debit'], 0, 'J');
         }
 
-        foreach ($this->loadCategoryCharges('RES', 'RESD', 'RES', 'RESD', 'K', 'Coffe Lounge', $registration['reg_no']) as $row) {
+        foreach ($this->loadCategoryCharges('RES', 'RESD', 'RES', 'RESD', 'K', 'Coffe Lounge', $registration['reg_no'], $isRoomOnly ? $roomCodes : []) as $row) {
             $pushLine($row['date'], $row['invoice'], $row['description'], $row['debit'], 0, 'K');
         }
 
-        foreach ($this->loadCategoryCharges('RES2', 'RESD2', 'RES2', 'RESD2', 'K01', 'Restaurant', $registration['reg_no']) as $row) {
+        foreach ($this->loadCategoryCharges('RES2', 'RESD2', 'RES2', 'RESD2', 'K01', 'Restaurant', $registration['reg_no'], $isRoomOnly ? $roomCodes : []) as $row) {
             $pushLine($row['date'], $row['invoice'], $row['description'], $row['debit'], 0, 'K01');
         }
 
-        foreach ($this->loadCategoryCharges('BANQUET', 'BANQUETD', 'BANQUET', 'BANQUETD', 'J1', 'Banquet', $registration['reg_no']) as $row) {
+        foreach ($this->loadCategoryCharges('BANQUET', 'BANQUETD', 'BANQUET', 'BANQUETD', 'J1', 'Banquet', $registration['reg_no'], $isRoomOnly ? $roomCodes : []) as $row) {
             $pushLine($row['date'], $row['invoice'], $row['description'], $row['debit'], 0, 'J1');
         }
 
-        foreach ($this->loadCategoryCharges('CUCI', 'CUCID', 'CUCI', 'CUCID', 'L', 'Laundry', $registration['reg_no']) as $row) {
+        foreach ($this->loadCategoryCharges('CUCI', 'CUCID', 'CUCI', 'CUCID', 'L', 'Laundry', $registration['reg_no'], $isRoomOnly ? $roomCodes : []) as $row) {
             $pushLine($row['date'], $row['invoice'], $row['description'], $row['debit'], 0, 'L');
         }
 
-        $otherRows = DB::table('TAMBAH')
+        $otherQuery = DB::table('TAMBAH')
             ->join('TAMBAHD', 'TAMBAH.Nofak', '=', 'TAMBAHD.Nofak')
             ->selectRaw("TAMBAH.Tgl as Tgl, RTRIM(TAMBAHD.Nofak) as Nofak, RTRIM(TAMBAH.Kode) as Kode, RTRIM(TAMBAHD.Ket) as Ket, TAMBAHD.Nominal as Nominal")
-            ->whereRaw('RTRIM(TAMBAH.RegNo) = ?', [$registration['reg_no']])
-            ->orderBy('TAMBAH.Tgl')
-            ->get();
+            ->whereRaw('RTRIM(TAMBAH.RegNo) = ?', [$registration['reg_no']]);
+
+        if ($isRoomOnly) {
+            $otherQuery->whereIn(DB::raw('RTRIM(TAMBAH.Kode)'), $roomCodes);
+        }
+
+        $otherRows = $otherQuery->orderBy('TAMBAH.Tgl')->get();
         foreach ($otherRows as $row) {
             $pushLine($row->Tgl, $this->crNofak((string) $row->Nofak), $this->crJudul((string) $row->Ket, (string) $row->Kode), (float) ($row->Nominal ?? 0), 0, 'M');
         }
 
-        foreach ($this->loadTelephoneChargeRows($registration['reg_no'], $checkoutAt) as $row) {
+        foreach ($this->loadTelephoneChargeRows($registration['reg_no'], $checkoutAt, $isRoomOnly ? $regNo2s : [], $isRoomOnly ? $roomCodes : []) as $row) {
             $pushLine($row['date'], $row['invoice'], $row['description'], $row['debit'], 0, $row['code']);
         }
 
-        foreach ($this->loadCorrectionRows($registration['reg_no']) as $row) {
+        foreach ($this->loadCorrectionRows($registration['reg_no'], $isRoomOnly ? $regNo2s : []) as $row) {
             $pushLine($row['date'], $row['invoice'], $row['description'], $row['debit'], $row['credit'], $row['code']);
         }
 
@@ -573,12 +1041,14 @@ class CheckoutController extends Controller
             );
         }
 
-        foreach ($this->loadPaymentRows($registration['reg_no']) as $row) {
-            $pushLine($row['date'], $row['invoice'], $row['description'], 0, $row['credit'], $row['code']);
-        }
+        if (!$isRoomOnly) {
+            foreach ($this->loadPaymentRows($registration['reg_no']) as $row) {
+                $pushLine($row['date'], $row['invoice'], $row['description'], 0, $row['credit'], $row['code']);
+            }
 
-        foreach ($this->loadRefundRows($registration['reg_no']) as $row) {
-            $pushLine($row['date'], $row['invoice'], $row['description'], 0, $row['credit'], $row['code']);
+            foreach ($this->loadRefundRows($registration['reg_no']) as $row) {
+                $pushLine($row['date'], $row['invoice'], $row['description'], 0, $row['credit'], $row['code']);
+            }
         }
 
         if (round($balance, 2) < 0) {
@@ -727,9 +1197,10 @@ class CheckoutController extends Controller
         string $detailAlias,
         string $code,
         string $defaultLabel,
-        string $regNo
+        string $regNo,
+        array $roomCodes = []
     ): array {
-        $rows = DB::table($headerTable)
+        $query = DB::table($headerTable)
             ->join($detailTable, $headerTable . '.Nofak', '=', $detailTable . '.Nofak')
             ->selectRaw("
                 {$headerTable}.Tgl as Tgl,
@@ -739,8 +1210,13 @@ class CheckoutController extends Controller
             ")
             ->whereRaw("RTRIM({$headerTable}.RegNo) = ?", [$regNo])
             ->groupBy($headerTable . '.Tgl', $headerTable . '.Nofak', $headerTable . '.Kode')
-            ->orderBy($headerTable . '.Tgl')
-            ->get();
+            ->orderBy($headerTable . '.Tgl');
+
+        if ($roomCodes !== []) {
+            $query->whereIn(DB::raw("RTRIM({$headerTable}.Kode)"), $roomCodes);
+        }
+
+        $rows = $query->get();
 
         return $rows->map(function ($row) use ($defaultLabel) {
             return [
@@ -752,14 +1228,19 @@ class CheckoutController extends Controller
         })->all();
     }
 
-    private function loadTelephoneChargeRows(string $regNo, Carbon $checkoutAt): array
+    private function loadTelephoneChargeRows(string $regNo, Carbon $checkoutAt, array $regNo2s = [], array $roomCodes = []): array
     {
         $rows = [];
-        $callRows = DB::table('CALL')
+        $callQuery = DB::table('CALL')
             ->selectRaw('RTRIM(CallRegNo2) as RegNo2, SUM(CallCost) as Cost')
             ->whereRaw('RTRIM(CallRegno) = ?', [$regNo])
-            ->groupBy('CallRegNo2')
-            ->get();
+            ->groupBy('CallRegNo2');
+
+        if ($regNo2s !== []) {
+            $callQuery->whereIn(DB::raw('RTRIM(CallRegNo2)'), $regNo2s);
+        }
+
+        $callRows = $callQuery->get();
 
         foreach ($callRows as $row) {
             $roomCode = DB::table('DATA2')
@@ -775,12 +1256,17 @@ class CheckoutController extends Controller
             ];
         }
 
-        $manualRows = DB::table('TELP')
+        $manualQuery = DB::table('TELP')
             ->join('TELPD', 'TELP.Nofak', '=', 'TELPD.Nofak')
             ->selectRaw("TELP.Tgl as Tgl, RTRIM(TELPD.Nofak) as Nofak, RTRIM(TELP.Kode) as Kode, RTRIM(TELPD.Ket) as Ket, TELPD.Nominal as Nominal")
             ->whereRaw('RTRIM(TELP.RegNo) = ?', [$regNo])
-            ->orderBy('TELP.Tgl')
-            ->get();
+            ->orderBy('TELP.Tgl');
+
+        if ($roomCodes !== []) {
+            $manualQuery->whereIn(DB::raw('RTRIM(TELP.Kode)'), $roomCodes);
+        }
+
+        $manualRows = $manualQuery->get();
 
         foreach ($manualRows as $row) {
             $rows[] = [
@@ -795,16 +1281,21 @@ class CheckoutController extends Controller
         return $rows;
     }
 
-    private function loadCorrectionRows(string $regNo): array
+    private function loadCorrectionRows(string $regNo, array $regNo2s = []): array
     {
         if (!Schema::hasTable('Koreksi')) {
             return [];
         }
 
-        $details = DB::table('DATA2')
+        $detailsQuery = DB::table('DATA2')
             ->selectRaw('RTRIM(RegNo2) as RegNo2')
-            ->whereRaw('RTRIM(RegNo) = ?', [$regNo])
-            ->get();
+            ->whereRaw('RTRIM(RegNo) = ?', [$regNo]);
+
+        if ($regNo2s !== []) {
+            $detailsQuery->whereIn(DB::raw('RTRIM(RegNo2)'), $regNo2s);
+        }
+
+        $details = $detailsQuery->get();
 
         if ($details->isEmpty()) {
             return [];

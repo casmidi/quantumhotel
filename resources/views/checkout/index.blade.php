@@ -88,6 +88,72 @@
         color: #10233b;
     }
 
+    .checkout-mode-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+    }
+
+    .checkout-mode-tab {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.85rem;
+        padding: 0.95rem 1rem;
+        border-radius: 16px;
+        border: 1px solid rgba(137, 167, 214, 0.28);
+        background: #fff;
+        color: #516783;
+        text-decoration: none;
+        box-shadow: 0 10px 24px rgba(16, 35, 59, 0.05);
+        transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+
+    .checkout-mode-tab:hover {
+        color: #173761;
+        text-decoration: none;
+        border-color: rgba(23, 55, 97, 0.32);
+        transform: translateY(-1px);
+    }
+
+    .checkout-mode-tab.is-active {
+        border-color: rgba(15, 90, 184, 0.38);
+        background: linear-gradient(180deg, #f4f9ff 0%, #e9f2ff 100%);
+        box-shadow: 0 14px 28px rgba(15, 90, 184, 0.1);
+    }
+
+    .checkout-mode-tab strong,
+    .checkout-mode-tab small {
+        display: block;
+    }
+
+    .checkout-mode-tab strong {
+        color: #173761;
+        font-size: 0.98rem;
+        font-weight: 900;
+    }
+
+    .checkout-mode-tab small {
+        margin-top: 0.18rem;
+        color: #6b7b92;
+        font-size: 0.78rem;
+        font-weight: 650;
+        line-height: 1.35;
+    }
+
+    .checkout-mode-badge {
+        flex: 0 0 auto;
+        border-radius: 999px;
+        padding: 0.36rem 0.65rem;
+        background: rgba(23, 55, 97, 0.08);
+        color: #173761;
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
     .checkout-grid {
         display: grid;
         grid-template-columns: minmax(360px, 1fr) minmax(0, 1.3fr);
@@ -640,6 +706,7 @@
 
     @media (max-width: 767.98px) {
         .checkout-search-grid,
+        .checkout-mode-tabs,
         .checkout-meta-grid,
         .checkout-system-grid,
         .checkout-form-grid,
@@ -671,6 +738,31 @@
     }
 </style>
 
+@php
+    $checkoutScope = $checkoutScope ?? 'all';
+    $selectedRegNo = $selectedRegNo ?? '';
+    $selectedRegNo2 = $selectedRegNo2 ?? '';
+    $modeUrl = function (string $scope) use ($search, $perPage, $sortBy, $sortDir, $selectedRegNo, $selectedRegNo2) {
+        $query = [
+            'checkout_scope' => $scope,
+            'search' => $search,
+            'per_page' => $perPage,
+            'sort_by' => $sortBy,
+            'sort_dir' => $sortDir,
+        ];
+
+        if ($selectedRegNo !== '') {
+            $query['reg_no'] = $selectedRegNo;
+        }
+
+        if ($selectedRegNo2 !== '') {
+            $query['reg_no2'] = $selectedRegNo2;
+        }
+
+        return url('/checkout') . '?' . http_build_query($query);
+    };
+@endphp
+
 <section class="checkout-page">
     @if(session('success'))
         <div class="alert alert-success" id="successAlert">{{ session('success') }}</div>
@@ -679,6 +771,23 @@
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
+
+    <div class="checkout-mode-tabs" role="tablist" aria-label="Checkout mode">
+        <a href="{{ $modeUrl('all') }}" class="checkout-mode-tab {{ $checkoutScope === 'all' ? 'is-active' : '' }}" role="tab" aria-selected="{{ $checkoutScope === 'all' ? 'true' : 'false' }}">
+            <span>
+                <strong>Checkout Semua Kamar</strong>
+                <small>Menutup seluruh kamar dalam satu registration/group.</small>
+            </span>
+            <span class="checkout-mode-badge">All Rooms</span>
+        </a>
+        <a href="{{ $modeUrl('room') }}" class="checkout-mode-tab {{ $checkoutScope === 'room' ? 'is-active' : '' }}" role="tab" aria-selected="{{ $checkoutScope === 'room' ? 'true' : 'false' }}">
+            <span>
+                <strong>Checkout 1 Kamar</strong>
+                <small>Menutup hanya kamar yang dipilih dari group.</small>
+            </span>
+            <span class="checkout-mode-badge">Room Only</span>
+        </a>
+    </div>
 
     <div class="checkout-grid">
         @include('checkout.partials.directory-section')
@@ -693,6 +802,8 @@
                     <form method="POST" action="/checkout" class="checkout-editor-form">
                         @csrf
                         <input type="hidden" name="reg_no" value="{{ $selectedRegistration['reg_no'] }}">
+                        <input type="hidden" name="reg_no2" id="reg_no2" value="{{ $selectedRegNo2 }}">
+                        <input type="hidden" name="checkout_scope" id="checkout_scope" value="{{ $checkoutScope }}">
 
                         <div class="checkout-form-stack">
                             <div class="checkout-subsection">
@@ -714,6 +825,11 @@
                                             <small>Room & Payment</small>
                                             <strong>{{ $selectedRegistration['room_label'] ?: '-' }}</strong>
                                             <span class="folio-muted">{{ $selectedRegistration['payment'] ?: '-' }}</span>
+                                        </div>
+                                        <div class="checkout-meta-card">
+                                            <small>Checkout Mode</small>
+                                            <strong>{{ $checkoutScope === 'room' ? '1 Kamar Saja' : 'Semua Kamar' }}</strong>
+                                            <span class="folio-muted">{{ $checkoutScope === 'room' ? ($selectedRegNo2 ?: '-') : number_format((int) ($selectedRegistration['room_count'] ?? 0), 0, ',', '.') . ' kamar' }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -808,18 +924,33 @@
 
                             <div class="checkout-action-bar">
                                 <div class="checkout-action-copy">
-                                    <strong>Final Action</strong>
-                                    Gunakan preview untuk cek guest folio terakhir. Jika semua sudah sesuai, simpan checkout untuk menutup stay aktif dan mengubah status kamar.
+                                    <strong>{{ $checkoutScope === 'room' ? 'Final Action - Room Only' : 'Final Action - All Rooms' }}</strong>
+                                    {{ $checkoutScope === 'room'
+                                        ? 'Mode ini hanya menutup kamar yang dipilih dari group. Kamar lain dalam registration yang sama tetap aktif.'
+                                        : 'Mode ini menutup seluruh kamar aktif dalam registration/group yang sama.' }}
                                 </div>
                                 <div class="checkout-actions">
                                     <a
-                                        href="/checkout/{{ urlencode($selectedRegistration['reg_no']) }}/print-folio?mode=preview&checkout_date={{ urlencode($checkoutDate) }}&checkout_time={{ urlencode($checkoutTime) }}"
+                                        href="/checkout/{{ urlencode($selectedRegistration['reg_no']) }}/print-folio?mode=preview&checkout_date={{ urlencode($checkoutDate) }}&checkout_time={{ urlencode($checkoutTime) }}&checkout_scope={{ urlencode($checkoutScope) }}@if($checkoutScope === 'room')&reg_no2={{ urlencode($selectedRegNo2) }}@endif"
                                         target="_blank"
                                         class="btn package-btn-secondary"
                                         id="preview-folio-link"
                                         data-base-url="/checkout/{{ urlencode($selectedRegistration['reg_no']) }}/print-folio"
                                     >Preview Folio</a>
-                                    <button type="submit" class="btn package-btn-primary" onclick="return confirm('Proses checkout guest ini sekarang?')">Save Check Out</button>
+                                    <a
+                                        href="/checkout/{{ urlencode($selectedRegistration['reg_no']) }}/export-folio/excel?mode=preview&checkout_date={{ urlencode($checkoutDate) }}&checkout_time={{ urlencode($checkoutTime) }}&checkout_scope={{ urlencode($checkoutScope) }}@if($checkoutScope === 'room')&reg_no2={{ urlencode($selectedRegNo2) }}@endif"
+                                        class="btn package-btn-secondary"
+                                        id="export-excel-link"
+                                        data-base-url="/checkout/{{ urlencode($selectedRegistration['reg_no']) }}/export-folio/excel"
+                                    >Excel</a>
+                                    <a
+                                        href="/checkout/{{ urlencode($selectedRegistration['reg_no']) }}/export-folio/pdf?mode=preview&checkout_date={{ urlencode($checkoutDate) }}&checkout_time={{ urlencode($checkoutTime) }}&checkout_scope={{ urlencode($checkoutScope) }}@if($checkoutScope === 'room')&reg_no2={{ urlencode($selectedRegNo2) }}@endif"
+                                        target="_blank"
+                                        class="btn package-btn-secondary"
+                                        id="export-pdf-link"
+                                        data-base-url="/checkout/{{ urlencode($selectedRegistration['reg_no']) }}/export-folio/pdf"
+                                    >PDF</a>
+                                    <button type="submit" class="btn package-btn-primary" onclick="return confirm('{{ $checkoutScope === 'room' ? 'Proses checkout hanya kamar ini sekarang?' : 'Proses checkout semua kamar dalam group ini sekarang?' }}')">{{ $checkoutScope === 'room' ? 'Save Check Out Room Only' : 'Save Check Out All Rooms' }}</button>
                                 </div>
                             </div>
                         </div>
@@ -900,7 +1031,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const timeInput = document.getElementById('checkout_time');
     const dateDisplayInput = document.getElementById('checkout_date_display');
     const timeDisplayInput = document.getElementById('checkout_time_display');
-    const previewLink = document.getElementById('preview-folio-link');
+    const checkoutScopeInput = document.getElementById('checkout_scope');
+    const regNo2Input = document.getElementById('reg_no2');
+    const folioActionLinks = [
+        document.getElementById('preview-folio-link'),
+        document.getElementById('export-excel-link'),
+        document.getElementById('export-pdf-link'),
+    ].filter(Boolean);
 
     if (!dateInput || !timeInput || !dateDisplayInput || !timeDisplayInput) {
         return;
@@ -916,19 +1053,23 @@ document.addEventListener('DOMContentLoaded', function () {
     dateDisplayInput.value = currentDate;
     timeDisplayInput.value = currentTime;
 
-    const syncPreviewLink = () => {
-        if (!previewLink) {
-            return;
-        }
-
-        const url = new URL(previewLink.dataset.baseUrl, window.location.origin);
-        url.searchParams.set('mode', 'preview');
-        url.searchParams.set('checkout_date', dateInput.value);
-        url.searchParams.set('checkout_time', timeInput.value);
-        previewLink.href = url.toString();
+    const syncFolioActionLinks = () => {
+        folioActionLinks.forEach((link) => {
+            const url = new URL(link.dataset.baseUrl, window.location.origin);
+            url.searchParams.set('mode', 'preview');
+            url.searchParams.set('checkout_date', dateInput.value);
+            url.searchParams.set('checkout_time', timeInput.value);
+            url.searchParams.set('checkout_scope', checkoutScopeInput?.value || 'all');
+            if (regNo2Input?.value) {
+                url.searchParams.set('reg_no2', regNo2Input.value);
+            } else {
+                url.searchParams.delete('reg_no2');
+            }
+            link.href = url.toString();
+        });
     };
 
-    syncPreviewLink();
+    syncFolioActionLinks();
 
     let checkoutDirectoryRequestController = null;
     const checkoutDirectoryCache = new Map();

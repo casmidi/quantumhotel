@@ -1,12 +1,14 @@
 @php
     $sortBy = $sortBy ?? 'check_in';
     $sortDir = $sortDir ?? 'desc';
+    $checkoutScope = $checkoutScope ?? 'all';
     $selectedRegNo = $selectedRegNo ?? '';
     $selectedRegNo2 = $selectedRegNo2 ?? '';
-    $sortUrl = function (string $column) use ($sortBy, $sortDir, $selectedRegNo, $selectedRegNo2) {
+    $sortUrl = function (string $column) use ($sortBy, $sortDir, $checkoutScope, $selectedRegNo, $selectedRegNo2) {
         $query = array_merge(request()->except('page'), [
             'sort_by' => $column,
             'sort_dir' => $sortBy === $column && $sortDir === 'asc' ? 'desc' : 'asc',
+            'checkout_scope' => $checkoutScope,
         ]);
 
         if ($selectedRegNo !== '') {
@@ -28,11 +30,24 @@
 
         return $sortDir === 'asc' ? 'fa-solid fa-sort-up' : 'fa-solid fa-sort-down';
     };
+    $rowUrl = function ($row) use ($search, $perPage, $sortBy, $sortDir, $checkoutScope) {
+        $query = [
+            'checkout_scope' => $checkoutScope,
+            'search' => $search,
+            'per_page' => $perPage,
+            'sort_by' => $sortBy,
+            'sort_dir' => $sortDir,
+            'reg_no' => trim((string) $row->RegNo),
+            'reg_no2' => trim((string) $row->RegNo2),
+        ];
+
+        return '/checkout?' . http_build_query(array_filter($query, fn ($value) => $value !== '' && $value !== null));
+    };
 @endphp
 <div class="checkout-section">
     <div class="checkout-section-header">
         <h3>Checkout Directory</h3>
-        <span class="checkout-folio-meta">Choose a live registration to prepare departure.</span>
+        <span class="checkout-folio-meta">{{ $checkoutScope === 'room' ? 'Choose one room from a group to checkout.' : 'Choose a live registration to checkout all active rooms.' }}</span>
     </div>
     <div class="checkout-section-body checkout-section-main-body" id="checkoutDirectoryShell">
         <div class="checkout-directory-loading" aria-hidden="true">
@@ -45,6 +60,7 @@
         <form method="GET" action="/checkout" id="checkoutSearchForm" class="mb-4">
             <input type="hidden" name="sort_by" value="{{ $sortBy }}">
             <input type="hidden" name="sort_dir" value="{{ $sortDir }}">
+            <input type="hidden" name="checkout_scope" value="{{ $checkoutScope }}">
             @if($selectedRegNo !== '')
                 <input type="hidden" name="reg_no" value="{{ $selectedRegNo }}">
             @endif
@@ -67,7 +83,7 @@
                 </div>
                 <div class="checkout-actions" style="justify-content: flex-start; align-items: end;">
                     <button type="submit" class="btn package-btn-primary">Search</button>
-                    <a href="/checkout" class="btn package-btn-secondary">Clear</a>
+                    <a href="/checkout?checkout_scope={{ urlencode($checkoutScope) }}" class="btn package-btn-secondary">Clear</a>
                 </div>
             </div>
         </form>
@@ -105,12 +121,17 @@
                 </thead>
                 <tbody>
                     @forelse($directory as $row)
-                        <tr class="checkout-directory-row {{ $selectedRegNo === trim((string) $row->RegNo) && $selectedRegNo2 === trim((string) $row->RegNo2) ? 'is-active' : '' }}">
-                            <td><a href="/checkout?{{ http_build_query(array_filter(['search' => $search, 'per_page' => $perPage, 'sort_by' => $sortBy, 'sort_dir' => $sortDir, 'reg_no' => trim((string) $row->RegNo), 'reg_no2' => trim((string) $row->RegNo2)])) }}"><span class="package-code">{{ trim((string) $row->RegNo) }}</span></a></td>
-                            <td><a href="/checkout?{{ http_build_query(array_filter(['search' => $search, 'per_page' => $perPage, 'sort_by' => $sortBy, 'sort_dir' => $sortDir, 'reg_no' => trim((string) $row->RegNo), 'reg_no2' => trim((string) $row->RegNo2)])) }}"><strong>{{ trim((string) $row->Guest) }}</strong><br><span class="folio-muted">{{ trim((string) $row->Usaha) !== '' ? trim((string) $row->Usaha) : trim((string) $row->Tipe) }}</span></a></td>
-                            <td><a href="/checkout?{{ http_build_query(array_filter(['search' => $search, 'per_page' => $perPage, 'sort_by' => $sortBy, 'sort_dir' => $sortDir, 'reg_no' => trim((string) $row->RegNo), 'reg_no2' => trim((string) $row->RegNo2)])) }}">{{ trim((string) $row->Kode) }}</a></td>
-                            <td><a href="/checkout?{{ http_build_query(array_filter(['search' => $search, 'per_page' => $perPage, 'sort_by' => $sortBy, 'sort_dir' => $sortDir, 'reg_no' => trim((string) $row->RegNo), 'reg_no2' => trim((string) $row->RegNo2)])) }}">{{ $row->check_in_date }}</a></td>
-                            <td class="text-right"><a href="/checkout?{{ http_build_query(array_filter(['search' => $search, 'per_page' => $perPage, 'sort_by' => $sortBy, 'sort_dir' => $sortDir, 'reg_no' => trim((string) $row->RegNo), 'reg_no2' => trim((string) $row->RegNo2)])) }}">Rp {{ $row->nominal_display }}</a></td>
+                        @php
+                            $isActive = $selectedRegNo === trim((string) $row->RegNo)
+                                && ($checkoutScope === 'all' || $selectedRegNo2 === trim((string) $row->RegNo2));
+                            $href = $rowUrl($row);
+                        @endphp
+                        <tr class="checkout-directory-row {{ $isActive ? 'is-active' : '' }}">
+                            <td><a href="{{ $href }}"><span class="package-code">{{ trim((string) $row->RegNo) }}</span></a></td>
+                            <td><a href="{{ $href }}"><strong>{{ trim((string) $row->Guest) }}</strong><br><span class="folio-muted">{{ trim((string) $row->Usaha) !== '' ? trim((string) $row->Usaha) : trim((string) $row->Tipe) }}</span></a></td>
+                            <td><a href="{{ $href }}">{{ trim((string) $row->Kode) }}</a></td>
+                            <td><a href="{{ $href }}">{{ $row->check_in_date }}</a></td>
+                            <td class="text-right"><a href="{{ $href }}">Rp {{ $row->nominal_display }}</a></td>
                         </tr>
                     @empty
                         <tr>
