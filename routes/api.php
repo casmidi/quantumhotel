@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\KelasController;
+use App\Http\Controllers\NightAuditController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StockPackageController;
 use App\Http\Controllers\PackageTransactionController;
@@ -43,6 +44,14 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/checkout', [CheckoutController::class, 'index']);
         Route::post('/checkout', [CheckoutController::class, 'store']);
+
+        Route::get('/night-audit', [NightAuditController::class, 'index']);
+        Route::post('/night-audit/start', [NightAuditController::class, 'start']);
+        Route::post('/night-audit/{batchId}/refresh', [NightAuditController::class, 'refresh']);
+        Route::post('/night-audit/{batchId}/close', [NightAuditController::class, 'close']);
+        Route::post('/night-audit/{batchId}/approve', [NightAuditController::class, 'approve']);
+        Route::post('/night-audit/{batchId}/adjustments', [NightAuditController::class, 'storeAdjustment']);
+        Route::match(['put', 'patch'], '/night-audit/checklist/{checklistId}', [NightAuditController::class, 'updateChecklist']);
 
         Route::get('/guest-in-house', fn () => response()->json([
             'success' => true,

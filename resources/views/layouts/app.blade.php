@@ -342,6 +342,12 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="/night-audit" class="nav-link {{ request()->is('night-audit') || request()->is('night-audit/*') ? 'active' : '' }}">
+                            <p>Night Audit</p>
+                        </a>
+                    </li>
+
                     <li class="nav-header">REPORT</li>
 
                     <li class="nav-item">

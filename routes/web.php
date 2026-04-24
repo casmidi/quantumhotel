@@ -8,6 +8,7 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HotelSettingsController;
+use App\Http\Controllers\NightAuditController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StockPackageController;
 use App\Http\Controllers\PackageTransactionController;
@@ -249,6 +250,41 @@ Route::get('/checkout/{regNo}/print-folio', function ($regNo) {
 Route::get('/checkout/{regNo}/export-folio/{format}', function ($regNo, $format) {
     if ($response = ensureSessionAccess()) return $response;
     return app(CheckoutController::class)->exportFolio(request(), $regNo, $format);
+});
+
+Route::get('/night-audit', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(NightAuditController::class)->index(request());
+});
+
+Route::post('/night-audit/start', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(NightAuditController::class)->start(request());
+});
+
+Route::post('/night-audit/{batchId}/refresh', function ($batchId) {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(NightAuditController::class)->refresh(request(), (int) $batchId);
+});
+
+Route::post('/night-audit/{batchId}/close', function ($batchId) {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(NightAuditController::class)->close(request(), (int) $batchId);
+});
+
+Route::post('/night-audit/{batchId}/approve', function ($batchId) {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(NightAuditController::class)->approve(request(), (int) $batchId);
+});
+
+Route::post('/night-audit/{batchId}/adjustments', function ($batchId) {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(NightAuditController::class)->storeAdjustment(request(), (int) $batchId);
+});
+
+Route::post('/night-audit/checklist/{checklistId}', function ($checklistId) {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(NightAuditController::class)->updateChecklist(request(), (int) $checklistId);
 });
 
 Route::get('/settings/hotel-branding', function () {

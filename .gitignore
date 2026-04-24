@@ -22,3 +22,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+.venv/
+venv/
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+.env
+storage/logs/
