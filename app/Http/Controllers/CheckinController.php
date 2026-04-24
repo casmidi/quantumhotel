@@ -18,11 +18,29 @@ class CheckinController extends Controller
     {
         $search = trim((string) $request->query('search', ''));
         $perPage = (int) $request->query('per_page', 10);
+        $sortBy = $this->resolveCheckinSortBy((string) $request->query('sort_by', 'check_in'));
+        $sortDir = $this->resolveCheckinSortDirection((string) $request->query('sort_dir', 'desc'));
         if (!in_array($perPage, [10, 25, 50], true)) {
             $perPage = 10;
         }
 
-        $checkins = $this->loadActiveCheckins($search, $perPage, $request);
+        $checkins = $this->loadActiveCheckins($search, $perPage, $request, $sortBy, $sortDir);
+
+        if ($this->isCheckinDirectoryPartialRequest($request)) {
+            return view('checkin.partials.directory-section', [
+                'checkins' => $checkins,
+                'search' => $search,
+                'perPage' => $perPage,
+                'sortBy' => $sortBy,
+                'sortDir' => $sortDir,
+                'summary' => [
+                    'active' => $checkins->total(),
+                    'rooms_ready' => $this->countAvailableRooms(),
+                    'packages' => $this->countActivePackages(),
+                ],
+            ])->render();
+        }
+
         $rooms = $this->loadRoomOptions();
         $packages = $this->loadPackageOptions();
         $typeOptions = $this->loadTypeOptions();
@@ -99,6 +117,8 @@ class CheckinController extends Controller
             'checkins' => $checkins,
             'search' => $search,
             'perPage' => $perPage,
+            'sortBy' => $sortBy,
+            'sortDir' => $sortDir,
             'nextRegNo' => $this->generateNextRegNo(),
             'rooms' => $rooms,
             'packages' => $packages,
@@ -137,6 +157,8 @@ class CheckinController extends Controller
             'checkins' => $this->paginatorPayload($checkins),
             'search' => $search,
             'per_page' => $perPage,
+            'sort_by' => $sortBy,
+            'sort_dir' => $sortDir,
             'next_reg_no' => $viewData['nextRegNo'],
             'rooms' => $rooms,
             'packages' => $packages,
@@ -154,6 +176,23 @@ class CheckinController extends Controller
                 'id_type' => $viewData['idTypeOptions'],
             ],
         ]);
+    }
+
+    private function isCheckinDirectoryPartialRequest(Request $request): bool
+    {
+        return $request->header('X-Partial-Component') === 'checkin-directory';
+    }
+
+    private function resolveCheckinSortBy(string $sortBy): string
+    {
+        $allowedSorts = ['reg_no', 'room', 'guest', 'check_in', 'check_out', 'package', 'nominal'];
+
+        return in_array($sortBy, $allowedSorts, true) ? $sortBy : 'check_in';
+    }
+
+    private function resolveCheckinSortDirection(string $sortDir): string
+    {
+        return strtolower(trim($sortDir)) === 'asc' ? 'asc' : 'desc';
     }
 
     public function store(Request $request)
@@ -970,32 +1009,42 @@ class CheckinController extends Controller
             ]);
     }
 
-    private function loadActiveCheckins(string $search, int $perPage, Request $request): LengthAwarePaginator
+    private function loadActiveCheckins(string $search, int $perPage, Request $request, string $sortBy, string $sortDir): LengthAwarePaginator
     {
-        $idSelect = $this->legacyIdSelect('DATA2');
-        $query = DB::table('DATA2')
-            ->selectRaw("$idSelect, Pst, RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode, RTRIM(Guest) as Guest, RTRIM(Guest2) as Guest2, RTRIM(Tipe) as Tipe, RTRIM(Payment) as Payment, RTRIM(Segment) as Segment, RTRIM(Package) as Package, RTRIM(Receipt) as Receipt, RTRIM(TypeId) as TypeOfId, RTRIM(KTP) as KTP, RTRIM(Alamat) as Alamat, RTRIM(Kelurahan) as Kelurahan, RTRIM(Kecamatan) as Kecamatan, RTRIM(Kota) as Kota, RTRIM(Propinsi) as Propinsi, RTRIM(PlaceBirth) as PlaceBirth, RTRIM(Agama) as Agama, RTRIM(KodeNegara) as KodeNegara, RTRIM(Usaha) as Usaha, RTRIM(Profesi) as Profesi, RTRIM(CardNumber) as CardNumber, RTRIM(Remark) as Remark, RTRIM(Posisi) as Posisi, RTRIM(Phone) as Phone, RTRIM(Email) as Email, RTRIM(Member) as Member, RTRIM(Sales) as Sales, TglIn, JamIn, JamOut, TglKeluar, TglLahir, Expired, Person, BF, Nominal, SafeDeposit")
-            ->where('Pst', '=', ' ')
-            ->whereRaw("RTRIM(Kode) <> '999'");
+        $page = max((int) $request->query('page', 1), 1);
+        $offsetStart = (($page - 1) * $perPage) + 1;
+        $offsetEnd = $offsetStart + $perPage - 1;
+        $bindings = [];
+        $whereClause = $this->buildActiveCheckinWhereClause($search, $bindings);
+        $summaryRow = DB::selectOne("SELECT COUNT(*) AS total FROM DATA2 WHERE $whereClause", $bindings);
+        $total = (int) ($summaryRow->total ?? 0);
+        $sortExpression = $this->resolveCheckinSortExpression($sortBy);
+        $sortDirection = strtoupper($sortDir) === 'ASC' ? 'ASC' : 'DESC';
 
-        if ($search !== '') {
-            $keyword = '%' . strtoupper($search) . '%';
-            $query->where(function ($builder) use ($keyword) {
-                $builder->whereRaw('UPPER(RTRIM(RegNo)) LIKE ?', [$keyword])
-                    ->orWhereRaw('UPPER(RTRIM(RegNo2)) LIKE ?', [$keyword])
-                    ->orWhereRaw('UPPER(RTRIM(Kode)) LIKE ?', [$keyword])
-                    ->orWhereRaw('UPPER(RTRIM(Guest)) LIKE ?', [$keyword])
-                    ->orWhereRaw('UPPER(RTRIM(Package)) LIKE ?', [$keyword]);
-            });
+        if ($total === 0) {
+            return new LengthAwarePaginator(collect(), 0, $perPage, $page, [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]);
         }
 
-        $paginator = $query
-            ->orderByDesc('TglIn')
-            ->orderByDesc('RegNo2')
-            ->paginate($perPage, ['*'], 'page', max((int) $request->query('page', 1), 1))
-            ->appends($request->query());
+        $idSelect = $this->legacyIdSelect('DATA2');
+        $selectColumns = $this->activeCheckinSelectColumns($idSelect);
+        $rowSql = "
+            SELECT paged.*
+            FROM (
+                SELECT
+                    ROW_NUMBER() OVER (ORDER BY $sortExpression $sortDirection, RTRIM(RegNo2) DESC) AS row_num,
+                    $selectColumns
+                FROM DATA2
+                WHERE $whereClause
+            ) AS paged
+            WHERE paged.row_num BETWEEN ? AND ?
+            ORDER BY paged.row_num
+        ";
 
-        $pageRows = collect($paginator->items());
+        $pageRows = collect(DB::select($rowSql, array_merge($bindings, [$offsetStart, $offsetEnd])));
+
         $regNos = $pageRows
             ->pluck('RegNo')
             ->map(fn ($value) => trim((string) $value))
@@ -1021,7 +1070,58 @@ class CheckinController extends Controller
             return $this->hydrateActiveCheckinRow($row, $groupedRows);
         });
 
-        return $paginator->setCollection($processedRows);
+        return new LengthAwarePaginator(
+            $processedRows,
+            $total,
+            $perPage,
+            $page,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+    }
+
+    private function resolveCheckinSortExpression(string $sortBy): string
+    {
+        return match ($sortBy) {
+            'reg_no' => 'RTRIM(RegNo)',
+            'room' => 'RTRIM(Kode)',
+            'guest' => 'RTRIM(Guest)',
+            'check_out' => 'TglKeluar',
+            'package' => 'RTRIM(Package)',
+            'nominal' => 'Nominal',
+            default => 'TglIn',
+        };
+    }
+
+    private function activeCheckinSelectColumns(string $idSelect): string
+    {
+        return "$idSelect, Pst, RTRIM(RegNo) as RegNo, RTRIM(RegNo2) as RegNo2, RTRIM(Kode) as Kode, RTRIM(Guest) as Guest, RTRIM(Guest2) as Guest2, RTRIM(Tipe) as Tipe, RTRIM(Payment) as Payment, RTRIM(Segment) as Segment, RTRIM(Package) as Package, RTRIM(Receipt) as Receipt, RTRIM(TypeId) as TypeOfId, RTRIM(KTP) as KTP, RTRIM(Alamat) as Alamat, RTRIM(Kelurahan) as Kelurahan, RTRIM(Kecamatan) as Kecamatan, RTRIM(Kota) as Kota, RTRIM(Propinsi) as Propinsi, RTRIM(PlaceBirth) as PlaceBirth, RTRIM(Agama) as Agama, RTRIM(KodeNegara) as KodeNegara, RTRIM(Usaha) as Usaha, RTRIM(Profesi) as Profesi, RTRIM(CardNumber) as CardNumber, RTRIM(Remark) as Remark, RTRIM(Posisi) as Posisi, RTRIM(Phone) as Phone, RTRIM(Email) as Email, RTRIM(Member) as Member, RTRIM(Sales) as Sales, TglIn, JamIn, JamOut, TglKeluar, TglLahir, Expired, Person, BF, Nominal, SafeDeposit";
+    }
+
+    private function buildActiveCheckinWhereClause(string $search, array &$bindings): string
+    {
+        $bindings[] = ' ';
+        $bindings[] = '999';
+        $clauses = [
+            'Pst = ?',
+            'RTRIM(Kode) <> ?',
+        ];
+
+        if ($search !== '') {
+            $keyword = '%' . strtoupper($search) . '%';
+            $clauses[] = '(
+                UPPER(RTRIM(RegNo)) LIKE ?
+                OR UPPER(RTRIM(RegNo2)) LIKE ?
+                OR UPPER(RTRIM(Kode)) LIKE ?
+                OR UPPER(RTRIM(Guest)) LIKE ?
+                OR UPPER(RTRIM(Package)) LIKE ?
+            )';
+            array_push($bindings, $keyword, $keyword, $keyword, $keyword, $keyword);
+        }
+
+        return implode(' AND ', $clauses);
     }
 
     private function hydrateActiveCheckinRow(object $row, $groupedRows): object
@@ -1185,6 +1285,39 @@ class CheckinController extends Controller
             ->filter(fn (array $room) => $room['available'])
             ->values()
             ->all();
+    }
+
+    private function countAvailableRooms(): int
+    {
+        $activeRoomCodes = DB::table('DATA2')
+            ->selectRaw('RTRIM(Kode) as Kode')
+            ->where('Pst', '=', ' ')
+            ->whereRaw("RTRIM(Kode) <> '999'")
+            ->get()
+            ->pluck('Kode')
+            ->map(fn ($value) => trim((string) $value))
+            ->filter()
+            ->values()
+            ->all();
+
+        $blockedStatus = ['CHECK OUT', 'OUT OF ORDER', 'VACANT DIRTY', 'RENOVATED', 'VACANT CLEAN'];
+        $query = DB::table('ROOM')
+            ->whereRaw("RTRIM(Kode) <> '999'")
+            ->where('Meeting', 0)
+            ->whereNotIn(DB::raw('UPPER(RTRIM(Status))'), $blockedStatus);
+
+        if (!empty($activeRoomCodes)) {
+            $query->whereNotIn(DB::raw('RTRIM(Kode)'), $activeRoomCodes);
+        }
+
+        return (int) $query->count();
+    }
+
+    private function countActivePackages(): int
+    {
+        return (int) DB::table('Package')
+            ->where('Expired', '>=', Carbon::today()->format('Y-m-d'))
+            ->count();
     }
 
     private function loadCompanyOptions(): array

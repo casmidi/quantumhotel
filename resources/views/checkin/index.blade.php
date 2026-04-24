@@ -59,6 +59,133 @@
         margin-top: 1.5rem;
     }
 
+    #checkinDirectoryShell.is-loading {
+        opacity: 0.62;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .checkin-directory-loading {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        background: rgba(244, 248, 255, 0.72);
+        backdrop-filter: blur(2px);
+        z-index: 3;
+    }
+
+    #checkinDirectoryShell {
+        position: relative;
+    }
+
+    #checkinDirectoryShell.is-loading .checkin-directory-loading {
+        opacity: 1;
+    }
+
+    .checkin-directory-loading-card {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.85rem 1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(128, 159, 208, 0.28);
+        box-shadow: 0 12px 30px rgba(16, 35, 59, 0.12);
+        color: #173761;
+        font-size: 0.92rem;
+        font-weight: 800;
+    }
+
+    .checkin-directory-loading-spinner {
+        width: 1.05rem;
+        height: 1.05rem;
+        border-radius: 999px;
+        border: 2px solid rgba(23, 55, 97, 0.18);
+        border-top-color: #2962ff;
+        animation: checkinDirectorySpin 0.8s linear infinite;
+    }
+
+    @keyframes checkinDirectorySpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .checkin-table {
+        table-layout: fixed;
+    }
+
+    .checkin-col-reg {
+        width: 17%;
+    }
+
+    .checkin-col-room {
+        width: 10%;
+    }
+
+    .checkin-col-guest {
+        width: 24%;
+    }
+
+    .checkin-col-date {
+        width: 10%;
+    }
+
+    .checkin-col-package {
+        width: 15%;
+    }
+
+    .checkin-col-nominal {
+        width: 10%;
+    }
+
+    .checkin-col-action {
+        width: 4%;
+    }
+
+    .checkin-cell-reg,
+    .checkin-cell-room,
+    .checkin-cell-date,
+    .checkin-cell-package,
+    .checkin-cell-nominal {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .checkin-sort-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: #4c5d78;
+        text-decoration: none;
+        font-weight: 800;
+        transition: color 0.18s ease;
+    }
+
+    .checkin-sort-link:hover {
+        color: #173761;
+        text-decoration: none;
+    }
+
+    .checkin-sort-link.is-active {
+        color: #173761;
+    }
+
+    .checkin-sort-link i {
+        color: #8da0bb;
+        font-size: 0.8rem;
+    }
+
+    .checkin-sort-link.is-active i {
+        color: #2962ff;
+    }
+
     .checkin-header-side {
         display: flex;
         align-items: stretch;
@@ -2228,121 +2355,7 @@
     </div>
     </section>
 
-    <section class="package-shell checkin-shell" id="checkinDirectoryShell">
-        <div class="package-shell-body">
-            <div class="checkin-directory-head">
-                <div>
-                    <h3 class="package-grid-title mb-1">Check In Directory</h3>
-                    <p class="package-grid-note mb-0">Click any row to load its data into the form above.</p>
-                </div>
-                <div class="checkin-table-meta">
-                    Active: <strong>{{ number_format($summary['active'], 0, ',', '.') }}</strong> &nbsp;|&nbsp;
-                    Rooms Ready: <strong>{{ number_format($summary['rooms_ready'], 0, ',', '.') }}</strong>
-                    &nbsp;|&nbsp;
-                    Active Packages: <strong>{{ number_format($summary['packages'], 0, ',', '.') }}</strong>
-                </div>
-            </div>
-
-            <form method="GET" action="/checkin" class="checkin-search-form" id="checkinSearchForm">
-                <div class="checkin-search-group">
-                    <label class="package-label" for="searchKeyword">Search Keyword</label>
-                    <input type="text" name="search" id="searchKeyword" class="form-control package-input"
-                        value="{{ $search }}" placeholder="Search reg number, room, guest, or package">
-                </div>
-                <div class="checkin-search-actions">
-                    <button type="submit" class="btn package-btn-primary"><i
-                            class="fa-solid fa-magnifying-glass mr-2"></i>Search</button>
-                    <a href="/checkin" class="btn package-btn-secondary">Clear</a>
-                </div>
-            </form>
-            <div class="checkin-directory-tools">
-                <div class="checkin-directory-result">
-                    Showing
-                    <strong>{{ number_format($checkins->firstItem() ?? 0, 0, ',', '.') }}</strong>
-                    -
-                    <strong>{{ number_format($checkins->lastItem() ?? 0, 0, ',', '.') }}</strong>
-                    of
-                    <strong>{{ number_format($checkins->total(), 0, ',', '.') }}</strong>
-                    active stay record(s)
-                </div>
-                <form method="GET" action="/checkin" class="checkin-per-page">
-                    <input type="hidden" name="search" value="{{ $search }}">
-                    <label class="package-label" for="perPage">Rows Per Page</label>
-                    <select name="per_page" id="perPage" class="form-control package-select"
-                        onchange="this.form.submit()">
-                        @foreach ([10, 25, 50] as $size)
-                            <option value="{{ $size }}" {{ (int) $perPage === $size ? 'selected' : '' }}>
-                                {{ $size }} rows
-                            </option>
-                        @endforeach
-                    </select>
-                </form>
-            </div>
-            <div class="package-table-wrap mt-4">
-                <table class="table package-table checkin-table mb-0">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Status</th>
-                            <th>Reg Number</th>
-                            <th>Room</th>
-                            <th>Guest</th>
-                            <th>Check In</th>
-                            <th>Est. Out</th>
-                            <th>Package</th>
-                            <th class="text-right">Nominal</th>
-                            <th class="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($checkins as $record)
-                            <tr class="checkin-record-row" data-record="{{ $record->record_json }}"
-                                data-detail-key="{{ $record->RegNo2 }}">
-                                <td>{{ $record->id ?? '-' }}</td>
-                                <td>
-                                    @if ($record->guest_status === 'CHECKOUT')
-                                        <span class="status-badge status-checkout">CHECKOUT</span>
-                                    @else
-                                        <span class="status-badge status-stay">STAY</span>
-                                    @endif
-                                </td>
-                                <td><span class="package-code">{{ $record->RegNo }}</span></td>
-                                <td><span class="room-pill">{{ $record->Kode }}</span></td>
-                                <td>
-                                    <div class="guest-block">
-                                        <strong>{{ $record->Guest }}</strong>
-                                        <span>{{ $record->Tipe ?: 'CHECK IN' }}</span>
-                                    </div>
-                                </td>
-                                <td>{{ $record->check_in_date }}</td>
-                                <td>{{ $record->check_out_date }}</td>
-                                <td>{{ $record->Package ?: '-' }}</td>
-                                <td class="text-right nominal-cell">Rp {{ $record->nominal_display }}</td>
-                                <td class="text-center">
-                                    <a href="/checkin/{{ urlencode($record->RegNo2) }}/delete"
-                                        class="checkin-delete-link"
-                                        onclick="event.stopPropagation(); return confirm('Hapus data check in ini?');"
-                                        title="Delete record"><i class="fa-solid fa-trash"></i></a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="10" class="package-empty">Belum ada data check in aktif untuk
-                                    ditampilkan.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            @if ($checkins->hasPages())
-                <div class="package-pagination-wrap mt-4">
-                    {{ $checkins->onEachSide(1)->links('pagination::bootstrap-4') }}
-                </div>
-            @endif
-
-
-        </div>
-    </section>
+    @include('checkin.partials.directory-section')
 
     <datalist id="packageCodeOptions">
         @foreach ($packages as $package)
@@ -4717,11 +4730,11 @@
             printRegistrationButton.disabled = !(currentDetailKeyField?.value || primaryDetailKeyField?.value || '').trim();
         }
         focusSearchButton.addEventListener('click', function() {
-            document.getElementById('checkinDirectoryShell').scrollIntoView({
+            document.getElementById('checkinDirectoryShell')?.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
             });
-            setTimeout(() => searchKeyword.focus(), 250);
+            setTimeout(() => document.getElementById('searchKeyword')?.focus(), 250);
         });
         form.addEventListener('submit', function(event) {
             generatedRegNoField.value = generatedRegNoField.value.trim().toUpperCase();
@@ -4880,25 +4893,339 @@
             return JSON.parse(json);
         }
 
-        Array.from(document.querySelectorAll('.checkin-record-row')).forEach(function(row) {
-            row.addEventListener('click', function(event) {
-                if (event.target.closest('.checkin-delete-link')) {
+        let checkinDirectoryRequestController = null;
+        const checkinDirectoryCache = new Map();
+        const checkinDirectoryPrefetches = new Map();
+        const checkinSortMemory = new Map();
+
+        function getCheckinDirectoryCacheKey(url) {
+            const targetUrl = new URL(url, window.location.origin);
+            return targetUrl.pathname + targetUrl.search;
+        }
+
+        function buildCheckinDirectoryRequestUrl(url) {
+            return new URL(url, window.location.origin);
+        }
+
+        function parseCheckinDirectoryShell(html) {
+            const template = document.createElement('template');
+            template.innerHTML = (html || '').trim();
+            return template.content.querySelector('#checkinDirectoryShell')
+                || template.content.firstElementChild
+                || null;
+        }
+
+        function cloneCheckinDirectoryShell(shell) {
+            if (!shell) {
+                return null;
+            }
+
+            const template = document.createElement('template');
+            template.innerHTML = shell.outerHTML;
+            return template.content.querySelector('#checkinDirectoryShell')
+                || template.content.firstElementChild
+                || null;
+        }
+
+        function cacheCheckinDirectoryShell(url, shell) {
+            const cacheKey = getCheckinDirectoryCacheKey(url);
+            if (!cacheKey || !shell) {
+                return;
+            }
+
+            checkinDirectoryCache.set(cacheKey, shell.outerHTML);
+        }
+
+        function getCachedCheckinDirectoryShell(url) {
+            const markup = checkinDirectoryCache.get(getCheckinDirectoryCacheKey(url));
+            return markup ? parseCheckinDirectoryShell(markup) : null;
+        }
+
+        function storeCurrentCheckinDirectorySnapshot(url = window.location.pathname + window.location.search) {
+            const shell = document.getElementById('checkinDirectoryShell');
+            if (!shell) {
+                return;
+            }
+
+            cacheCheckinDirectoryShell(url, shell);
+        }
+
+        function getCurrentCheckinSortState() {
+            const searchForm = document.getElementById('checkinSearchForm');
+            const sortByField = searchForm?.querySelector('input[name="sort_by"]');
+            const sortDirField = searchForm?.querySelector('input[name="sort_dir"]');
+
+            return {
+                sortBy: (sortByField?.value || 'check_in').trim(),
+                sortDir: (sortDirField?.value || 'desc').trim().toLowerCase() === 'asc' ? 'asc' : 'desc',
+            };
+        }
+
+        function rememberCurrentCheckinSortState() {
+            const currentSort = getCurrentCheckinSortState();
+            if (!currentSort.sortBy) {
+                return;
+            }
+
+            checkinSortMemory.set(currentSort.sortBy, currentSort.sortDir);
+        }
+
+        function buildCheckinSortUrl(column) {
+            const currentSort = getCurrentCheckinSortState();
+            const targetUrl = new URL(window.location.pathname + window.location.search, window.location.origin);
+            const rememberedDir = checkinSortMemory.get(column);
+            let nextDir = 'asc';
+
+            if (currentSort.sortBy === column) {
+                nextDir = currentSort.sortDir === 'asc' ? 'desc' : 'asc';
+            } else if (rememberedDir) {
+                nextDir = rememberedDir === 'asc' ? 'desc' : 'asc';
+            }
+
+            targetUrl.searchParams.set('sort_by', column);
+            targetUrl.searchParams.set('sort_dir', nextDir);
+            targetUrl.searchParams.delete('page');
+            checkinSortMemory.set(column, nextDir);
+
+            return targetUrl.pathname + targetUrl.search;
+        }
+
+        function replaceCheckinDirectoryShell(nextShell) {
+            const currentShell = document.getElementById('checkinDirectoryShell');
+            if (!currentShell || !nextShell) {
+                return;
+            }
+
+            currentShell.replaceWith(nextShell);
+            rememberCurrentCheckinSortState();
+            syncActiveDirectoryRow();
+            warmCheckinDirectoryPaginationCache();
+        }
+
+        async function prefetchCheckinDirectory(url) {
+            const cacheKey = getCheckinDirectoryCacheKey(url);
+            if (!cacheKey || checkinDirectoryCache.has(cacheKey) || checkinDirectoryPrefetches.has(cacheKey)) {
+                return;
+            }
+
+            const requestUrl = buildCheckinDirectoryRequestUrl(url);
+            const request = fetch(requestUrl.toString(), {
+                headers: {
+                    'Accept': 'text/html',
+                    'X-Partial-Component': 'checkin-directory',
+                },
+                credentials: 'same-origin',
+            }).then(async function(response) {
+                if (!response.ok) {
                     return;
                 }
-                Array.from(document.querySelectorAll('.checkin-record-row')).forEach(item => item.classList
-                    .remove('is-active'));
-                row.classList.add('is-active');
-                try {
-                    applyRecord(parseRowRecordPayload(row.dataset.record));
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                } catch (error) {
-                    showCrudAlert('Data baris tidak bisa dimuat ke form.');
+
+                const html = await response.text();
+                const shell = parseCheckinDirectoryShell(html);
+                if (shell) {
+                    cacheCheckinDirectoryShell(url, shell);
                 }
+            }).catch(function() {
+            }).finally(function() {
+                checkinDirectoryPrefetches.delete(cacheKey);
+            });
+
+            checkinDirectoryPrefetches.set(cacheKey, request);
+            await request;
+        }
+
+        function warmCheckinDirectoryPaginationCache() {
+            const shell = document.getElementById('checkinDirectoryShell');
+            if (!shell) {
+                return;
+            }
+
+            const links = Array.from(shell.querySelectorAll('.package-pagination-wrap a[href]'))
+                .map(link => link.getAttribute('href') || '')
+                .filter(href => href && href !== '#');
+
+            links.slice(0, 4).forEach(function(href) {
+                prefetchCheckinDirectory(href);
+            });
+        }
+
+        function syncActiveDirectoryRow() {
+            const activeDetailKey = (currentDetailKeyField?.value || primaryDetailKeyField?.value || '').trim();
+            Array.from(document.querySelectorAll('.checkin-record-row')).forEach(function(item) {
+                item.classList.toggle('is-active', activeDetailKey !== '' && (item.dataset.detailKey || '').trim() === activeDetailKey);
+            });
+        }
+
+        async function refreshCheckinDirectory(url, options = {}) {
+            const currentShell = document.getElementById('checkinDirectoryShell');
+            if (!currentShell) {
+                window.location.href = url;
+                return;
+            }
+
+            const targetUrl = new URL(url, window.location.origin);
+            const cacheKey = getCheckinDirectoryCacheKey(targetUrl.toString());
+            const requestUrl = buildCheckinDirectoryRequestUrl(targetUrl.toString());
+            const cachedShell = options.forceRefresh ? null : getCachedCheckinDirectoryShell(targetUrl.toString());
+            if (cachedShell) {
+                replaceCheckinDirectoryShell(cachedShell);
+                if (options.pushHistory !== false) {
+                    window.history.pushState({
+                        checkinDirectory: true
+                    }, '', targetUrl.pathname + targetUrl.search + targetUrl.hash);
+                }
+                return;
+            }
+
+            if (checkinDirectoryRequestController) {
+                checkinDirectoryRequestController.abort();
+            }
+
+            const controller = new AbortController();
+            const pushHistory = options.pushHistory !== false;
+            checkinDirectoryRequestController = controller;
+            currentShell.setAttribute('aria-busy', 'true');
+            currentShell.classList.add('is-loading');
+
+            try {
+                const response = await fetch(requestUrl.toString(), {
+                    headers: {
+                        'Accept': 'text/html',
+                        'X-Partial-Component': 'checkin-directory',
+                    },
+                    credentials: 'same-origin',
+                    signal: controller.signal,
+                });
+
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Directory request failed.');
+                }
+
+                const html = await response.text();
+                const nextShell = parseCheckinDirectoryShell(html);
+
+                if (!nextShell) {
+                    throw new Error('Directory markup is missing.');
+                }
+
+                cacheCheckinDirectoryShell(cacheKey, nextShell);
+                replaceCheckinDirectoryShell(cloneCheckinDirectoryShell(nextShell));
+
+                if (pushHistory) {
+                    window.history.pushState({
+                        checkinDirectory: true
+                    }, '', targetUrl.pathname + targetUrl.search + targetUrl.hash);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    return;
+                }
+                console.error('Unable to refresh check-in directory:', error);
+                window.location.href = targetUrl.pathname + targetUrl.search + targetUrl.hash;
+            } finally {
+                if (checkinDirectoryRequestController === controller) {
+                    checkinDirectoryRequestController = null;
+                }
+                document.getElementById('checkinDirectoryShell')?.classList.remove('is-loading');
+                document.getElementById('checkinDirectoryShell')?.setAttribute('aria-busy', 'false');
+            }
+        }
+
+        document.addEventListener('submit', function(event) {
+            const submittedForm = event.target;
+            if (!(submittedForm instanceof HTMLFormElement)) {
+                return;
+            }
+
+            if (submittedForm.id !== 'checkinSearchForm' && !submittedForm.classList.contains('checkin-per-page')) {
+                return;
+            }
+
+            event.preventDefault();
+            const targetUrl = new URL(submittedForm.getAttribute('action') || '/checkin', window.location.origin);
+            const params = new URLSearchParams(new FormData(submittedForm));
+
+            if (submittedForm.id === 'checkinSearchForm') {
+                params.delete('page');
+            }
+
+            const queryString = params.toString();
+            refreshCheckinDirectory(targetUrl.pathname + (queryString ? '?' + queryString : ''));
+        });
+
+        document.addEventListener('click', function(event) {
+            const directoryShell = document.getElementById('checkinDirectoryShell');
+            if (!directoryShell) {
+                return;
+            }
+
+            const link = event.target.closest('a');
+            if (link && directoryShell.contains(link) && !link.classList.contains('checkin-delete-link')) {
+                const href = link.getAttribute('href') || '';
+                if (link.classList.contains('checkin-sort-link')) {
+                    event.preventDefault();
+                    const sortColumn = (link.dataset.sortColumn || '').trim();
+                    if (sortColumn) {
+                        refreshCheckinDirectory(buildCheckinSortUrl(sortColumn));
+                    }
+                    return;
+                }
+                const isDirectoryActionLink = link.closest('.package-pagination-wrap')
+                    || link.closest('.checkin-search-actions');
+                if (isDirectoryActionLink) {
+                    event.preventDefault();
+                    if (href && href !== '#') {
+                        refreshCheckinDirectory(href);
+                    }
+                    return;
+                }
+            }
+
+            const row = event.target.closest('.checkin-record-row');
+            if (!row || !directoryShell.contains(row)) {
+                return;
+            }
+
+            if (event.target.closest('.checkin-delete-link')) {
+                return;
+            }
+
+            event.preventDefault();
+
+            try {
+                applyRecord(parseRowRecordPayload(row.dataset.record));
+                syncActiveDirectoryRow();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            } catch (error) {
+                showCrudAlert('Data baris tidak bisa dimuat ke form.');
+            }
+        });
+
+        window.addEventListener('popstate', function() {
+            if (window.location.pathname !== '/checkin') {
+                return;
+            }
+
+            const cachedShell = getCachedCheckinDirectoryShell(window.location.pathname + window.location.search);
+            if (cachedShell) {
+                replaceCheckinDirectoryShell(cachedShell);
+                return;
+            }
+
+            refreshCheckinDirectory(window.location.pathname + window.location.search, {
+                pushHistory: false,
+                forceRefresh: true
             });
         });
+
         form.addEventListener('keydown', function(event) {
             if (event.key !== 'Enter' || event.target.tagName === 'TEXTAREA') {
                 return;
@@ -4926,6 +5253,17 @@
         } else {
             resetForm();
         }
+        if (window.location.pathname === '/checkin') {
+            const cleanUrl = new URL(window.location.href);
+            if (cleanUrl.searchParams.has('_partial')) {
+                cleanUrl.searchParams.delete('_partial');
+                window.history.replaceState(window.history.state, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+            }
+        }
+        storeCurrentCheckinDirectorySnapshot();
+        rememberCurrentCheckinSortState();
+        syncActiveDirectoryRow();
+        warmCheckinDirectoryPaginationCache();
         const successAlert = document.getElementById('successAlert');
         if (successAlert) {
             setTimeout(() => {
