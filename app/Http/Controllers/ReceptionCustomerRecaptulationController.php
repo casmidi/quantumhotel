@@ -127,7 +127,7 @@ class ReceptionCustomerRecaptulationController extends Controller
 
     private function loadReportRows(string $startDate, string $endDate, string $regno = '', string $search = ''): Collection
     {
-        if ($this->hasOnlineRows($startDate, $endDate, $regno)) {
+        if (Schema::hasTable('ONLINE')) {
             return $this->loadOnlinePostingRows($startDate, $endDate, $regno, $search);
         }
 

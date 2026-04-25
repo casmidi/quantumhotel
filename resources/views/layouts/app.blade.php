@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     @php
         $layoutBrandingProfile = \App\Support\HotelBranding::profile();
@@ -76,7 +77,7 @@
         .main-sidebar {
             min-height: 100vh;
             background: linear-gradient(180deg, #101721 0%, #07111c 55%, #05070d 100%) !important;
-            border-right: 1px solid rgba(232, 199, 119, 0.28);
+            border-right: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 16px 0 34px rgba(4, 10, 18, 0.28);
         }
 
@@ -151,7 +152,7 @@
 
         .nav-sidebar.quantum-sidebar-menu .nav-link:hover {
             background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(232, 199, 119, 0.22);
+            border-color: rgba(255, 255, 255, 0.12);
             color: #fff;
             transform: translateX(2px);
         }
@@ -170,10 +171,10 @@
         }
 
         .nav-sidebar.quantum-sidebar-menu .nav-link.active {
-            background: linear-gradient(90deg, rgba(232, 199, 119, 0.24), rgba(255, 255, 255, 0.08));
-            border-color: rgba(232, 199, 119, 0.46);
-            color: #fff;
-            box-shadow: inset 3px 0 0 #f1d27a, 0 10px 22px rgba(0, 0, 0, 0.18);
+            background: #2b313a !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #fff !important;
+            box-shadow: none !important;
         }
 
         .nav-sidebar.quantum-sidebar-menu .nav-link.active .nav-icon {
@@ -228,7 +229,7 @@
             bottom: 0.65rem;
             left: -0.32rem;
             width: 1px;
-            background: rgba(232, 199, 119, 0.22);
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .quantum-sidebar-child .nav-link {
@@ -241,6 +242,47 @@
             width: 1.12rem !important;
             margin-right: 0.55rem !important;
             font-size: 0.82rem;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-treeview {
+            margin: 0.28rem 0 0.48rem 0.88rem;
+            padding-left: 0.22rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.12);
+            background: transparent;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-treeview .nav-link {
+            min-height: 38px;
+            padding-left: 0.72rem !important;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.74);
+            font-size: 0.93rem;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-treeview .nav-link:hover,
+        .nav-sidebar.quantum-sidebar-menu .nav-treeview .nav-link:focus {
+            background: linear-gradient(90deg, rgba(232, 199, 119, 0.2), rgba(255, 255, 255, 0.06)) !important;
+            border-color: rgba(232, 199, 119, 0.4);
+            color: #fff !important;
+            box-shadow: inset 3px 0 0 #f1d27a;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-treeview .nav-link.active {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #fff !important;
+            box-shadow: none;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-treeview .nav-link.active:hover,
+        .nav-sidebar.quantum-sidebar-menu .nav-treeview .nav-link.active:focus {
+            background: linear-gradient(90deg, rgba(232, 199, 119, 0.2), rgba(255, 255, 255, 0.06)) !important;
+            border-color: rgba(232, 199, 119, 0.4);
+            box-shadow: inset 3px 0 0 #f1d27a;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-treeview .nav-icon {
+            color: rgba(232, 199, 119, 0.88) !important;
         }
 
         .quantum-sidebar-logout {
@@ -444,13 +486,13 @@
         </ul>
         <div class="navbar-topbar-content">
             <div class="navbar-topbar-brand-slot">
-                @if(trim($__env->yieldContent('topbar_brand')) !== '')
+                @if (trim($__env->yieldContent('topbar_brand')) !== '')
                     {!! $__env->yieldContent('topbar_brand') !!}
                 @else
                     <span class="navbar-brand">Quantum Hotel System</span>
                 @endif
             </div>
-            @if(trim($__env->yieldContent('topbar_tools')) !== '')
+            @if (trim($__env->yieldContent('topbar_tools')) !== '')
                 <div class="navbar-page-tools">
                     {!! $__env->yieldContent('topbar_tools') !!}
                 </div>
@@ -475,7 +517,13 @@
         <!-- MENU -->
         <div class="sidebar">
             <nav>
-                <ul class="nav nav-pills nav-sidebar flex-column quantum-sidebar-menu">
+                @php
+                    $isTableMenu = request()->is('kelas') || request()->is('kelas/*') || request()->is('room') || request()->is('room/*');
+                    $isTransactionMenu = request()->is('checkin') || request()->is('checkin/*') || request()->is('checkout') || request()->is('checkout/*') || request()->is('night-audit') || request()->is('night-audit/*');
+                    $isReportMenu = request()->is('guest-in-house') || request()->is('guest-in-house/*') || request()->is('expected-departure') || request()->is('expected-departure/*') || request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*');
+                    $isSettingMenu = request()->is('settings*') || request()->is('synchronise');
+                @endphp
+                <ul class="nav nav-pills nav-sidebar flex-column quantum-sidebar-menu" data-widget="treeview" role="menu" data-accordion="false">
 
                     <li class="nav-item quantum-sidebar-root">
                         <a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
@@ -484,87 +532,124 @@
                         </a>
                     </li>
 
-                    <li class="nav-header quantum-sidebar-header">
-                        <span class="sidebar-header-icon"><i class="fas fa-database"></i></span>
-                        <span>TABLE</span>
-                    </li>
-
-                    <li class="nav-item quantum-sidebar-child">
-                        <a href="/kelas" class="nav-link {{ request()->is('kelas') || request()->is('kelas/*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-layer-group"></i>
-                            <p>Room Class</p>
+                    <li class="nav-item has-treeview {{ $isTableMenu ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isTableMenu ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-database"></i>
+                            <p>
+                                Table
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
                         </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/kelas" class="nav-link {{ request()->is('kelas') || request()->is('kelas/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-layer-group"></i>
+                                    <p>Room Class</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="/room" class="nav-link {{ request()->is('room') || request()->is('room/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-bed"></i>
+                                    <p>Room</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
-                    <li class="nav-item quantum-sidebar-child">
-                        <a href="/room" class="nav-link {{ request()->is('room') || request()->is('room/*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-bed"></i>
-                            <p>Room</p>
+                    <!-- Setting menu dipindah ke bawah sebelum logout -->
+
+                    <li class="nav-item has-treeview {{ $isTransactionMenu ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isTransactionMenu ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-concierge-bell"></i>
+                            <p>
+                                Transaction
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
                         </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/checkin" class="nav-link {{ request()->is('checkin') || request()->is('checkin/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-sign-in-alt"></i>
+                                    <p>Check-in</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="/checkout" class="nav-link {{ request()->is('checkout') || request()->is('checkout/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                                    <p>Check-out</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="/night-audit" class="nav-link {{ request()->is('night-audit') || request()->is('night-audit/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-moon"></i>
+                                    <p>Night Audit</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
-                    <li class="nav-item quantum-sidebar-child">
-                        <a href="/settings/hotel-branding" class="nav-link {{ request()->is('settings/hotel-branding') || request()->is('settings/hotel-branding/*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-paint-brush"></i>
-                            <p>Hotel Branding</p>
+                    <li class="nav-item has-treeview {{ $isReportMenu ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isReportMenu ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-chart-line"></i>
+                            <p>
+                                Report
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
                         </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/guest-in-house" class="nav-link {{ request()->is('guest-in-house') || request()->is('guest-in-house/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-users"></i>
+                                    <p>Guest In House</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="/expected-departure" class="nav-link {{ request()->is('expected-departure') || request()->is('expected-departure/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-calendar-check"></i>
+                                    <p>Expected Departure</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="/reception-customer-recaptulation" class="nav-link {{ request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                                    <p>Receptionist Customer Recaptulation</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
-
-                    <li class="nav-header quantum-sidebar-header">
-                        <span class="sidebar-header-icon"><i class="fas fa-concierge-bell"></i></span>
-                        <span>TRANSACTION</span>
-                    </li>
-
-                    <li class="nav-item quantum-sidebar-child">
-                        <a href="/checkin" class="nav-link {{ request()->is('checkin') || request()->is('checkin/*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-sign-in-alt"></i>
-                            <p>Check-in</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item quantum-sidebar-child">
-                        <a href="/checkout" class="nav-link {{ request()->is('checkout') || request()->is('checkout/*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
-                            <p>Check-out</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item quantum-sidebar-child">
-                        <a href="/night-audit" class="nav-link {{ request()->is('night-audit') || request()->is('night-audit/*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-moon"></i>
-                            <p>Night Audit</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-header quantum-sidebar-header">
-                        <span class="sidebar-header-icon"><i class="fas fa-chart-line"></i></span>
-                        <span>REPORT</span>
-                    </li>
-
-                    <li class="nav-item quantum-sidebar-child">
-                        <a href="/guest-in-house" class="nav-link {{ request()->is('guest-in-house') || request()->is('guest-in-house/*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Guest In House</p>
-                        </a>
-                    </li>
-
-                      <li class="nav-item quantum-sidebar-child">
-                          <a href="/expected-departure" class="nav-link {{ request()->is('expected-departure') || request()->is('expected-departure/*') ? 'active' : '' }}">
-                              <i class="nav-icon fas fa-calendar-check"></i>
-                              <p>Expected Departure</p>
-                          </a>
-                      </li>
-
-                      <li class="nav-item quantum-sidebar-child">
-                          <a href="/reception-customer-recaptulation" class="nav-link {{ request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*') ? 'active' : '' }}">
-                              <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                              <p>Reception Recap</p>
-                          </a>
-                      </li>
  
-                      <li class="nav-item quantum-sidebar-logout">
-                          <a href="/logout" class="nav-link text-danger">
-                              <i class="nav-icon fas fa-power-off"></i>
+                    <li class="nav-item has-treeview {{ $isSettingMenu ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isSettingMenu ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-cogs"></i>
+                            <p>
+                                Setting
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/settings/hotel-branding" class="nav-link {{ request()->is('settings/hotel-branding') || request()->is('settings/hotel-branding/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-paint-brush"></i>
+                                    <p>Hotel Branding</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/synchronise" class="nav-link {{ request()->is('synchronise') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-sync-alt"></i>
+                                    <p>Synchronise</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item quantum-sidebar-logout">
+                        <a href="/logout" class="nav-link text-danger">
+                            <i class="nav-icon fas fa-power-off"></i>
                             <p>Logout</p>
                         </a>
                     </li>
@@ -580,9 +665,8 @@
         <div class="content-shell">
 
         <!-- TITLE -->
-        @if(trim($__env->yieldContent('title')) !== '')
-            <h3>@yield('title')</h3>
-        @endif
+        @if (trim($__env->yieldContent('title')) !== '')
+            <h3>@yield('title')</h3> @endif
 
         <!-- CONTENT -->
         @yield('content')
@@ -597,7 +681,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 <script>
-    (function () {
+    (function() {
         function isoToDisplayDate(value) {
             var match = String(value || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
@@ -636,16 +720,16 @@
             date = new Date(year, month - 1, day);
 
             if (
-                date.getFullYear() !== year
-                || date.getMonth() !== month - 1
-                || date.getDate() !== day
+                date.getFullYear() !== year ||
+                date.getMonth() !== month - 1 ||
+                date.getDate() !== day
             ) {
                 return null;
             }
 
-            return String(year).padStart(4, '0') + '-'
-                + String(month).padStart(2, '0') + '-'
-                + String(day).padStart(2, '0');
+            return String(year).padStart(4, '0') + '-' +
+                String(month).padStart(2, '0') + '-' +
+                String(day).padStart(2, '0');
         }
 
         function normalizeHotelDateInput(input, shouldReport) {
@@ -676,8 +760,8 @@
             var value;
 
             if (
-                input.dataset.hotelDateDisplay === '1'
-                || input.matches('[data-date-native], .package-date-native')
+                input.dataset.hotelDateDisplay === '1' ||
+                input.matches('[data-date-native], .package-date-native')
             ) {
                 return;
             }
@@ -691,11 +775,11 @@
             input.classList.add('hotel-date-input');
             input.value = isoToDisplayDate(value);
 
-            input.addEventListener('input', function () {
+            input.addEventListener('input', function() {
                 input.setCustomValidity('');
             });
 
-            input.addEventListener('blur', function () {
+            input.addEventListener('blur', function() {
                 normalizeHotelDateInput(input, false);
             });
         }
@@ -704,11 +788,11 @@
             (root || document).querySelectorAll('input[type="date"]').forEach(bindHotelDateInput);
         }
 
-        document.addEventListener('submit', function (event) {
+        document.addEventListener('submit', function(event) {
             var inputs = event.target.querySelectorAll('input[data-hotel-date-display="1"]');
             var isValid = true;
 
-            inputs.forEach(function (input) {
+            inputs.forEach(function(input) {
                 if (isValid && !normalizeHotelDateInput(input, true)) {
                     isValid = false;
                 }
@@ -722,9 +806,9 @@
         bindHotelDateInputs(document);
 
         if (window.MutationObserver) {
-            new MutationObserver(function (mutations) {
-                mutations.forEach(function (mutation) {
-                    mutation.addedNodes.forEach(function (node) {
+            new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
                         if (node.nodeType !== 1) {
                             return;
                         }
@@ -747,14 +831,15 @@
 
         var tables = document.querySelectorAll('.content-shell table');
 
-        tables.forEach(function (table) {
+        tables.forEach(function(table) {
             if (table.closest('.responsive-table-shell')) {
                 return;
             }
 
-            var existingWrapper = table.parentElement && table.parentElement.classList.contains('table-responsive')
-                ? table.parentElement
-                : null;
+            var existingWrapper = table.parentElement && table.parentElement.classList.contains(
+                    'table-responsive') ?
+                table.parentElement :
+                null;
             var shell = existingWrapper || document.createElement('div');
 
             if (!existingWrapper) {
@@ -773,7 +858,8 @@
 
             var hint = document.createElement('div');
             hint.className = 'table-responsive-hint';
-            hint.innerHTML = '<i class="fas fa-arrows-left-right"></i><span>Geser tabel untuk melihat kolom lainnya</span>';
+            hint.innerHTML =
+                '<i class="fas fa-arrows-left-right"></i><span>Geser tabel untuk melihat kolom lainnya</span>';
 
             if (!existingWrapper) {
                 table.parentNode.insertBefore(shell, table);
@@ -782,7 +868,7 @@
 
             shell.parentNode.insertBefore(hint, shell);
 
-            var syncHint = function () {
+            var syncHint = function() {
                 if (window.innerWidth > 767.98) {
                     hint.classList.remove('is-visible');
                     return;

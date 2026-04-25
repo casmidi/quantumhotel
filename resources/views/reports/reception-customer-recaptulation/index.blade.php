@@ -313,9 +313,15 @@
         text-transform: none;
         letter-spacing: 0;
         font-size: 0.82rem;
-        font-weight: 700;
-        border: 1px solid #d9d9d9;
+        font-weight: 900;
+        border: 1px solid #c3cbd5;
+        border-bottom: 2px solid #173761;
         white-space: nowrap;
+    }
+
+    .rcr-table thead th.rcr-text-head .rcr-sort-link {
+        justify-content: flex-start;
+        text-align: left;
     }
 
     .rcr-sort-link {
@@ -521,7 +527,7 @@
     @endif
 
     <section class="rcr-filter-band">
-        <form method="GET" action="/reception-customer-recaptulation" class="rcr-filter">
+        <form method="GET" action="/reception-customer-recaptulation" class="rcr-filter" data-rcr-filter-form>
             <label class="rcr-field">
                 <span class="rcr-label">Start Date</span>
                 <span class="rcr-date-control">
@@ -550,15 +556,12 @@
             </label>
             <label class="rcr-field">
                 <span class="rcr-label">Rows</span>
-                <select name="per_page" class="form-control rcr-select">
+                <select name="per_page" class="form-control rcr-select" data-auto-submit>
                     @foreach([25, 50, 100, 150, 300] as $option)
                         <option value="{{ $option }}" {{ (int) $perPage === $option ? 'selected' : '' }}>{{ $option }}</option>
                     @endforeach
                 </select>
             </label>
-            <button type="submit" class="btn package-btn-primary">
-                <i class="fas fa-search mr-1"></i> Process
-            </button>
             <a href="/reception-customer-recaptulation" class="btn package-btn-secondary">
                 <i class="fas fa-sync-alt mr-1"></i> Reset
             </a>
@@ -603,8 +606,8 @@
                 <table class="table rcr-table rcr-summary-table">
                     <thead>
                         <tr>
-                            <th><a href="{{ $sortUrl('summary', 'regno') }}" class="rcr-sort-link" data-rcr-grid-link>RegNo{{ $sortMark('summary', 'regno') }}</a></th>
-                            <th><a href="{{ $sortUrl('summary', 'guest') }}" class="rcr-sort-link" data-rcr-grid-link>Guest{{ $sortMark('summary', 'guest') }}</a></th>
+                            <th class="rcr-text-head"><a href="{{ $sortUrl('summary', 'regno') }}" class="rcr-sort-link" data-rcr-grid-link>RegNo{{ $sortMark('summary', 'regno') }}</a></th>
+                            <th class="rcr-text-head"><a href="{{ $sortUrl('summary', 'guest') }}" class="rcr-sort-link" data-rcr-grid-link>Guest{{ $sortMark('summary', 'guest') }}</a></th>
                             <th class="rcr-number"><a href="{{ $sortUrl('summary', 'rows') }}" class="rcr-sort-link" data-rcr-grid-link>Rows{{ $sortMark('summary', 'rows') }}</a></th>
                             <th class="rcr-number"><a href="{{ $sortUrl('summary', 'pax') }}" class="rcr-sort-link" data-rcr-grid-link>Pax{{ $sortMark('summary', 'pax') }}</a></th>
                             <th class="rcr-money"><a href="{{ $sortUrl('summary', 'room') }}" class="rcr-sort-link" data-rcr-grid-link>ROOM{{ $sortMark('summary', 'room') }}</a></th>
@@ -721,9 +724,9 @@
             <table class="table rcr-table">
                 <thead>
                     <tr>
-                        <th><a href="{{ $sortUrl('detail', 'invoice') }}" class="rcr-sort-link" data-rcr-grid-link>INVOICE{{ $sortMark('detail', 'invoice') }}</a></th>
-                        <th><a href="{{ $sortUrl('detail', 'room_no') }}" class="rcr-sort-link" data-rcr-grid-link>Room #{{ $sortMark('detail', 'room_no') }}</a></th>
-                        <th><a href="{{ $sortUrl('detail', 'guest') }}" class="rcr-sort-link" data-rcr-grid-link>Guest{{ $sortMark('detail', 'guest') }}</a></th>
+                        <th class="rcr-text-head"><a href="{{ $sortUrl('detail', 'invoice') }}" class="rcr-sort-link" data-rcr-grid-link>INVOICE{{ $sortMark('detail', 'invoice') }}</a></th>
+                        <th class="rcr-text-head"><a href="{{ $sortUrl('detail', 'room_no') }}" class="rcr-sort-link" data-rcr-grid-link>Room #{{ $sortMark('detail', 'room_no') }}</a></th>
+                        <th class="rcr-text-head"><a href="{{ $sortUrl('detail', 'guest') }}" class="rcr-sort-link" data-rcr-grid-link>Guest{{ $sortMark('detail', 'guest') }}</a></th>
                         <th class="rcr-number"><a href="{{ $sortUrl('detail', 'pax') }}" class="rcr-sort-link" data-rcr-grid-link>Pax{{ $sortMark('detail', 'pax') }}</a></th>
                         <th><a href="{{ $sortUrl('detail', 'tgl_in') }}" class="rcr-sort-link" data-rcr-grid-link>C/I Date{{ $sortMark('detail', 'tgl_in') }}</a></th>
                         <th><a href="{{ $sortUrl('detail', 'tgl_out') }}" class="rcr-sort-link" data-rcr-grid-link>C/O Date{{ $sortMark('detail', 'tgl_out') }}</a></th>
@@ -890,6 +893,12 @@
             } else {
                 input.focus();
             }
+        });
+    });
+
+    document.querySelectorAll('[data-rcr-filter-form] input[type="date"], [data-auto-submit]').forEach((input) => {
+        input.addEventListener('change', () => {
+            input.form?.requestSubmit();
         });
     });
 </script>

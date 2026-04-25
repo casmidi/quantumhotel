@@ -102,6 +102,20 @@ return [
             'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'true'),
         ],
 
+        'sqlsrv_bogor' => [
+            'driver' => 'sqlsrv',
+            'host' => env('DB_BOGOR_HOST', '192.168.1.100'),
+            'port' => env('DB_BOGOR_PORT', '1433'),
+            'database' => env('DB_BOGOR_DATABASE', 'BGF'),
+            'username' => env('DB_BOGOR_USERNAME', 'sa'),
+            'password' => env('DB_BOGOR_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'encrypt' => env('DB_BOGOR_ENCRYPT', 'no'),
+            'trust_server_certificate' => env('DB_BOGOR_TRUST_SERVER_CERTIFICATE', 'true'),
+        ],
+
     ],
 
     /*
@@ -137,7 +151,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')) . '-database-'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 
@@ -151,6 +165,7 @@ return [
             'max_retries' => env('REDIS_MAX_RETRIES', 3),
             'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
             'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
+
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
         ],
 

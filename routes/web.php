@@ -15,6 +15,7 @@ use App\Http\Controllers\ReceptionCustomerRecaptulationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StockPackageController;
 use App\Http\Controllers\PackageTransactionController;
+use App\Http\Controllers\SynchroniseController;
 
 if (!function_exists('ensureSessionAccess')) {
     function ensureSessionAccess()
@@ -91,6 +92,17 @@ Route::get('/logout', [AuthController::class, 'logout']);
 | DASHBOARD
 |--------------------------------------------------------------------------
 */
+
+Route::get('/synchronise', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(SynchroniseController::class)->index(request());
+})->name('synchronise.index');
+
+Route::post('/synchronise/run', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(SynchroniseController::class)->run(request());
+})->name('synchronise.run');
+
 Route::get('/dashboard', function () {
     if ($response = ensureSessionAccess()) return $response;
     return app(DashboardController::class)->index();
