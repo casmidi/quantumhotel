@@ -657,6 +657,57 @@
             });
         }
 
+        function suggestCashierCode() {
+            const usedCodes = new Set(existingCashierCodes);
+
+            for (let code = 1; code <= 9999; code += 1) {
+                const candidate = String(code).padStart(4, '0');
+
+                if (!usedCodes.has(candidate)) {
+                    return candidate;
+                }
+            }
+
+            return '';
+        }
+
+        function resetAddUserForm() {
+            if (!addUserForm) {
+                return;
+            }
+
+            const kodeInput = addUserForm.querySelector('[name="kode"]');
+            const cashierInput = addUserForm.querySelector('[name="kode_kasir"]');
+            const positionInput = addUserForm.querySelector('[name="nama"]');
+            const sheetInput = addUserForm.querySelector('[name="sheet"]');
+            const passwordInput = addUserForm.querySelector('[name="password"]');
+            const activeInput = addUserForm.querySelector('[name="active"]');
+
+            if (kodeInput) {
+                kodeInput.value = '';
+            }
+
+            if (cashierInput) {
+                cashierInput.value = suggestCashierCode();
+            }
+
+            if (positionInput) {
+                positionInput.value = 'OWNER';
+            }
+
+            if (sheetInput) {
+                sheetInput.value = 'I';
+            }
+
+            if (passwordInput) {
+                passwordInput.value = '';
+            }
+
+            if (activeInput) {
+                activeInput.checked = true;
+            }
+        }
+
         if (userSelect && userForm) {
             userSelect.addEventListener('change', () => userForm.submit());
         }
@@ -688,14 +739,17 @@
 
         if (addUserForm) {
             addUserForm.querySelectorAll('input, select').forEach((field) => {
-                field.addEventListener('input', () => {
+                const clearWarning = () => {
                     if (!addUserWarning) {
                         return;
                     }
 
                     addUserWarning.hidden = true;
                     addUserWarning.textContent = '';
-                });
+                };
+
+                field.addEventListener('input', clearWarning);
+                field.addEventListener('change', clearWarning);
             });
 
             addUserForm.addEventListener('submit', (event) => {
@@ -764,6 +818,10 @@
             if (modal.id === 'addUserModal' && addUserWarning) {
                 addUserWarning.hidden = true;
                 addUserWarning.textContent = '';
+            }
+
+            if (modal.id === 'addUserModal') {
+                resetAddUserForm();
             }
 
             const firstInput = modal.querySelector('input:not([type="hidden"]), select, button');

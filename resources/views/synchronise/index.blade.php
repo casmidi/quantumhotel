@@ -456,7 +456,7 @@
                 <i class="fas fa-file-import"></i>
                 Import Data
             </h4>
-            <span class="sync-badge">Bogor to Local</span>
+            <span class="sync-badge">Source Data to Local</span>
         </div>
 
         <div class="sync-panel-body">
@@ -491,11 +491,12 @@
                 <div class="sync-table-row is-head">
                     <span>Table</span>
                     <span>Primary Key</span>
-                    <span>Bogor</span>
+                    <span>Source Data</span>
                     <span>Local</span>
                 </div>
 
                 @foreach ($tables as $key => $table)
+                    @continue($key === 'RES2D')
                     <label class="sync-table-row" for="table_{{ $key }}">
                         <span class="sync-table-name">
                             <input type="checkbox" name="tables[]" value="{{ $key }}" id="table_{{ $key }}" checked>
