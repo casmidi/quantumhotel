@@ -7,7 +7,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ExpectedDepartureController;
 use App\Http\Controllers\HotelSettingsController;
+use App\Http\Controllers\GuestInHouseController;
 use App\Http\Controllers\NightAuditController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StockPackageController;
@@ -315,12 +317,22 @@ Route::get('/settings/hotel-branding/logo', function () {
 */
 Route::get('/guest-in-house', function () {
     if ($response = ensureSessionAccess()) return $response;
-    return respondPlaceholder('Guest In House Report');
+    return app(GuestInHouseController::class)->index(request());
+});
+
+Route::get('/guest-in-house/print', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(GuestInHouseController::class)->print(request());
 });
 
 Route::get('/expected-departure', function () {
     if ($response = ensureSessionAccess()) return $response;
-    return respondPlaceholder('Expected Departure Report');
+    return app(ExpectedDepartureController::class)->index(request());
+});
+
+Route::get('/expected-departure/print', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(ExpectedDepartureController::class)->print(request());
 });
 
 

@@ -75,21 +75,186 @@
 
         .main-sidebar {
             min-height: 100vh;
+            background: linear-gradient(180deg, #101721 0%, #07111c 55%, #05070d 100%) !important;
+            border-right: 1px solid rgba(232, 199, 119, 0.28);
+            box-shadow: 16px 0 34px rgba(4, 10, 18, 0.28);
+        }
+
+        .brand-link.quantum-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.72rem;
+            min-height: 72px;
+            padding: 1rem 0.95rem;
+            border-bottom: 1px solid rgba(232, 199, 119, 0.24);
+            color: #fff;
+        }
+
+        .brand-link.quantum-brand:hover {
+            color: #fff;
+        }
+
+        .quantum-brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 42px;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(232, 199, 119, 0.72);
+            border-radius: 8px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(232, 199, 119, 0.08));
+            color: #f1d27a;
+            font-size: 1.05rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 10px 22px rgba(0, 0, 0, 0.2);
+        }
+
+        .quantum-brand-copy {
+            min-width: 0;
+            line-height: 1.15;
+        }
+
+        .quantum-brand-copy .brand-text {
+            display: block;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .quantum-brand-kicker {
+            display: block;
+            margin-top: 0.22rem;
+            color: rgba(232, 199, 119, 0.82);
+            font-size: 0.72rem;
+            font-weight: 600;
         }
 
         .sidebar {
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            padding: 0.9rem 0.72rem 1.2rem;
         }
 
-        .nav-sidebar .nav-link p {
+        .nav-sidebar.quantum-sidebar-menu > .nav-item {
+            width: 100%;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-link {
+            display: flex;
+            align-items: center;
+            min-height: 42px;
+            padding: 0.68rem 0.78rem;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.78);
+            transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(232, 199, 119, 0.22);
+            color: #fff;
+            transform: translateX(2px);
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-link p {
             white-space: normal;
             line-height: 1.25;
+            margin: 0;
         }
 
-        .nav-sidebar .nav-link.active {
-            background: rgba(255, 255, 255, 0.16);
+        .nav-sidebar.quantum-sidebar-menu .nav-icon {
+            width: 1.35rem;
+            margin-right: 0.62rem;
+            color: rgba(232, 199, 119, 0.88);
+            text-align: center;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-link.active {
+            background: linear-gradient(90deg, rgba(232, 199, 119, 0.24), rgba(255, 255, 255, 0.08));
+            border-color: rgba(232, 199, 119, 0.46);
             color: #fff;
+            box-shadow: inset 3px 0 0 #f1d27a, 0 10px 22px rgba(0, 0, 0, 0.18);
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .nav-link.active .nav-icon {
+            color: #f7df9c;
+        }
+
+        .quantum-sidebar-root {
+            margin-bottom: 0.65rem;
+        }
+
+        .quantum-sidebar-root .nav-link {
+            font-weight: 700;
+        }
+
+        .nav-sidebar.quantum-sidebar-menu .quantum-sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin: 1rem 0.16rem 0.45rem;
+            padding: 0.55rem 0.62rem;
+            border-left: 2px solid rgba(232, 199, 119, 0.75);
+            border-radius: 8px;
+            background: linear-gradient(90deg, rgba(232, 199, 119, 0.16), rgba(255, 255, 255, 0.03));
+            color: #f1d27a;
+            font-size: 0.74rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .sidebar-header-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 26px;
+            width: 26px;
+            height: 26px;
+            border: 1px solid rgba(232, 199, 119, 0.42);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.07);
+            color: #f7df9c;
+        }
+
+        .quantum-sidebar-child {
+            position: relative;
+            margin-left: 0.88rem;
+        }
+
+        .quantum-sidebar-child::before {
+            content: "";
+            position: absolute;
+            top: 0.65rem;
+            bottom: 0.65rem;
+            left: -0.32rem;
+            width: 1px;
+            background: rgba(232, 199, 119, 0.22);
+        }
+
+        .quantum-sidebar-child .nav-link {
+            min-height: 38px;
+            padding-left: 0.72rem !important;
+            font-size: 0.93rem;
+        }
+
+        .quantum-sidebar-child .nav-icon {
+            width: 1.12rem !important;
+            margin-right: 0.55rem !important;
+            font-size: 0.82rem;
+        }
+
+        .quantum-sidebar-logout {
+            margin-top: 1rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .quantum-sidebar-logout .nav-link {
+            color: #ffb3b3 !important;
+        }
+
+        .quantum-sidebar-logout .nav-icon {
+            color: #ffb3b3 !important;
         }
 
         .content-wrapper {
@@ -293,77 +458,102 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
 
         <!-- BRAND -->
-        <a href="/dashboard" class="brand-link">
-            <span class="brand-text font-weight-light">Quantum Hotel</span>
+        <a href="/dashboard" class="brand-link quantum-brand">
+            <span class="quantum-brand-mark">
+                <i class="fas fa-hotel"></i>
+            </span>
+            <span class="quantum-brand-copy">
+                <span class="brand-text">Quantum Hotel</span>
+                <span class="quantum-brand-kicker">Five-Star Operations</span>
+            </span>
         </a>
 
         <!-- MENU -->
         <div class="sidebar">
             <nav>
-                <ul class="nav nav-pills nav-sidebar flex-column">
+                <ul class="nav nav-pills nav-sidebar flex-column quantum-sidebar-menu">
 
-                    <li class="nav-item">
+                    <li class="nav-item quantum-sidebar-root">
                         <a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Dashboard</p>
                         </a>
                     </li>
 
-                    <li class="nav-header">TABLE</li>
+                    <li class="nav-header quantum-sidebar-header">
+                        <span class="sidebar-header-icon"><i class="fas fa-database"></i></span>
+                        <span>TABLE</span>
+                    </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item quantum-sidebar-child">
                         <a href="/kelas" class="nav-link {{ request()->is('kelas') || request()->is('kelas/*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-layer-group"></i>
                             <p>Room Class</p>
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item quantum-sidebar-child">
                         <a href="/room" class="nav-link {{ request()->is('room') || request()->is('room/*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-bed"></i>
                             <p>Room</p>
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item quantum-sidebar-child">
                         <a href="/settings/hotel-branding" class="nav-link {{ request()->is('settings/hotel-branding') || request()->is('settings/hotel-branding/*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-paint-brush"></i>
                             <p>Hotel Branding</p>
                         </a>
                     </li>
 
-                    <li class="nav-header">TRANSACTION</li>
+                    <li class="nav-header quantum-sidebar-header">
+                        <span class="sidebar-header-icon"><i class="fas fa-concierge-bell"></i></span>
+                        <span>TRANSACTION</span>
+                    </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item quantum-sidebar-child">
                         <a href="/checkin" class="nav-link {{ request()->is('checkin') || request()->is('checkin/*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-sign-in-alt"></i>
                             <p>Check-in</p>
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item quantum-sidebar-child">
                         <a href="/checkout" class="nav-link {{ request()->is('checkout') || request()->is('checkout/*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-sign-out-alt"></i>
                             <p>Check-out</p>
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item quantum-sidebar-child">
                         <a href="/night-audit" class="nav-link {{ request()->is('night-audit') || request()->is('night-audit/*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-moon"></i>
                             <p>Night Audit</p>
                         </a>
                     </li>
 
-                    <li class="nav-header">REPORT</li>
+                    <li class="nav-header quantum-sidebar-header">
+                        <span class="sidebar-header-icon"><i class="fas fa-chart-line"></i></span>
+                        <span>REPORT</span>
+                    </li>
 
-                    <li class="nav-item">
-                        <a href="/guest-in-house" class="nav-link {{ request()->is('guest-in-house') ? 'active' : '' }}">
+                    <li class="nav-item quantum-sidebar-child">
+                        <a href="/guest-in-house" class="nav-link {{ request()->is('guest-in-house') || request()->is('guest-in-house/*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-users"></i>
                             <p>Guest In House</p>
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item quantum-sidebar-child">
                         <a href="/expected-departure" class="nav-link {{ request()->is('expected-departure') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-calendar-check"></i>
                             <p>Expected Departure</p>
                         </a>
                     </li>
 
-                    <li class="nav-item mt-3">
+                    <li class="nav-item quantum-sidebar-logout">
                         <a href="/logout" class="nav-link text-danger">
+                            <i class="nav-icon fas fa-power-off"></i>
                             <p>Logout</p>
                         </a>
                     </li>

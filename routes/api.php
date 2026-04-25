@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ExpectedDepartureController;
+use App\Http\Controllers\GuestInHouseController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\NightAuditController;
 use App\Http\Controllers\RoomController;
@@ -54,15 +56,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/night-audit/{batchId}/adjustments', [NightAuditController::class, 'storeAdjustment']);
         Route::match(['put', 'patch'], '/night-audit/checklist/{checklistId}', [NightAuditController::class, 'updateChecklist']);
 
-        Route::get('/guest-in-house', fn () => response()->json([
-            'success' => true,
-            'data' => ['message' => 'Guest In House API placeholder'],
-        ]));
+        Route::get('/guest-in-house', [GuestInHouseController::class, 'index']);
 
-        Route::get('/expected-departure', fn () => response()->json([
-            'success' => true,
-            'data' => ['message' => 'Expected Departure API placeholder'],
-        ]));
+        Route::get('/expected-departure', [ExpectedDepartureController::class, 'index']);
 
         Route::get('/user', fn () => response()->json([
             'success' => true,
