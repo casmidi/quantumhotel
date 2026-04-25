@@ -518,10 +518,60 @@
         <div class="sidebar">
             <nav>
                 @php
-                    $isTableMenu = request()->is('kelas') || request()->is('kelas/*') || request()->is('room') || request()->is('room/*');
-                    $isTransactionMenu = request()->is('checkin') || request()->is('checkin/*') || request()->is('checkout') || request()->is('checkout/*') || request()->is('night-audit') || request()->is('night-audit/*');
-                    $isReportMenu = request()->is('guest-in-house') || request()->is('guest-in-house/*') || request()->is('expected-departure') || request()->is('expected-departure/*') || request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*');
-                    $isSettingMenu = request()->is('settings*') || request()->is('synchronise');
+                    $sidebarUser = strtoupper(trim((string) session('user')));
+                    $sidebarRole = strtoupper(trim((string) session('role')));
+                    $sidebarAllowedMenus = collect();
+
+                    if ($sidebarUser !== '' && $sidebarUser !== 'S') {
+                        try {
+                            $sidebarAllowedMenus = collect(\Illuminate\Support\Facades\DB::select("
+                                SELECT RTRIM(Ket) AS ket
+                                FROM dbo.SANDI2
+                                WHERE RTRIM(Kode) = ?
+                                  AND RTRIM(Boleh) = '*'
+                            ", [$sidebarUser]))->pluck('ket');
+                        } catch (\Throwable $exception) {
+                            $sidebarAllowedMenus = collect();
+                        }
+                    }
+
+                    $canSidebarMenu = function (?string $menuKet) use ($sidebarUser, $sidebarAllowedMenus) {
+                        if (!$menuKet) {
+                            return true;
+                        }
+
+                        if ($sidebarUser === 'S') {
+                            return true;
+                        }
+
+                        if ($sidebarUser === '') {
+                            return false;
+                        }
+
+                        return $sidebarAllowedMenus->contains($menuKet);
+                    };
+
+                    $canKelasMenu = $canSidebarMenu('130 Master Kelas');
+                    $canRoomMenu = $canSidebarMenu('102 Master Room');
+                    $canCheckinMenu = $canSidebarMenu('400 Transaksi Check In');
+                    $canCheckoutMenu = $canSidebarMenu('410 Transaksi Check Out');
+                    $canNightAuditMenu = $canSidebarMenu('M31 Night Audit Report');
+                    $canGuestInHouseMenu = $canSidebarMenu('902 Laporan Guest In House');
+                    $canExpectedDepartureMenu = $canSidebarMenu('918 Laporan Expected Departure');
+                    $canReceptionRecapMenu = $canSidebarMenu('925 Laporan Room Recapitulation');
+                    $canHotelBrandingMenu = $canSidebarMenu('Q01 Hotel Branding');
+                    $canSynchroniseMenu = $canSidebarMenu('Q02 Synchronise');
+                    $canUserAuthorizationMenu = $sidebarRole === 'SUPERVISOR';
+
+                    $canTableMenu = $canKelasMenu || $canRoomMenu;
+                    $canTransactionMenu = $canCheckinMenu || $canCheckoutMenu || $canNightAuditMenu;
+                    $canReportMenu = $canGuestInHouseMenu || $canExpectedDepartureMenu || $canReceptionRecapMenu;
+                    $canSettingMenu = $canHotelBrandingMenu || $canSynchroniseMenu || $canUserAuthorizationMenu;
+
+                    $isTableMenu = ($canKelasMenu && (request()->is('kelas') || request()->is('kelas/*'))) || ($canRoomMenu && (request()->is('room') || request()->is('room/*')));
+                    $isTransactionMenu = ($canCheckinMenu && (request()->is('checkin') || request()->is('checkin/*'))) || ($canCheckoutMenu && (request()->is('checkout') || request()->is('checkout/*'))) || ($canNightAuditMenu && (request()->is('night-audit') || request()->is('night-audit/*')));
+                    $isReportMenu = ($canGuestInHouseMenu && (request()->is('guest-in-house') || request()->is('guest-in-house/*'))) || ($canExpectedDepartureMenu && (request()->is('expected-departure') || request()->is('expected-departure/*'))) || ($canReceptionRecapMenu && (request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*')));
+                    $isSettingMenu = ($canHotelBrandingMenu && request()->is('settings/hotel-branding*')) || ($canUserAuthorizationMenu && request()->is('settings/user-authorization*')) || ($canSynchroniseMenu && request()->is('synchronise'));
                 @endphp
                 <ul class="nav nav-pills nav-sidebar flex-column quantum-sidebar-menu" data-widget="treeview" role="menu" data-accordion="false">
 
@@ -532,6 +582,7 @@
                         </a>
                     </li>
 
+                    @if ($canTableMenu)
                     <li class="nav-item has-treeview {{ $isTableMenu ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ $isTableMenu ? 'active' : '' }}">
                             <i class="nav-icon fas fa-database"></i>
@@ -541,24 +592,30 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @if ($canKelasMenu)
                             <li class="nav-item">
                                 <a href="/kelas" class="nav-link {{ request()->is('kelas') || request()->is('kelas/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-layer-group"></i>
                                     <p>Room Class</p>
                                 </a>
                             </li>
+                            @endif
 
+                            @if ($canRoomMenu)
                             <li class="nav-item">
                                 <a href="/room" class="nav-link {{ request()->is('room') || request()->is('room/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-bed"></i>
                                     <p>Room</p>
                                 </a>
                             </li>
+                            @endif
                         </ul>
                     </li>
+                    @endif
 
                     <!-- Setting menu dipindah ke bawah sebelum logout -->
 
+                    @if ($canTransactionMenu)
                     <li class="nav-item has-treeview {{ $isTransactionMenu ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ $isTransactionMenu ? 'active' : '' }}">
                             <i class="nav-icon fas fa-concierge-bell"></i>
@@ -568,29 +625,37 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @if ($canCheckinMenu)
                             <li class="nav-item">
                                 <a href="/checkin" class="nav-link {{ request()->is('checkin') || request()->is('checkin/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-sign-in-alt"></i>
                                     <p>Check-in</p>
                                 </a>
                             </li>
+                            @endif
 
+                            @if ($canCheckoutMenu)
                             <li class="nav-item">
                                 <a href="/checkout" class="nav-link {{ request()->is('checkout') || request()->is('checkout/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-sign-out-alt"></i>
                                     <p>Check-out</p>
                                 </a>
                             </li>
+                            @endif
 
+                            @if ($canNightAuditMenu)
                             <li class="nav-item">
                                 <a href="/night-audit" class="nav-link {{ request()->is('night-audit') || request()->is('night-audit/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-moon"></i>
                                     <p>Night Audit</p>
                                 </a>
                             </li>
+                            @endif
                         </ul>
                     </li>
+                    @endif
 
+                    @if ($canReportMenu)
                     <li class="nav-item has-treeview {{ $isReportMenu ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ $isReportMenu ? 'active' : '' }}">
                             <i class="nav-icon fas fa-chart-line"></i>
@@ -600,29 +665,37 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @if ($canGuestInHouseMenu)
                             <li class="nav-item">
                                 <a href="/guest-in-house" class="nav-link {{ request()->is('guest-in-house') || request()->is('guest-in-house/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-users"></i>
                                     <p>Guest In House</p>
                                 </a>
                             </li>
+                            @endif
 
+                            @if ($canExpectedDepartureMenu)
                             <li class="nav-item">
                                 <a href="/expected-departure" class="nav-link {{ request()->is('expected-departure') || request()->is('expected-departure/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-calendar-check"></i>
                                     <p>Expected Departure</p>
                                 </a>
                             </li>
+                            @endif
 
+                            @if ($canReceptionRecapMenu)
                             <li class="nav-item">
                                 <a href="/reception-customer-recaptulation" class="nav-link {{ request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-file-invoice-dollar"></i>
                                     <p>Receptionist Customer Recaptulation</p>
                                 </a>
                             </li>
+                            @endif
                         </ul>
                     </li>
+                    @endif
  
+                    @if ($canSettingMenu)
                     <li class="nav-item has-treeview {{ $isSettingMenu ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ $isSettingMenu ? 'active' : '' }}">
                             <i class="nav-icon fas fa-cogs"></i>
@@ -632,20 +705,33 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @if ($canHotelBrandingMenu)
                             <li class="nav-item">
                                 <a href="/settings/hotel-branding" class="nav-link {{ request()->is('settings/hotel-branding') || request()->is('settings/hotel-branding/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-paint-brush"></i>
                                     <p>Hotel Branding</p>
                                 </a>
                             </li>
+                            @endif
+                            @if ($canUserAuthorizationMenu)
+                            <li class="nav-item">
+                                <a href="/settings/user-authorization" class="nav-link {{ request()->is('settings/user-authorization') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-user-shield"></i>
+                                    <p>User Authorization</p>
+                                </a>
+                            </li>
+                            @endif
+                            @if ($canSynchroniseMenu)
                             <li class="nav-item">
                                 <a href="/synchronise" class="nav-link {{ request()->is('synchronise') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-sync-alt"></i>
                                     <p>Synchronise</p>
                                 </a>
                             </li>
+                            @endif
                         </ul>
                     </li>
+                    @endif
 
                     <li class="nav-item quantum-sidebar-logout">
                         <a href="/logout" class="nav-link text-danger">
