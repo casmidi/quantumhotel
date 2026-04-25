@@ -11,6 +11,7 @@ use App\Http\Controllers\ExpectedDepartureController;
 use App\Http\Controllers\HotelSettingsController;
 use App\Http\Controllers\GuestInHouseController;
 use App\Http\Controllers\NightAuditController;
+use App\Http\Controllers\ReceptionCustomerRecaptulationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StockPackageController;
 use App\Http\Controllers\PackageTransactionController;
@@ -333,6 +334,16 @@ Route::get('/expected-departure', function () {
 Route::get('/expected-departure/print', function () {
     if ($response = ensureSessionAccess()) return $response;
     return app(ExpectedDepartureController::class)->print(request());
+});
+
+Route::get('/reception-customer-recaptulation', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(ReceptionCustomerRecaptulationController::class)->index(request());
+});
+
+Route::get('/reception-customer-recaptulation/print', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(ReceptionCustomerRecaptulationController::class)->print(request());
 });
 
 

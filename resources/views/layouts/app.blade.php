@@ -330,6 +330,10 @@
             color: {{ $layoutTheme['muted'] }};
         }
 
+        .hotel-date-input {
+            letter-spacing: 0;
+        }
+
         img,
         table,
         input,
@@ -544,16 +548,23 @@
                         </a>
                     </li>
 
-                    <li class="nav-item quantum-sidebar-child">
-                        <a href="/expected-departure" class="nav-link {{ request()->is('expected-departure') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-calendar-check"></i>
-                            <p>Expected Departure</p>
-                        </a>
-                    </li>
+                      <li class="nav-item quantum-sidebar-child">
+                          <a href="/expected-departure" class="nav-link {{ request()->is('expected-departure') || request()->is('expected-departure/*') ? 'active' : '' }}">
+                              <i class="nav-icon fas fa-calendar-check"></i>
+                              <p>Expected Departure</p>
+                          </a>
+                      </li>
 
-                    <li class="nav-item quantum-sidebar-logout">
-                        <a href="/logout" class="nav-link text-danger">
-                            <i class="nav-icon fas fa-power-off"></i>
+                      <li class="nav-item quantum-sidebar-child">
+                          <a href="/reception-customer-recaptulation" class="nav-link {{ request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*') ? 'active' : '' }}">
+                              <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                              <p>Reception Recap</p>
+                          </a>
+                      </li>
+ 
+                      <li class="nav-item quantum-sidebar-logout">
+                          <a href="/logout" class="nav-link text-danger">
+                              <i class="nav-icon fas fa-power-off"></i>
                             <p>Logout</p>
                         </a>
                     </li>
@@ -587,6 +598,153 @@
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 <script>
     (function () {
+        function isoToDisplayDate(value) {
+            var match = String(value || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+            if (!match) {
+                return value || '';
+            }
+
+            return match[3] + '-' + match[2] + '-' + match[1];
+        }
+
+        function displayToIsoDate(value) {
+            var raw = String(value || '').trim();
+            var match;
+            var day;
+            var month;
+            var year;
+            var date;
+
+            if (raw === '') {
+                return '';
+            }
+
+            match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (match) {
+                return raw;
+            }
+
+            match = raw.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+            if (!match) {
+                return null;
+            }
+
+            day = parseInt(match[1], 10);
+            month = parseInt(match[2], 10);
+            year = parseInt(match[3], 10);
+            date = new Date(year, month - 1, day);
+
+            if (
+                date.getFullYear() !== year
+                || date.getMonth() !== month - 1
+                || date.getDate() !== day
+            ) {
+                return null;
+            }
+
+            return String(year).padStart(4, '0') + '-'
+                + String(month).padStart(2, '0') + '-'
+                + String(day).padStart(2, '0');
+        }
+
+        function normalizeHotelDateInput(input, shouldReport) {
+            var iso;
+
+            if (!input.value.trim()) {
+                input.setCustomValidity('');
+                return true;
+            }
+
+            iso = displayToIsoDate(input.value);
+
+            if (!iso) {
+                input.setCustomValidity('Tanggal harus memakai format dd-MM-yyyy.');
+                if (shouldReport) {
+                    input.reportValidity();
+                }
+                return false;
+            }
+
+            input.setCustomValidity('');
+            input.value = shouldReport ? iso : isoToDisplayDate(iso);
+
+            return true;
+        }
+
+        function bindHotelDateInput(input) {
+            var value;
+
+            if (
+                input.dataset.hotelDateDisplay === '1'
+                || input.matches('[data-date-native], .package-date-native')
+            ) {
+                return;
+            }
+
+            value = input.value;
+            input.type = 'text';
+            input.placeholder = input.placeholder || 'dd-MM-yyyy';
+            input.inputMode = 'numeric';
+            input.autocomplete = input.autocomplete || 'off';
+            input.dataset.hotelDateDisplay = '1';
+            input.classList.add('hotel-date-input');
+            input.value = isoToDisplayDate(value);
+
+            input.addEventListener('input', function () {
+                input.setCustomValidity('');
+            });
+
+            input.addEventListener('blur', function () {
+                normalizeHotelDateInput(input, false);
+            });
+        }
+
+        function bindHotelDateInputs(root) {
+            (root || document).querySelectorAll('input[type="date"]').forEach(bindHotelDateInput);
+        }
+
+        document.addEventListener('submit', function (event) {
+            var inputs = event.target.querySelectorAll('input[data-hotel-date-display="1"]');
+            var isValid = true;
+
+            inputs.forEach(function (input) {
+                if (isValid && !normalizeHotelDateInput(input, true)) {
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        }, true);
+
+        bindHotelDateInputs(document);
+
+        if (window.MutationObserver) {
+            new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (node.nodeType !== 1) {
+                            return;
+                        }
+
+                        if (node.matches && node.matches('input[type="date"]')) {
+                            bindHotelDateInput(node);
+                            return;
+                        }
+
+                        if (node.querySelectorAll) {
+                            bindHotelDateInputs(node);
+                        }
+                    });
+                });
+            }).observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+
         var tables = document.querySelectorAll('.content-shell table');
 
         tables.forEach(function (table) {

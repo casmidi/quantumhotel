@@ -17,7 +17,8 @@ abstract class Controller
     {
         $request = $request ?: request();
         $collection = $items instanceof Collection ? $items->values() : collect($items)->values();
-        $page = max((int) $request->query('page', 1), 1);
+        $pageName = (string) ($options['pageName'] ?? 'page');
+        $page = max((int) $request->query($pageName, 1), 1);
         $results = $collection->slice(($page - 1) * $perPage, $perPage)->values();
 
         return new LengthAwarePaginator(
@@ -28,6 +29,7 @@ abstract class Controller
             array_merge([
                 'path' => $request->url(),
                 'query' => $request->query(),
+                'pageName' => $pageName,
             ], $options)
         );
     }

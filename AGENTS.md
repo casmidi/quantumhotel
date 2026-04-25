@@ -1,6 +1,6 @@
 # Quantum Hotel - AGENTS
 
-Last updated: 2026-04-20
+Last updated: 2026-04-25
 
 ## Start Here
 
@@ -28,6 +28,13 @@ Last updated: 2026-04-20
 - Dedicated API endpoints should live in `routes/api.php` under `/api/v1/...`.
 - For Postman-friendly protected API access, use bearer token auth instead of relying on web session cookies.
 - Legacy CRUD tables should use an integer identity column named `id`, while the business code field such as `Kode`, `KodeBrg`, `Nofak`, `RegNo`, or `RegNo2` stays unique.
+
+## Date Format Standard
+
+- All visible browser date inputs must display `dd-MM-yyyy`.
+- Backend/controller payloads may continue using ISO `yyyy-MM-dd` when Laravel validation or legacy SQL logic requires it.
+- When adding new Blade date fields, prefer the existing hidden ISO value plus visible `dd-MM-yyyy` text pattern, or rely on the global layout date-input converter for simple `input[type="date"]` fields.
+- Printed reports and human-facing date labels should use `dd-MM-yyyy` unless a specific external integration requires another format.
 
 ## Current Focus
 

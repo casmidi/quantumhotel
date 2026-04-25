@@ -8,6 +8,7 @@ use App\Http\Controllers\GuestInHouseController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\NightAuditController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\ReceptionCustomerRecaptulationController;
 use App\Http\Controllers\StockPackageController;
 use App\Http\Controllers\PackageTransactionController;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +60,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/guest-in-house', [GuestInHouseController::class, 'index']);
 
         Route::get('/expected-departure', [ExpectedDepartureController::class, 'index']);
+
+        Route::get('/reception-customer-recaptulation', [ReceptionCustomerRecaptulationController::class, 'index']);
 
         Route::get('/user', fn () => response()->json([
             'success' => true,
