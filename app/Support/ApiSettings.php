@@ -40,6 +40,10 @@ class ApiSettings
             $payload['basic_password_hash'] = Hash::make($password);
         }
 
+        if ($username === '') {
+            $payload['basic_password_hash'] = '';
+        }
+
         static::write($payload);
 
         return static::current();

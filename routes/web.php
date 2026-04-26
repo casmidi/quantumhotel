@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ClassTestController;
 use App\Http\Controllers\ExpectedDepartureController;
 use App\Http\Controllers\HotelSettingsController;
 use App\Http\Controllers\GuestInHouseController;
@@ -178,6 +179,16 @@ Route::get('/dashboard', function () {
     if ($response = ensureSessionAccess()) return $response;
     return app(DashboardController::class)->index();
 });
+
+Route::get('/tools/class-test', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(ClassTestController::class)->index(request());
+})->name('tools.class-test');
+
+Route::post('/tools/class-test', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(ClassTestController::class)->fetch(request());
+})->name('tools.class-test.fetch');
 
 
 /*

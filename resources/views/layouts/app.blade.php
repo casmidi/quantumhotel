@@ -566,6 +566,7 @@
                     $canUserAuthorizationMenu = $sidebarRole === 'SUPERVISOR';
                     $canApiSettingsMenu = $sidebarRole === 'SUPERVISOR';
                     $canChangePasswordMenu = $sidebarUser !== '';
+                    $canToolsMenu = $sidebarUser !== '';
 
                     $canTableMenu = $canKelasMenu || $canRoomMenu;
                     $canPackageMenu = $canItemPackageMenu || $canPackageTransactionMenu;
@@ -578,6 +579,7 @@
                     $isTransactionMenu = ($canCheckinMenu && (request()->is('checkin') || request()->is('checkin/*'))) || ($canCheckoutMenu && (request()->is('checkout') || request()->is('checkout/*'))) || ($canNightAuditMenu && (request()->is('night-audit') || request()->is('night-audit/*')));
                     $isReportMenu = ($canGuestInHouseMenu && (request()->is('guest-in-house') || request()->is('guest-in-house/*'))) || ($canExpectedDepartureMenu && (request()->is('expected-departure') || request()->is('expected-departure/*'))) || ($canReceptionRecapMenu && (request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*')));
                     $isSettingMenu = ($canHotelBrandingMenu && request()->is('settings/hotel-branding*')) || ($canUserAuthorizationMenu && request()->is('settings/user-authorization*')) || ($canApiSettingsMenu && request()->is('settings/api*')) || ($canSynchroniseMenu && request()->is('synchronise')) || ($canChangePasswordMenu && request()->is('settings/change-password'));
+                    $isToolsMenu = $canToolsMenu && request()->is('tools/class-test*');
                 @endphp
                 <ul class="nav nav-pills nav-sidebar flex-column quantum-sidebar-menu" data-widget="treeview" role="menu" data-accordion="false">
 
@@ -728,6 +730,26 @@
                                 </a>
                             </li>
                             @endif
+                        </ul>
+                    </li>
+                    @endif
+
+                    @if ($canToolsMenu)
+                    <li class="nav-item has-treeview {{ $isToolsMenu ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isToolsMenu ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-tools"></i>
+                            <p>
+                                Tools
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/tools/class-test" class="nav-link {{ request()->is('tools/class-test') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-vial"></i>
+                                    <p>Class Test</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     @endif
