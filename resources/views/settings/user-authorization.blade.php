@@ -104,7 +104,7 @@
 
     .authorization-user-grid {
         display: grid;
-        grid-template-columns: minmax(260px, 1fr) repeat(3, minmax(120px, 0.35fr));
+        grid-template-columns: minmax(260px, 1fr) repeat(3, minmax(120px, 0.35fr)) auto;
         gap: 0.85rem;
         align-items: end;
     }
@@ -133,6 +133,22 @@
         background: var(--package-heading-bg);
         color: var(--package-title);
         font-weight: 800;
+    }
+
+    .authorization-add-user-btn {
+        min-height: 42px;
+        min-width: 112px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        border: 1px solid #8f650f !important;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #b78422 0%, #8d5d0e 100%) !important;
+        color: #fffaf0 !important;
+        box-shadow: 0 10px 24px rgba(132, 86, 11, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        font-weight: 900;
+        white-space: nowrap;
     }
 
     .authorization-toolbar {
@@ -325,11 +341,215 @@
         font-weight: 700;
     }
 
-    .authorization-modal {
-        display: none;
+    .authorization-master-toolbar {
+        display: flex;
+        align-items: end;
+        gap: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .authorization-master-toolbar .authorization-field {
+        flex: 1 1 220px;
+    }
+
+    .authorization-position-toolbar {
+        display: grid;
+        grid-template-columns: minmax(260px, 1fr) auto auto;
+        align-items: end;
+        gap: 0.75rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .authorization-position-toolbar .authorization-field {
+        min-width: 0;
+    }
+
+    .authorization-position-toolbar .btn {
+        min-height: 46px;
+        white-space: nowrap;
+    }
+
+    .authorization-position-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin: 0 0 0.65rem;
+        padding: 0.65rem 0.75rem;
+        border: 1px solid var(--package-shell-border);
+        border-radius: 8px;
+        background: var(--package-heading-bg);
+    }
+
+    .authorization-position-summary-title {
+        display: grid;
+        gap: 0.1rem;
+        min-width: 0;
+    }
+
+    .authorization-position-summary-title strong {
+        color: var(--package-title);
+        font-weight: 850;
+    }
+
+    .authorization-position-summary-title span {
+        color: var(--package-muted);
+        font-size: 0.84rem;
+        font-weight: 800;
+    }
+
+    .authorization-position-summary form {
+        margin: 0;
+    }
+
+    .authorization-sync-action {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .authorization-sync-copy {
+        max-width: 260px;
+        color: var(--package-muted);
+        font-size: 0.82rem;
+        font-weight: 750;
+        line-height: 1.25;
+        text-align: right;
+    }
+
+    .authorization-sync-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.48rem;
+        min-height: 42px;
+        padding-inline: 1rem;
+        border: 1px solid #8f650f !important;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #a87416 0%, #84560b 100%) !important;
+        color: #fffaf0 !important;
+        box-shadow: 0 10px 24px rgba(132, 86, 11, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .authorization-sync-btn:hover,
+    .authorization-sync-btn:focus {
+        color: #fffaf0 !important;
+        box-shadow: 0 12px 30px rgba(132, 86, 11, 0.25), var(--package-input-focus-shadow);
+    }
+
+    .authorization-sync-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+        box-shadow: none;
+    }
+
+    .authorization-confirm {
         position: fixed;
         inset: 0;
-        z-index: 1080;
+        z-index: 1090;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1.25rem;
+        pointer-events: none;
+    }
+
+    .authorization-confirm.is-open {
+        display: flex;
+        pointer-events: auto;
+    }
+
+    .authorization-confirm-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(21, 14, 5, 0.42);
+        backdrop-filter: blur(4px);
+    }
+
+    .authorization-confirm-dialog {
+        position: relative;
+        width: min(430px, 100%);
+        border: 1px solid rgba(184, 139, 54, 0.38);
+        border-radius: 8px;
+        background: linear-gradient(180deg, #fffdf8 0%, #fff8ea 100%);
+        box-shadow: 0 24px 70px rgba(66, 43, 8, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        overflow: hidden;
+    }
+
+    .authorization-confirm-head {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 1rem 1.1rem 0.75rem;
+    }
+
+    .authorization-confirm-icon {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        border-radius: 8px;
+        background: #fff4dc;
+        color: #9f341f;
+        box-shadow: inset 0 0 0 1px rgba(184, 139, 54, 0.32);
+    }
+
+    .authorization-confirm-title {
+        margin: 0;
+        color: var(--package-title);
+        font-size: 1.05rem;
+        font-weight: 900;
+    }
+
+    .authorization-confirm-body {
+        padding: 0 1.1rem 1rem 4.95rem;
+        color: var(--package-muted);
+        font-size: 0.93rem;
+        font-weight: 750;
+        line-height: 1.4;
+    }
+
+    .authorization-confirm-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.6rem;
+        padding: 0.85rem 1.1rem 1.1rem;
+        background: rgba(255, 249, 235, 0.72);
+        border-top: 1px solid rgba(184, 139, 54, 0.2);
+    }
+
+    .authorization-confirm-cancel,
+    .authorization-confirm-ok {
+        min-height: 38px;
+        padding: 0.48rem 1rem;
+        border-radius: 999px;
+        font-weight: 900;
+    }
+
+    .authorization-confirm-cancel {
+        border: 1px solid var(--package-input-border);
+        background: #fffdf8;
+        color: var(--package-muted);
+    }
+
+    .authorization-confirm-ok {
+        border: 1px solid #8f650f;
+        background: linear-gradient(180deg, #b78422 0%, #8d5d0e 100%);
+        color: #fffaf0;
+        box-shadow: 0 10px 24px rgba(132, 86, 11, 0.18);
+    }
+
+    .authorization-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1088;
+        display: none;
         align-items: center;
         justify-content: center;
         padding: 1.25rem;
@@ -342,30 +562,233 @@
     .authorization-modal-backdrop {
         position: absolute;
         inset: 0;
-        background: rgba(5, 12, 20, 0.52);
-        backdrop-filter: blur(3px);
+        background: rgba(21, 14, 5, 0.42);
+        backdrop-filter: blur(4px);
     }
 
     .authorization-modal-dialog {
         position: relative;
-        width: min(760px, 100%);
+        width: min(880px, 100%);
         max-height: calc(100vh - 2.5rem);
         overflow: auto;
+        border: 1px solid rgba(184, 139, 54, 0.38);
         border-radius: 8px;
-        box-shadow: 0 28px 70px rgba(4, 10, 18, 0.28);
+        background: var(--package-shell-bg);
+        box-shadow: 0 24px 70px rgba(66, 43, 8, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
 
-    .authorization-modal-close {
-        width: 2.25rem;
-        height: 2.25rem;
+    .authorization-modal-preview {
+        max-height: 260px;
+        overflow: auto;
+        border: 1px solid var(--package-shell-border);
+        border-radius: 8px;
+        background: var(--package-heading-bg);
+    }
+
+    .authorization-modal-preview-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.7rem 0.75rem;
+        border-bottom: 1px solid var(--package-shell-border);
+        background: var(--package-table-head-bg);
+        color: var(--package-title);
+        font-weight: 900;
+    }
+
+    .authorization-modal-preview-count {
+        color: var(--package-muted);
+        font-size: 0.82rem;
+        font-weight: 850;
+    }
+
+    .authorization-modal-preview-row {
+        display: grid;
+        grid-template-columns: 70px minmax(0, 1fr);
+        gap: 0.7rem;
+        padding: 0.62rem 0.75rem;
+        border-bottom: 1px solid var(--package-shell-border);
+        color: var(--package-text);
+        font-weight: 750;
+    }
+
+    .authorization-modal-preview-row:last-child {
+        border-bottom: 0;
+    }
+
+    .authorization-modal-warning {
+        margin-bottom: 0.85rem;
+        padding: 0.65rem 0.75rem;
+        border: 1px solid #d8b7ac;
+        border-radius: 8px;
+        background: #fff7f3;
+        color: #9f341f;
+        font-weight: 850;
+    }
+
+    .authorization-position-feedback {
+        margin-bottom: 0.8rem;
+        padding: 0.65rem 0.75rem;
+        border: 1px solid var(--package-shell-border);
+        border-radius: 8px;
+        background: var(--package-table-hover);
+        color: var(--package-title);
+        font-weight: 800;
+    }
+
+    .authorization-master-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin: 1rem 0 0.65rem;
+        color: var(--package-title);
+        font-weight: 850;
+    }
+
+    .authorization-master-count {
+        color: var(--package-muted);
+        font-size: 0.84rem;
+        font-weight: 800;
+    }
+
+    .authorization-master-description {
+        min-width: 240px;
+    }
+
+    .authorization-master-key {
+        color: var(--package-muted);
+        font-size: 0.84rem;
+        word-break: break-word;
+    }
+
+    .authorization-usage-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid var(--package-input-border);
+        min-width: 38px;
+        min-height: 30px;
+        padding: 0.25rem 0.55rem;
+        border-radius: 8px;
+        background: var(--package-heading-bg);
+        color: var(--package-title);
+        font-weight: 850;
+    }
+
+    .authorization-row-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+    }
+
+    .authorization-danger-btn {
+        border: 1px solid #d8b7ac !important;
         border-radius: 999px;
-        background: var(--package-button-secondary-bg);
-        color: var(--package-button-secondary-text);
-        font-weight: 900;
+        background: #fff7f3 !important;
+        color: #9f341f !important;
+        font-weight: 850;
+    }
+
+    .authorization-danger-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.52;
+    }
+
+    .authorization-icon-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-radius: 8px !important;
+    }
+
+    .authorization-visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .authorization-master-row {
+        cursor: pointer;
+    }
+
+    .authorization-master-row.is-selected {
+        background: var(--package-table-hover) !important;
+        box-shadow: inset 4px 0 0 var(--package-button-primary);
+    }
+
+    .authorization-tabs {
+        display: flex;
+        gap: 0.45rem;
+        padding: 0.25rem;
+        border: 1px solid var(--package-input-border);
+        border-radius: 8px;
+        background: var(--package-heading-bg);
+        overflow-x: auto;
+    }
+
+    .authorization-tab {
+        border: 0;
+        border-radius: 7px;
+        padding: 0.62rem 0.95rem;
+        background: transparent;
+        color: var(--package-muted);
+        font-weight: 850;
+        white-space: nowrap;
+    }
+
+    .authorization-tab.is-active {
+        background: var(--package-button-primary);
+        color: #fff;
+    }
+
+    .authorization-tab-panel {
+        display: none;
+    }
+
+    .authorization-tab-panel.is-active {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .authorization-position-grid {
+        display: grid;
+        grid-template-columns: minmax(220px, 0.45fr) minmax(0, 1fr);
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .authorization-position-list {
+        max-height: 62vh;
+        overflow: auto;
+        border: 1px solid var(--package-shell-border);
+        border-radius: 8px;
+        background: var(--package-shell-bg);
+    }
+
+    .authorization-position-item {
+        width: 100%;
+        border: 0;
+        border-bottom: 1px solid var(--package-shell-border);
+        padding: 0.75rem 0.85rem;
+        background: transparent;
+        color: var(--package-title);
+        text-align: left;
+        font-weight: 850;
+    }
+
+    .authorization-position-item.is-active {
+        background: var(--package-table-hover);
+        box-shadow: inset 4px 0 0 var(--package-button-primary);
     }
 
     @media (max-width: 991.98px) {
@@ -386,6 +809,36 @@
 
         .authorization-form-wide {
             grid-column: span 1;
+        }
+
+        .authorization-master-toolbar {
+            display: grid;
+        }
+
+        .authorization-position-toolbar {
+            grid-template-columns: 1fr;
+        }
+
+        .authorization-position-summary {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .authorization-sync-action {
+            justify-content: stretch;
+        }
+
+        .authorization-sync-copy {
+            max-width: none;
+            text-align: left;
+        }
+
+        .authorization-confirm-body {
+            padding-left: 1.1rem;
+        }
+
+        .authorization-position-grid {
+            grid-template-columns: 1fr;
         }
 
         .authorization-topbar-title {
@@ -409,15 +862,19 @@
         </div>
     @endif
 
+    <div class="authorization-tabs" aria-label="User authorization sections">
+        <button type="button" class="authorization-tab is-active" data-authorization-tab="user">User Authorization</button>
+        <button type="button" class="authorization-tab" data-authorization-tab="positions">Role Menu Defaults</button>
+        <button type="button" class="authorization-tab" data-authorization-tab="menus">Master Menu</button>
+    </div>
+
+    <div class="authorization-tab-panel is-active" data-authorization-panel="user">
+
     <div class="authorization-card">
         <div class="authorization-head">
             <div>
                 <h3>User Profile</h3>
                 <p>Select a user, then configure which menus they can access.</p>
-            </div>
-            <div class="authorization-head-actions">
-                <button type="button" class="authorization-head-action" data-modal-target="addUserModal">Add User</button>
-                <button type="button" class="authorization-head-action" data-modal-target="addMenuModal">Add Menu</button>
             </div>
         </div>
         <div class="authorization-body">
@@ -443,6 +900,13 @@
                 <div class="authorization-field">
                     <label>Allowed Menu</label>
                     <div class="authorization-stat"><span id="allowedCounter">{{ $allowedCount }}</span> / {{ $permissionRows->count() }}</div>
+                </div>
+                <div class="authorization-field">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn authorization-add-user-btn" id="openAddUserModal">
+                        <i class="fas fa-user-plus" aria-hidden="true"></i>
+                        <span>Add User</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -515,92 +979,228 @@
         </div>
     </form>
 
-    <div class="authorization-modal" id="addUserModal" aria-hidden="true">
-        <div class="authorization-modal-backdrop" data-modal-close></div>
-        <form method="POST" action="/settings/user-authorization/users" class="authorization-card authorization-modal-dialog" id="addUserForm">
-            @csrf
-            <div class="authorization-head">
-                <div>
-                    <h3>Add User</h3>
-                    <p>New user records are saved to the SANDI table.</p>
-                </div>
-                <button type="button" class="authorization-modal-close" data-modal-close aria-label="Close">x</button>
-            </div>
-            <div class="authorization-body">
-                <div class="alert authorization-alert" id="addUserWarning" hidden></div>
-                <div class="authorization-form-grid">
-                    <div class="authorization-field">
-                        <label for="new_kode">User Code</label>
-                        <input type="text" name="kode" id="new_kode" class="form-control package-input" maxlength="10" value="{{ old('kode') }}">
-                    </div>
-                    <div class="authorization-field">
-                        <label for="new_kode_kasir">Cashier Code</label>
-                        <input type="text" name="kode_kasir" id="new_kode_kasir" class="form-control package-input" maxlength="4" inputmode="numeric" value="{{ old('kode_kasir', $suggestedCashierCode) }}">
-                    </div>
-                    <div class="authorization-field">
-                        <label for="new_nama">Position</label>
-                        <select name="nama" id="new_nama" class="form-control package-input">
-                            @foreach (['OWNER', 'MANAGER', 'KEUANGAN', 'SUPERVISOR', 'RESEPSIONIS', 'HOUSE KEEPING', 'TEKNISI', 'KASIR', 'KEPALA GUDANG', 'STAFF GUDANG', 'ADMINISTRASI', 'F&B'] as $position)
-                                <option value="{{ $position }}" {{ old('nama') === $position ? 'selected' : '' }}>{{ $position }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="authorization-field">
-                        <label for="new_sheet">Sheet</label>
-                        <select name="sheet" id="new_sheet" class="form-control package-input">
-                            @foreach (['I', 'II', 'III', 'IV'] as $sheet)
-                                <option value="{{ $sheet }}" {{ old('sheet', 'I') === $sheet ? 'selected' : '' }}>{{ $sheet }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="authorization-field authorization-form-wide">
-                        <label for="new_password">Password</label>
-                        <input type="password" name="password" id="new_password" class="form-control package-input" maxlength="30" autocomplete="new-password">
-                    </div>
-                    <div class="authorization-field authorization-form-wide">
-                        <label class="authorization-check" for="new_active">
-                            <input type="checkbox" name="active" id="new_active" value="1" {{ old('active', '1') ? 'checked' : '' }}>
-                            Active user
-                        </label>
-                    </div>
-                </div>
-                <div class="authorization-savebar">
-                    <button type="submit" class="btn package-btn-primary">Add User</button>
-                </div>
-            </div>
-        </form>
     </div>
 
-    <div class="authorization-modal" id="addMenuModal" aria-hidden="true">
-        <div class="authorization-modal-backdrop" data-modal-close></div>
-        <form method="POST" action="/settings/user-authorization/menus" class="authorization-card authorization-modal-dialog" id="addMenuForm">
-            @csrf
-            <input type="hidden" name="selected_user" value="{{ $selectedKode }}">
+    <div class="authorization-tab-panel" data-authorization-panel="positions">
+        <div class="authorization-card">
             <div class="authorization-head">
                 <div>
-                    <h3>Add Menu</h3>
-                    <p>New master menu records are saved to SANDI3.</p>
+                    <h3>Role Menu Defaults</h3>
+                    <p>Select a role on the left to view its default accessible menus.</p>
                 </div>
-                <button type="button" class="authorization-modal-close" data-modal-close aria-label="Close">x</button>
             </div>
             <div class="authorization-body">
-                <div class="authorization-form-grid">
-                    <div class="authorization-field authorization-form-wide">
+                <div class="authorization-position-grid">
+                    <div>
+                        <div class="authorization-master-heading">
+                            <span>Positions</span>
+                            <span class="authorization-master-count">{{ $positionDefaults->count() }} positions</span>
+                        </div>
+                        <div class="authorization-position-list">
+                            @foreach ($positionDefaults as $position)
+                                <button
+                                    type="button"
+                                    class="authorization-position-item {{ $loop->first ? 'is-active' : '' }}"
+                                    data-position-tab="{{ $loop->iteration }}"
+                                    data-position-name="{{ $position['position'] }}"
+                                >
+                                    {{ $position['position'] }}
+                                    <span class="authorization-master-count">{{ $position['user_count'] }} user</span>
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div>
+                        @foreach ($positionDefaults as $position)
+                            <div class="authorization-position-panel {{ $loop->first ? 'is-active' : '' }}" data-position-panel="{{ $loop->iteration }}" {{ $loop->first ? '' : 'hidden' }}>
+                                @include('settings.partials.position-default-panel', [
+                                    'position' => $position,
+                                    'allMenus' => $allMenus,
+                                    'positionIndex' => $loop->iteration,
+                                ])
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="authorization-tab-panel" data-authorization-panel="menus">
+        <div class="authorization-card">
+            <div class="authorization-head">
+                <div>
+                    <h3>Master Menu</h3>
+                    <p>Add, edit, and delete master menu records in SANDI3.</p>
+                </div>
+            </div>
+            <div class="authorization-body">
+                <form method="POST" action="/settings/user-authorization/menus" class="authorization-master-toolbar" id="addMenuForm">
+                    @csrf
+                    <input type="hidden" name="selected_user" value="{{ $selectedKode }}">
+                    <input type="hidden" name="original_ket" id="menu_original_ket" value="">
+                    <div class="authorization-field">
                         <label for="new_ket">Menu Description</label>
                         <input type="text" name="ket" id="new_ket" class="form-control package-input" maxlength="50" placeholder="Example: 999 New Premium Menu" value="{{ old('ket') }}">
                     </div>
-                    <div class="authorization-field authorization-form-wide">
+                    <div class="authorization-field">
                         <label for="new_kunci">Menu Key</label>
                         <input type="text" name="kunci" id="new_kunci" class="form-control package-input" maxlength="50" placeholder="Example: mnuNewPremiumMenu" value="{{ old('kunci') }}">
                     </div>
+                    <button type="button" class="btn btn-sm authorization-secondary-btn" id="newMenuButton" hidden>New</button>
+                    <button type="submit" class="btn package-btn-primary" id="saveMenuButton">Add Menu</button>
+                </form>
+
+                <div class="authorization-master-heading">
+                    <span>Master Menu</span>
+                    <span class="authorization-master-count">{{ $masterMenus->count() }} menu</span>
                 </div>
-                <div class="authorization-savebar">
-                    <button type="submit" class="btn package-btn-primary">Add Menu</button>
+
+                <div class="authorization-table-wrap">
+                    @if ($masterMenus->isEmpty())
+                        <div class="authorization-empty">No master menus are available in SANDI3.</div>
+                    @else
+                        <table class="authorization-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 90px;">Code</th>
+                                    <th>Menu Description</th>
+                                    <th>Menu Key</th>
+                                    <th style="width: 95px;">Used</th>
+                                    <th style="width: 180px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($masterMenus as $menu)
+                                    <tr
+                                        class="authorization-master-row"
+                                        data-master-menu-row
+                                        data-ket="{{ $menu['ket'] }}"
+                                        data-kunci="{{ $menu['kunci'] }}"
+                                    >
+                                        <td><span class="authorization-menu-code">{{ $menu['code'] }}</span></td>
+                                        <td class="authorization-master-description">{{ $menu['ket'] }}</td>
+                                        <td class="authorization-master-key">{{ $menu['kunci'] }}</td>
+                                        <td><span class="authorization-usage-badge">{{ $menu['usage_count'] }}</span></td>
+                                        <td>
+                                            <div class="authorization-row-actions">
+                                                <button type="button" class="btn btn-sm authorization-secondary-btn" data-edit-menu>Edit</button>
+                                                <form method="POST" action="/settings/user-authorization/menus/delete" data-delete-menu-form>
+                                                    @csrf
+                                                    <input type="hidden" name="selected_user" value="{{ $selectedKode }}">
+                                                    <input type="hidden" name="ket" value="{{ $menu['ket'] }}">
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-sm authorization-danger-btn"
+                                                        {{ $menu['usage_count'] > 0 ? 'disabled' : '' }}
+                                                        title="{{ $menu['usage_count'] > 0 ? 'Menu has already been used by a user.' : 'Delete menu' }}"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </section>
+
+<div class="authorization-modal" id="addUserModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="addUserModalTitle">
+    <div class="authorization-modal-backdrop" data-add-user-close></div>
+    <form method="POST" action="/settings/user-authorization/users" class="authorization-modal-dialog" id="addUserForm">
+        @csrf
+        <div class="authorization-head">
+            <div>
+                <h3 id="addUserModalTitle">Add New User</h3>
+                <p>Create a user and load menu access from the selected role defaults.</p>
+            </div>
+            <button type="button" class="btn btn-sm authorization-secondary-btn" data-add-user-close>Close</button>
+        </div>
+        <div class="authorization-body">
+            <div class="authorization-modal-warning" id="addUserWarning" hidden></div>
+            <div class="authorization-form-grid">
+                <div class="authorization-field">
+                    <label for="add_user_kode">User Code / Name</label>
+                    <input type="text" name="kode" id="add_user_kode" class="form-control package-input" maxlength="10" required placeholder="Example: BUDI">
+                </div>
+                <div class="authorization-field">
+                    <label for="add_user_position">Position</label>
+                    <select name="nama" id="add_user_position" class="form-control package-input" required>
+                        @foreach ($positions as $position)
+                            <option value="{{ $position }}">{{ $position }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="authorization-field">
+                    <label for="add_user_password">Password</label>
+                    <input type="text" name="password" id="add_user_password" class="form-control package-input" maxlength="30" required>
+                </div>
+                <div class="authorization-field">
+                    <label for="add_user_kasir">Cashier Code</label>
+                    <input type="text" name="kode_kasir" id="add_user_kasir" class="form-control package-input" maxlength="4" inputmode="numeric" required value="{{ $suggestedCashierCode }}">
+                </div>
+                <div class="authorization-field">
+                    <label for="add_user_sheet">Sheet</label>
+                    <select name="sheet" id="add_user_sheet" class="form-control package-input" required>
+                        <option value="I">I</option>
+                        <option value="II">II</option>
+                        <option value="III">III</option>
+                        <option value="IV">IV</option>
+                    </select>
+                </div>
+                <div class="authorization-field">
+                    <label>Active</label>
+                    <label class="authorization-check authorization-stat">
+                        <input type="checkbox" name="active" value="1" checked>
+                        Active user
+                    </label>
+                </div>
+                <div class="authorization-field authorization-form-wide">
+                    <label>Default Menu Preview</label>
+                    <div class="authorization-modal-preview" id="addUserMenuPreview"></div>
+                </div>
+            </div>
+            <div class="authorization-savebar">
+                <button type="button" class="btn btn-sm authorization-secondary-btn" data-add-user-close>Cancel</button>
+                <button type="submit" class="btn package-btn-primary">Create User</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="authorization-confirm" id="authorizationConfirm" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="authorizationConfirmTitle">
+    <div class="authorization-confirm-backdrop" data-confirm-cancel></div>
+    <div class="authorization-confirm-dialog">
+        <div class="authorization-confirm-head">
+            <span class="authorization-confirm-icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></span>
+            <h3 class="authorization-confirm-title" id="authorizationConfirmTitle">Confirm Action</h3>
+        </div>
+        <div class="authorization-confirm-body" id="authorizationConfirmMessage">Are you sure?</div>
+        <div class="authorization-confirm-actions">
+            <button type="button" class="authorization-confirm-cancel" data-confirm-cancel>Cancel</button>
+            <button type="button" class="authorization-confirm-ok" data-confirm-ok>Confirm</button>
+        </div>
+    </div>
+</div>
+
+@php
+    $positionDefaultMenuPayload = $positionDefaults->mapWithKeys(function ($position) {
+        return [
+            $position['position'] => $position['menus']->map(function ($menu) {
+                return [
+                    'code' => $menu['code'],
+                    'ket' => $menu['ket'],
+                ];
+            })->values(),
+        ];
+    });
+@endphp
 
 <script>
     (function () {
@@ -613,13 +1213,76 @@
         const allowAllButton = document.getElementById('allowAllButton');
         const clearAllButton = document.getElementById('clearAllButton');
         const filterButtons = Array.from(document.querySelectorAll('[data-permission-filter]'));
-        const modalTriggers = Array.from(document.querySelectorAll('[data-modal-target]'));
-        const modals = Array.from(document.querySelectorAll('.authorization-modal'));
+        const tabButtons = Array.from(document.querySelectorAll('[data-authorization-tab]'));
+        const tabPanels = Array.from(document.querySelectorAll('[data-authorization-panel]'));
+        const positionButtons = Array.from(document.querySelectorAll('[data-position-tab]'));
+        const positionPanels = Array.from(document.querySelectorAll('[data-position-panel]'));
+        const addMenuForm = document.getElementById('addMenuForm');
+        const menuKetInput = document.getElementById('new_ket');
+        const menuKunciInput = document.getElementById('new_kunci');
+        const menuOriginalKetInput = document.getElementById('menu_original_ket');
+        const saveMenuButton = document.getElementById('saveMenuButton');
+        const newMenuButton = document.getElementById('newMenuButton');
+        const masterMenuRows = Array.from(document.querySelectorAll('[data-master-menu-row]'));
+        const editMenuButtons = Array.from(document.querySelectorAll('[data-edit-menu]'));
+        const deleteMenuForms = Array.from(document.querySelectorAll('[data-delete-menu-form]'));
+        const openAddUserModalButton = document.getElementById('openAddUserModal');
+        const addUserModal = document.getElementById('addUserModal');
         const addUserForm = document.getElementById('addUserForm');
+        const addUserPosition = document.getElementById('add_user_position');
+        const addUserMenuPreview = document.getElementById('addUserMenuPreview');
         const addUserWarning = document.getElementById('addUserWarning');
+        const addUserCloseButtons = addUserModal ? Array.from(addUserModal.querySelectorAll('[data-add-user-close]')) : [];
+        const confirmModal = document.getElementById('authorizationConfirm');
+        const confirmTitle = document.getElementById('authorizationConfirmTitle');
+        const confirmMessage = document.getElementById('authorizationConfirmMessage');
+        const confirmOkButton = confirmModal ? confirmModal.querySelector('[data-confirm-ok]') : null;
+        const confirmCancelButtons = confirmModal ? Array.from(confirmModal.querySelectorAll('[data-confirm-cancel]')) : [];
+        const positionDefaultMenus = @json($positionDefaultMenuPayload);
         const existingUserCodes = @json($users->pluck('kode')->map(fn ($kode) => strtoupper(trim((string) $kode)))->values());
         const existingCashierCodes = @json($users->pluck('kode_kasir')->map(fn ($kode) => trim((string) $kode))->filter()->values());
         let activeFilter = 'all';
+
+        function premiumConfirm(message, options = {}) {
+            if (!confirmModal || !confirmMessage || !confirmOkButton) {
+                return Promise.resolve(window.confirm(message));
+            }
+
+            return new Promise((resolve) => {
+                const title = options.title || 'Confirm Action';
+                const okText = options.okText || 'Confirm';
+
+                confirmTitle.textContent = title;
+                confirmMessage.textContent = message;
+                confirmOkButton.textContent = okText;
+                confirmModal.classList.add('is-open');
+                confirmModal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                confirmOkButton.focus();
+
+                const cleanup = (answer) => {
+                    confirmModal.classList.remove('is-open');
+                    confirmModal.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                    confirmOkButton.removeEventListener('click', onConfirm);
+                    confirmCancelButtons.forEach((button) => button.removeEventListener('click', onCancel));
+                    document.removeEventListener('keydown', onKeydown);
+
+                    resolve(answer);
+                };
+                const onConfirm = () => cleanup(true);
+                const onCancel = () => cleanup(false);
+                const onKeydown = (keyboardEvent) => {
+                    if (keyboardEvent.key === 'Escape') {
+                        cleanup(false);
+                    }
+                };
+
+                confirmOkButton.addEventListener('click', onConfirm);
+                confirmCancelButtons.forEach((button) => button.addEventListener('click', onCancel));
+                document.addEventListener('keydown', onKeydown);
+            });
+        }
 
         function syncCounter() {
             if (!allowedCounter) {
@@ -657,56 +1320,207 @@
             });
         }
 
-        function suggestCashierCode() {
-            const usedCodes = new Set(existingCashierCodes);
-
-            for (let code = 1; code <= 9999; code += 1) {
-                const candidate = String(code).padStart(4, '0');
-
-                if (!usedCodes.has(candidate)) {
-                    return candidate;
-                }
-            }
-
-            return '';
-        }
-
-        function resetAddUserForm() {
-            if (!addUserForm) {
+        function setMenuFormMode(menu, shouldFocus = false) {
+            if (!addMenuForm || !menuKetInput || !menuKunciInput || !menuOriginalKetInput || !saveMenuButton) {
                 return;
             }
 
-            const kodeInput = addUserForm.querySelector('[name="kode"]');
-            const cashierInput = addUserForm.querySelector('[name="kode_kasir"]');
-            const positionInput = addUserForm.querySelector('[name="nama"]');
-            const sheetInput = addUserForm.querySelector('[name="sheet"]');
-            const passwordInput = addUserForm.querySelector('[name="password"]');
-            const activeInput = addUserForm.querySelector('[name="active"]');
+            const isEdit = Boolean(menu);
+            const ket = menu ? menu.ket : '';
+            const kunci = menu ? menu.kunci : '';
 
-            if (kodeInput) {
-                kodeInput.value = '';
+            addMenuForm.action = isEdit
+                ? '/settings/user-authorization/menus/update'
+                : '/settings/user-authorization/menus';
+            menuOriginalKetInput.value = ket;
+            menuKetInput.value = ket;
+            menuKunciInput.value = kunci;
+            menuKunciInput.readOnly = isEdit;
+            saveMenuButton.textContent = isEdit ? 'Save Menu' : 'Add Menu';
+
+            if (newMenuButton) {
+                newMenuButton.hidden = !isEdit;
             }
 
-            if (cashierInput) {
-                cashierInput.value = suggestCashierCode();
-            }
+            masterMenuRows.forEach((row) => {
+                row.classList.toggle('is-selected', isEdit && row.dataset.ket === ket);
+            });
 
-            if (positionInput) {
-                positionInput.value = 'OWNER';
-            }
-
-            if (sheetInput) {
-                sheetInput.value = 'I';
-            }
-
-            if (passwordInput) {
-                passwordInput.value = '';
-            }
-
-            if (activeInput) {
-                activeInput.checked = true;
+            if (shouldFocus) {
+                menuKetInput.focus();
             }
         }
+
+        function menuFromRow(row) {
+            return {
+                ket: row.dataset.ket || '',
+                kunci: row.dataset.kunci || '',
+            };
+        }
+
+        function selectFirstMasterMenu() {
+            const firstRow = masterMenuRows[0] || null;
+
+            if (firstRow) {
+                setMenuFormMode(menuFromRow(firstRow));
+            } else {
+                setMenuFormMode(null);
+            }
+        }
+
+        function activateAuthorizationTab(tab) {
+            const targetTab = tabButtons.some((button) => button.dataset.authorizationTab === tab) ? tab : 'user';
+
+            tabButtons.forEach((button) => {
+                button.classList.toggle('is-active', button.dataset.authorizationTab === targetTab);
+            });
+
+            tabPanels.forEach((panel) => {
+                const isActive = panel.dataset.authorizationPanel === targetTab;
+                panel.classList.toggle('is-active', isActive);
+                panel.hidden = !isActive;
+            });
+
+            if (targetTab === 'menus') {
+                selectFirstMasterMenu();
+            }
+        }
+
+        function activatePositionTab(tab) {
+            positionButtons.forEach((button) => {
+                button.classList.toggle('is-active', button.dataset.positionTab === tab);
+            });
+
+            positionPanels.forEach((panel) => {
+                const isActive = panel.dataset.positionPanel === tab;
+                panel.classList.toggle('is-active', isActive);
+                panel.hidden = !isActive;
+            });
+        }
+
+        function activatePositionByName(positionName) {
+            const normalizedPosition = (positionName || '').trim().toUpperCase();
+            const button = positionButtons.find((item) => (item.dataset.positionName || '').trim().toUpperCase() === normalizedPosition);
+
+            if (button) {
+                activatePositionTab(button.dataset.positionTab || '1');
+            }
+        }
+
+        function resetConfirmModalState() {
+            if (confirmModal) {
+                confirmModal.classList.remove('is-open');
+                confirmModal.setAttribute('aria-hidden', 'true');
+            }
+
+            document.body.style.overflow = '';
+        }
+
+        function refreshPositionPanelControls(panel) {
+            if (!panel) {
+                return;
+            }
+
+            const select = panel.querySelector('select[name="menu_ket"]');
+
+            if (select && select.options.length > 0 && select.options[0].value !== '') {
+                select.disabled = false;
+            }
+        }
+
+        function renderAddUserMenuPreview() {
+            if (!addUserPosition || !addUserMenuPreview) {
+                return;
+            }
+
+            const menus = positionDefaultMenus[addUserPosition.value] || [];
+
+            if (menus.length === 0) {
+                addUserMenuPreview.innerHTML = `
+                    <div class="authorization-modal-preview-head">
+                        <span>Default Menus for ${addUserPosition.value}</span>
+                        <span class="authorization-modal-preview-count">0 menus</span>
+                    </div>
+                    <div class="authorization-empty">No default menus are recorded for this position.</div>
+                `;
+                return;
+            }
+
+            addUserMenuPreview.innerHTML = `
+                <div class="authorization-modal-preview-head">
+                    <span>Default Menus for ${addUserPosition.value}</span>
+                    <span class="authorization-modal-preview-count">${menus.length} menus</span>
+                </div>
+                ${menus.map((menu) => `
+                    <div class="authorization-modal-preview-row">
+                        <span class="authorization-menu-code">${menu.code || '-'}</span>
+                        <span>${menu.ket || ''}</span>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function openAddUserModal() {
+            if (!addUserModal) {
+                return;
+            }
+
+            if (addUserForm) {
+                addUserForm.reset();
+            }
+
+            if (addUserWarning) {
+                addUserWarning.hidden = true;
+                addUserWarning.textContent = '';
+            }
+
+            renderAddUserMenuPreview();
+            addUserModal.classList.add('is-open');
+            addUserModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+
+            const firstInput = addUserModal.querySelector('input:not([type="hidden"]), select, button');
+
+            if (firstInput) {
+                firstInput.focus();
+            }
+        }
+
+        function closeAddUserModal() {
+            if (!addUserModal) {
+                return;
+            }
+
+            addUserModal.classList.remove('is-open');
+            addUserModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function clearAddUserWarning() {
+            if (!addUserWarning) {
+                return;
+            }
+
+            addUserWarning.hidden = true;
+            addUserWarning.textContent = '';
+        }
+
+        tabButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                activateAuthorizationTab(button.dataset.authorizationTab || 'user');
+            });
+        });
+
+        positionButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                activatePositionTab(button.dataset.positionTab || '1');
+            });
+        });
+
+        const pageParams = new URLSearchParams(window.location.search);
+
+        activateAuthorizationTab(pageParams.get('tab') || 'user');
+        activatePositionByName(pageParams.get('position') || '');
 
         if (userSelect && userForm) {
             userSelect.addEventListener('change', () => userForm.submit());
@@ -737,19 +1551,18 @@
             clearAllButton.addEventListener('click', () => setVisibleCheckboxes(false));
         }
 
+        if (openAddUserModalButton) {
+            openAddUserModalButton.addEventListener('click', openAddUserModal);
+        }
+
+        addUserCloseButtons.forEach((button) => {
+            button.addEventListener('click', closeAddUserModal);
+        });
+
         if (addUserForm) {
             addUserForm.querySelectorAll('input, select').forEach((field) => {
-                const clearWarning = () => {
-                    if (!addUserWarning) {
-                        return;
-                    }
-
-                    addUserWarning.hidden = true;
-                    addUserWarning.textContent = '';
-                };
-
-                field.addEventListener('input', clearWarning);
-                field.addEventListener('change', clearWarning);
+                field.addEventListener('input', clearAddUserWarning);
+                field.addEventListener('change', clearAddUserWarning);
             });
 
             addUserForm.addEventListener('submit', (event) => {
@@ -757,6 +1570,7 @@
                 const cashierInput = addUserForm.querySelector('[name="kode_kasir"]');
                 const kode = kodeInput ? kodeInput.value.trim().toUpperCase() : '';
                 const kodeKasir = cashierInput ? cashierInput.value.trim() : '';
+                const warnings = [];
 
                 if (kodeInput) {
                     kodeInput.value = kode;
@@ -766,14 +1580,12 @@
                     cashierInput.value = kodeKasir;
                 }
 
-                const warnings = [];
-
                 if (existingUserCodes.includes(kode)) {
-                    warnings.push('User code already exists.');
+                    warnings.push('User code already exists. The user cannot be saved.');
                 }
 
                 if (existingCashierCodes.includes(kodeKasir)) {
-                    warnings.push('Cashier code is already used by another user.');
+                    warnings.push('Cashier code is already used by another user. The user cannot be saved.');
                 }
 
                 if (warnings.length === 0) {
@@ -785,11 +1597,20 @@
                 if (addUserWarning) {
                     addUserWarning.hidden = false;
                     addUserWarning.textContent = warnings.join(' ');
-                } else {
-                    window.alert(warnings.join(' '));
                 }
             });
         }
+
+        if (addUserPosition) {
+            addUserPosition.addEventListener('change', renderAddUserMenuPreview);
+            renderAddUserMenuPreview();
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && addUserModal && addUserModal.classList.contains('is-open')) {
+                closeAddUserModal();
+            }
+        });
 
         filterButtons.forEach((button) => {
             button.addEventListener('click', () => {
@@ -799,59 +1620,139 @@
             });
         });
 
-        function closeModal(modal) {
-            modal.classList.remove('is-open');
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
+        deleteMenuForms.forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                const ketInput = form.querySelector('[name="ket"]');
+                const ket = ketInput ? ketInput.value : 'this menu';
 
-            if (modal.id === 'addUserModal' && addUserWarning) {
-                addUserWarning.hidden = true;
-                addUserWarning.textContent = '';
-            }
-        }
-
-        function openModal(modal) {
-            modal.classList.add('is-open');
-            modal.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-
-            if (modal.id === 'addUserModal' && addUserWarning) {
-                addUserWarning.hidden = true;
-                addUserWarning.textContent = '';
-            }
-
-            if (modal.id === 'addUserModal') {
-                resetAddUserForm();
-            }
-
-            const firstInput = modal.querySelector('input:not([type="hidden"]), select, button');
-            if (firstInput) {
-                firstInput.focus();
-            }
-        }
-
-        modalTriggers.forEach((trigger) => {
-            trigger.addEventListener('click', () => {
-                const modal = document.getElementById(trigger.dataset.modalTarget || '');
-                if (modal) {
-                    openModal(modal);
+                if (!window.confirm(`Delete ${ket}?`)) {
+                    event.preventDefault();
                 }
             });
         });
 
-        modals.forEach((modal) => {
-            modal.querySelectorAll('[data-modal-close]').forEach((closeButton) => {
-                closeButton.addEventListener('click', () => closeModal(modal));
-            });
-        });
+        document.addEventListener('submit', async (event) => {
+            const form = event.target.closest('[data-position-ajax-form]');
 
-        document.addEventListener('keydown', (event) => {
-            if (event.key !== 'Escape') {
+            if (!form) {
                 return;
             }
 
-            modals.filter((modal) => modal.classList.contains('is-open')).forEach(closeModal);
+            event.preventDefault();
+
+            const panel = form.closest('[data-position-panel]');
+            const content = form.closest('[data-position-content]');
+            const submitter = event.submitter || form.querySelector('[type="submit"]');
+            const modeInput = form.querySelector('[data-position-menu-mode]');
+            const confirmMessage = form.dataset.confirmDelete || '';
+            const syncConfirmMessage = form.dataset.confirmSync || '';
+            const originalText = submitter ? submitter.textContent : '';
+
+            if (confirmMessage) {
+                const confirmed = await premiumConfirm(confirmMessage, {
+                    title: 'Delete Default Menu',
+                    okText: 'Delete',
+                });
+
+                if (!confirmed) {
+                    return;
+                }
+            }
+
+            if (syncConfirmMessage) {
+                const confirmed = await premiumConfirm(syncConfirmMessage, {
+                    title: 'Sync Users',
+                    okText: 'Sync Now',
+                });
+
+                if (!confirmed) {
+                    return;
+                }
+            }
+
+            if (modeInput) {
+                modeInput.value = submitter && submitter.matches('[data-add-all-position-menus]') ? 'all' : 'selected';
+            }
+
+            if (submitter) {
+                submitter.disabled = true;
+                submitter.textContent = confirmMessage ? 'Deleting...' : (syncConfirmMessage ? 'Syncing...' : 'Saving...');
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: new FormData(form),
+                });
+                const payload = await response.json();
+
+                if (!response.ok || !payload.success) {
+                    throw new Error(payload.message || 'Unable to save default menu.');
+                }
+
+                if (content && payload.data && payload.data.html) {
+                    content.outerHTML = payload.data.html;
+                }
+
+                resetConfirmModalState();
+                refreshPositionPanelControls(panel);
+
+                const refreshedFeedback = panel ? panel.querySelector('[data-position-feedback]') : null;
+
+                if (refreshedFeedback) {
+                    refreshedFeedback.hidden = false;
+                    refreshedFeedback.textContent = payload.message || 'Saved.';
+                }
+            } catch (error) {
+                const feedback = panel ? panel.querySelector('[data-position-feedback]') : null;
+
+                if (feedback) {
+                    feedback.hidden = false;
+                    feedback.textContent = error.message || 'Unable to save default menu.';
+                } else {
+                    window.alert(error.message || 'Unable to save default menu.');
+                }
+
+                if (submitter) {
+                    submitter.disabled = false;
+                    submitter.textContent = originalText;
+                }
+            }
         });
+
+        masterMenuRows.forEach((row) => {
+            const selectRow = (event) => {
+                if (event.target.closest('[data-delete-menu-form]')) {
+                    return;
+                }
+
+                setMenuFormMode(menuFromRow(row), event.type === 'click');
+            };
+
+            row.addEventListener('mouseenter', selectRow);
+            row.addEventListener('click', selectRow);
+        });
+
+        editMenuButtons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                const row = button.closest('[data-master-menu-row]');
+
+                event.preventDefault();
+
+                if (row) {
+                    setMenuFormMode(menuFromRow(row), true);
+                }
+            });
+        });
+
+        if (newMenuButton) {
+            newMenuButton.addEventListener('click', () => setMenuFormMode(null));
+        }
+
     }());
 </script>
 @endsection

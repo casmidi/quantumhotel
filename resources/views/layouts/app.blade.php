@@ -561,14 +561,18 @@
                     $canReceptionRecapMenu = $canSidebarMenu('925 Laporan Room Recapitulation');
                     $canHotelBrandingMenu = $canSidebarMenu('Q01 Hotel Branding');
                     $canSynchroniseMenu = $canSidebarMenu('Q02 Synchronise');
+                    $canItemPackageMenu = $canSidebarMenu('M01 Item Package For Global');
+                    $canPackageTransactionMenu = $canSidebarMenu('M02 Menu Package for transaction');
                     $canUserAuthorizationMenu = $sidebarRole === 'SUPERVISOR';
 
                     $canTableMenu = $canKelasMenu || $canRoomMenu;
+                    $canPackageMenu = $canItemPackageMenu || $canPackageTransactionMenu;
                     $canTransactionMenu = $canCheckinMenu || $canCheckoutMenu || $canNightAuditMenu;
                     $canReportMenu = $canGuestInHouseMenu || $canExpectedDepartureMenu || $canReceptionRecapMenu;
                     $canSettingMenu = $canHotelBrandingMenu || $canSynchroniseMenu || $canUserAuthorizationMenu;
 
                     $isTableMenu = ($canKelasMenu && (request()->is('kelas') || request()->is('kelas/*'))) || ($canRoomMenu && (request()->is('room') || request()->is('room/*')));
+                    $isPackageMenu = ($canItemPackageMenu && (request()->is('item-package-global') || request()->is('stock-package'))) || ($canPackageTransactionMenu && request()->is('menu-package-transaction*'));
                     $isTransactionMenu = ($canCheckinMenu && (request()->is('checkin') || request()->is('checkin/*'))) || ($canCheckoutMenu && (request()->is('checkout') || request()->is('checkout/*'))) || ($canNightAuditMenu && (request()->is('night-audit') || request()->is('night-audit/*')));
                     $isReportMenu = ($canGuestInHouseMenu && (request()->is('guest-in-house') || request()->is('guest-in-house/*'))) || ($canExpectedDepartureMenu && (request()->is('expected-departure') || request()->is('expected-departure/*'))) || ($canReceptionRecapMenu && (request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*')));
                     $isSettingMenu = ($canHotelBrandingMenu && request()->is('settings/hotel-branding*')) || ($canUserAuthorizationMenu && request()->is('settings/user-authorization*')) || ($canSynchroniseMenu && request()->is('synchronise'));
@@ -614,6 +618,37 @@
                     @endif
 
                     <!-- Setting menu dipindah ke bawah sebelum logout -->
+
+                    @if ($canPackageMenu)
+                    <li class="nav-item has-treeview {{ $isPackageMenu ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ $isPackageMenu ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-boxes"></i>
+                            <p>
+                                Package
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @if ($canItemPackageMenu)
+                            <li class="nav-item">
+                                <a href="/item-package-global" class="nav-link {{ request()->is('item-package-global') || request()->is('stock-package') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-box-open"></i>
+                                    <p>Item Package For Global</p>
+                                </a>
+                            </li>
+                            @endif
+
+                            @if ($canPackageTransactionMenu)
+                            <li class="nav-item">
+                                <a href="/menu-package-transaction" class="nav-link {{ request()->is('menu-package-transaction') || request()->is('menu-package-transaction/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-receipt"></i>
+                                    <p>Menu Package Transaction</p>
+                                </a>
+                            </li>
+                            @endif
+                        </ul>
+                    </li>
+                    @endif
 
                     @if ($canTransactionMenu)
                     <li class="nav-item has-treeview {{ $isTransactionMenu ? 'menu-open' : '' }}">

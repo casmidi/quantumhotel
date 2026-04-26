@@ -245,46 +245,55 @@ Route::get('/room/{kode}/delete', function ($kode) {
 */
 Route::get('/stock-package', function () {
     if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('M01 Item Package For Global')) return $response;
     return redirect('/item-package-global');
 });
 
 Route::get('/item-package-global', function () {
     if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('M01 Item Package For Global')) return $response;
     return app(StockPackageController::class)->index(request());
 });
 
 Route::post('/item-package-global', function () {
     if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('M01 Item Package For Global')) return $response;
     return app(StockPackageController::class)->store(request());
 });
 
 Route::post('/item-package-global/{kode}/update', function ($kode) {
     if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('M01 Item Package For Global')) return $response;
     return app(StockPackageController::class)->update(request(), $kode);
 });
 
 Route::get('/item-package-global/{kode}/delete', function ($kode) {
     if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('M01 Item Package For Global')) return $response;
     return app(StockPackageController::class)->destroy(request(), $kode);
 });
 
 Route::get('/menu-package-transaction', function () {
     if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('M02 Menu Package for transaction')) return $response;
     return app(PackageTransactionController::class)->index(request());
 });
 
 Route::post('/menu-package-transaction', function () {
     if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('M02 Menu Package for transaction')) return $response;
     return app(PackageTransactionController::class)->store(request());
 });
 
 Route::post('/menu-package-transaction/{nofak}/update', function ($nofak) {
     if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('M02 Menu Package for transaction')) return $response;
     return app(PackageTransactionController::class)->update(request(), $nofak);
 });
 
 Route::get('/menu-package-transaction/{nofak}/delete', function ($nofak) {
     if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('M02 Menu Package for transaction')) return $response;
     return app(PackageTransactionController::class)->destroy(request(), $nofak);
 });
 
@@ -438,10 +447,40 @@ Route::post('/settings/user-authorization/users', function () {
     return app(UserAuthorizationController::class)->storeUser(request());
 });
 
+Route::post('/settings/user-authorization/positions/menus', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureSupervisorAccess()) return $response;
+    return app(UserAuthorizationController::class)->storePositionDefaultMenus(request());
+});
+
+Route::post('/settings/user-authorization/positions/apply', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureSupervisorAccess()) return $response;
+    return app(UserAuthorizationController::class)->applyPositionDefaultMenus(request());
+});
+
+Route::post('/settings/user-authorization/positions/menus/delete', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureSupervisorAccess()) return $response;
+    return app(UserAuthorizationController::class)->destroyPositionDefaultMenu(request());
+});
+
 Route::post('/settings/user-authorization/menus', function () {
     if ($response = ensureSessionAccess()) return $response;
     if ($response = ensureSupervisorAccess()) return $response;
     return app(UserAuthorizationController::class)->storeMenu(request());
+});
+
+Route::post('/settings/user-authorization/menus/update', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureSupervisorAccess()) return $response;
+    return app(UserAuthorizationController::class)->updateMenu(request());
+});
+
+Route::post('/settings/user-authorization/menus/delete', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureSupervisorAccess()) return $response;
+    return app(UserAuthorizationController::class)->destroyMenu(request());
 });
 
 
