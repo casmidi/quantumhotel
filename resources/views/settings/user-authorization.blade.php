@@ -277,9 +277,40 @@
         background: var(--package-table-even);
     }
 
-    .authorization-table tbody tr:hover {
-        background: var(--package-table-hover);
-        box-shadow: inset 4px 0 0 var(--package-table-hover-accent);
+    .authorization-table tbody tr:hover,
+    .authorization-table tbody tr:focus-within {
+        background: var(--package-row-focus-bg);
+        box-shadow:
+            0 0 0 2px var(--package-row-focus-ring),
+            0 10px 22px var(--package-row-focus-shadow);
+    }
+
+    .authorization-table tbody tr:hover td,
+    .authorization-table tbody tr:focus-within td {
+        background: var(--package-row-focus-bg) !important;
+        border-top-color: var(--package-row-focus-ring);
+        border-bottom-color: var(--package-row-focus-ring);
+        color: var(--package-row-focus-text);
+    }
+
+    .authorization-table tbody tr:hover td:first-child,
+    .authorization-table tbody tr:focus-within td:first-child {
+        box-shadow: inset 7px 0 0 var(--package-row-focus-ring);
+    }
+
+    .authorization-table tbody tr:hover td:last-child,
+    .authorization-table tbody tr:focus-within td:last-child {
+        box-shadow: inset -2px 0 0 var(--package-row-focus-ring);
+    }
+
+    .authorization-table tbody tr:hover .authorization-menu-code,
+    .authorization-table tbody tr:focus-within .authorization-menu-code,
+    .authorization-master-row.is-selected .authorization-menu-code,
+    .authorization-master-row.is-selected .authorization-usage-badge {
+        background: #fff8e7;
+        color: #0f513c;
+        border: 1px solid var(--package-row-focus-ring);
+        box-shadow: 0 4px 10px rgba(6, 46, 35, 0.18);
     }
 
     .authorization-menu-code {
@@ -350,6 +381,10 @@
 
     .authorization-master-toolbar .authorization-field {
         flex: 1 1 220px;
+    }
+
+    .authorization-master-toolbar .authorization-menu-code-field {
+        flex: 0 0 150px;
     }
 
     .authorization-position-toolbar {
@@ -722,8 +757,25 @@
     }
 
     .authorization-master-row.is-selected {
-        background: var(--package-table-hover) !important;
-        box-shadow: inset 4px 0 0 var(--package-button-primary);
+        background: var(--package-row-focus-bg) !important;
+        box-shadow:
+            0 0 0 2px var(--package-row-focus-ring),
+            0 10px 22px var(--package-row-focus-shadow);
+    }
+
+    .authorization-master-row.is-selected td {
+        background: var(--package-row-focus-bg) !important;
+        border-top-color: var(--package-row-focus-ring);
+        border-bottom-color: var(--package-row-focus-ring);
+        color: var(--package-row-focus-text);
+    }
+
+    .authorization-master-row.is-selected td:first-child {
+        box-shadow: inset 7px 0 0 var(--package-row-focus-ring);
+    }
+
+    .authorization-master-row.is-selected td:last-child {
+        box-shadow: inset -2px 0 0 var(--package-row-focus-ring);
     }
 
     .authorization-tabs {
@@ -1039,9 +1091,13 @@
                     @csrf
                     <input type="hidden" name="selected_user" value="{{ $selectedKode }}">
                     <input type="hidden" name="original_ket" id="menu_original_ket" value="">
+                    <div class="authorization-field authorization-menu-code-field">
+                        <label for="new_menu_code">Menu Code</label>
+                        <input type="text" name="menu_code" id="new_menu_code" class="form-control package-input" maxlength="10" placeholder="150" value="{{ old('menu_code') }}">
+                    </div>
                     <div class="authorization-field">
-                        <label for="new_ket">Menu Description</label>
-                        <input type="text" name="ket" id="new_ket" class="form-control package-input" maxlength="50" placeholder="Example: 999 New Premium Menu" value="{{ old('ket') }}">
+                        <label for="new_menu_description">Menu Description</label>
+                        <input type="text" name="menu_description" id="new_menu_description" class="form-control package-input" maxlength="50" placeholder="Master Supplier" value="{{ old('menu_description') }}">
                     </div>
                     <div class="authorization-field">
                         <label for="new_kunci">Menu Key</label>
@@ -1076,10 +1132,12 @@
                                         class="authorization-master-row"
                                         data-master-menu-row
                                         data-ket="{{ $menu['ket'] }}"
+                                        data-code="{{ $menu['code'] }}"
+                                        data-label="{{ $menu['label'] }}"
                                         data-kunci="{{ $menu['kunci'] }}"
                                     >
                                         <td><span class="authorization-menu-code">{{ $menu['code'] }}</span></td>
-                                        <td class="authorization-master-description">{{ $menu['ket'] }}</td>
+                                        <td class="authorization-master-description">{{ $menu['label'] }}</td>
                                         <td class="authorization-master-key">{{ $menu['kunci'] }}</td>
                                         <td><span class="authorization-usage-badge">{{ $menu['usage_count'] }}</span></td>
                                         <td>
@@ -1218,7 +1276,8 @@
         const positionButtons = Array.from(document.querySelectorAll('[data-position-tab]'));
         const positionPanels = Array.from(document.querySelectorAll('[data-position-panel]'));
         const addMenuForm = document.getElementById('addMenuForm');
-        const menuKetInput = document.getElementById('new_ket');
+        const menuCodeInput = document.getElementById('new_menu_code');
+        const menuDescriptionInput = document.getElementById('new_menu_description');
         const menuKunciInput = document.getElementById('new_kunci');
         const menuOriginalKetInput = document.getElementById('menu_original_ket');
         const saveMenuButton = document.getElementById('saveMenuButton');
@@ -1321,19 +1380,22 @@
         }
 
         function setMenuFormMode(menu, shouldFocus = false) {
-            if (!addMenuForm || !menuKetInput || !menuKunciInput || !menuOriginalKetInput || !saveMenuButton) {
+            if (!addMenuForm || !menuCodeInput || !menuDescriptionInput || !menuKunciInput || !menuOriginalKetInput || !saveMenuButton) {
                 return;
             }
 
             const isEdit = Boolean(menu);
             const ket = menu ? menu.ket : '';
+            const code = menu ? menu.code : '';
+            const label = menu ? menu.label : '';
             const kunci = menu ? menu.kunci : '';
 
             addMenuForm.action = isEdit
                 ? '/settings/user-authorization/menus/update'
                 : '/settings/user-authorization/menus';
             menuOriginalKetInput.value = ket;
-            menuKetInput.value = ket;
+            menuCodeInput.value = code;
+            menuDescriptionInput.value = label;
             menuKunciInput.value = kunci;
             menuKunciInput.readOnly = isEdit;
             saveMenuButton.textContent = isEdit ? 'Save Menu' : 'Add Menu';
@@ -1347,13 +1409,15 @@
             });
 
             if (shouldFocus) {
-                menuKetInput.focus();
+                menuCodeInput.focus();
             }
         }
 
         function menuFromRow(row) {
             return {
                 ket: row.dataset.ket || '',
+                code: row.dataset.code || '',
+                label: row.dataset.label || '',
                 kunci: row.dataset.kunci || '',
             };
         }

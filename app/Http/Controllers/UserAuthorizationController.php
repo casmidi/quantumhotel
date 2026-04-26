@@ -164,11 +164,14 @@ class UserAuthorizationController extends Controller
     public function storeMenu(Request $request)
     {
         $validated = $request->validate([
-            'ket' => ['required', 'string', 'max:50'],
+            'menu_code' => ['required', 'string', 'max:10'],
+            'menu_description' => ['required', 'string', 'max:50'],
             'kunci' => ['required', 'string', 'max:50'],
         ]);
 
-        $ket = trim($validated['ket']);
+        $menuCode = $this->normalizeMenuCode($validated['menu_code']);
+        $menuDescription = trim($validated['menu_description']);
+        $ket = $this->buildMenuKet($menuCode, $menuDescription);
         $kunci = trim($validated['kunci']);
 
         $exists = DB::table('SANDI3')
@@ -179,10 +182,17 @@ class UserAuthorizationController extends Controller
             return $this->respondError($request, 'That menu already exists in SANDI3.');
         }
 
-        DB::table('SANDI3')->insert([
+        $payload = [
             'Ket' => $ket,
             'Kunci' => $kunci,
-        ]);
+        ];
+
+        if ($this->hasSandi3SplitMenuColumns()) {
+            $payload['MenuCode'] = $menuCode;
+            $payload['MenuDescription'] = $menuDescription;
+        }
+
+        DB::table('SANDI3')->insert($payload);
 
         return $this->respondAfterMutation(
             $request,
@@ -195,12 +205,15 @@ class UserAuthorizationController extends Controller
     {
         $validated = $request->validate([
             'original_ket' => ['required', 'string', 'max:50'],
-            'ket' => ['required', 'string', 'max:50'],
+            'menu_code' => ['required', 'string', 'max:10'],
+            'menu_description' => ['required', 'string', 'max:50'],
             'kunci' => ['nullable', 'string', 'max:255'],
         ]);
 
         $originalKet = trim($validated['original_ket']);
-        $ket = trim($validated['ket']);
+        $newMenuCode = $this->normalizeMenuCode($validated['menu_code']);
+        $newMenuDescription = trim($validated['menu_description']);
+        $ket = $this->buildMenuKet($newMenuCode, $newMenuDescription);
         $kunci = trim((string) ($validated['kunci'] ?? ''));
         $menuCode = trim(substr($originalKet, 0, 3));
 
@@ -217,10 +230,17 @@ class UserAuthorizationController extends Controller
             return $this->respondError($request, 'That menu description already exists in SANDI3.');
         }
 
-        DB::transaction(function () use ($originalKet, $ket, $kunci, $menuCode) {
+        DB::transaction(function () use ($originalKet, $ket, $kunci, $menuCode, $newMenuCode, $newMenuDescription) {
+            $sandi3Payload = ['Ket' => $ket];
+
+            if ($this->hasSandi3SplitMenuColumns()) {
+                $sandi3Payload['MenuCode'] = $newMenuCode;
+                $sandi3Payload['MenuDescription'] = $newMenuDescription;
+            }
+
             DB::table('SANDI3')
                 ->whereRaw('RTRIM(Ket) = ?', [$originalKet])
-                ->update(['Ket' => $ket]);
+                ->update($sandi3Payload);
 
             $sandi2Query = DB::table('SANDI2')
                 ->whereRaw('RTRIM(Ket) = ?', [$originalKet]);
@@ -507,19 +527,26 @@ class UserAuthorizationController extends Controller
 
     private function menus(): Collection
     {
+        $splitSelect = $this->hasSandi3SplitMenuColumns()
+            ? "RTRIM(MenuCode) AS menu_code, RTRIM(MenuDescription) AS menu_description,"
+            : "NULL AS menu_code, NULL AS menu_description,";
+
         $legacyMenus = collect(DB::select("
             SELECT RTRIM(Ket) AS ket,
+                   {$splitSelect}
                    RTRIM(Kunci) AS kunci
             FROM dbo.SANDI3
             ORDER BY RTRIM(Ket)
         "))->map(function ($row) {
             $ket = (string) $row->ket;
+            $code = trim((string) $row->menu_code) ?: trim(substr($ket, 0, 3));
+            $label = trim((string) $row->menu_description) ?: (trim(substr($ket, 3)) ?: $ket);
 
             return [
                 'ket' => $ket,
                 'kunci' => (string) $row->kunci,
-                'code' => trim(substr($ket, 0, 3)),
-                'label' => trim(substr($ket, 3)) ?: $ket,
+                'code' => $code,
+                'label' => $label,
             ];
         });
 
@@ -548,25 +575,52 @@ class UserAuthorizationController extends Controller
 
     private function masterMenus(): Collection
     {
+        $splitSelect = $this->hasSandi3SplitMenuColumns()
+            ? "RTRIM(s3.MenuCode) AS menu_code, RTRIM(s3.MenuDescription) AS menu_description,"
+            : "NULL AS menu_code, NULL AS menu_description,";
+
+        $splitGroup = $this->hasSandi3SplitMenuColumns()
+            ? ", RTRIM(s3.MenuCode), RTRIM(s3.MenuDescription)"
+            : "";
+
         return collect(DB::select("
             SELECT RTRIM(s3.Ket) AS ket,
+                   {$splitSelect}
                    RTRIM(s3.Kunci) AS kunci,
                    COUNT(s2.Ket) AS usage_count
             FROM dbo.SANDI3 s3
             LEFT JOIN dbo.SANDI2 s2 ON RTRIM(s2.Ket) = RTRIM(s3.Ket)
-            GROUP BY RTRIM(s3.Ket), RTRIM(s3.Kunci)
+            GROUP BY RTRIM(s3.Ket), RTRIM(s3.Kunci){$splitGroup}
             ORDER BY RTRIM(s3.Ket)
         "))->map(function ($row) {
             $ket = (string) $row->ket;
+            $code = trim((string) $row->menu_code) ?: trim(substr($ket, 0, 3));
+            $label = trim((string) $row->menu_description) ?: (trim(substr($ket, 3)) ?: $ket);
 
             return [
                 'ket' => $ket,
                 'kunci' => (string) $row->kunci,
-                'code' => trim(substr($ket, 0, 3)),
-                'label' => trim(substr($ket, 3)) ?: $ket,
+                'code' => $code,
+                'label' => $label,
                 'usage_count' => (int) $row->usage_count,
             ];
         });
+    }
+
+    private function normalizeMenuCode(string $menuCode): string
+    {
+        return strtoupper(preg_replace('/\s+/', '', trim($menuCode)));
+    }
+
+    private function buildMenuKet(string $menuCode, string $menuDescription): string
+    {
+        return trim($menuCode . ' ' . trim($menuDescription));
+    }
+
+    private function hasSandi3SplitMenuColumns(): bool
+    {
+        return Schema::hasColumn('SANDI3', 'MenuCode')
+            && Schema::hasColumn('SANDI3', 'MenuDescription');
     }
 
     private function positionDefaults(): Collection

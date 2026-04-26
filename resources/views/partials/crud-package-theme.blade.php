@@ -29,6 +29,10 @@
         --package-table-even: {{ $brandingTheme['table_even'] }};
         --package-table-hover: {{ $brandingTheme['table_hover'] }};
         --package-table-hover-accent: {{ $brandingTheme['table_hover_accent'] }};
+        --package-row-focus-bg: #1f6b52;
+        --package-row-focus-ring: #b88a34;
+        --package-row-focus-text: #fffaf0;
+        --package-row-focus-shadow: rgba(6, 46, 35, 0.16);
     }
 
     .content-wrapper {
@@ -343,10 +347,75 @@
     .package-table tbody tr:hover,
     .kelas-table tbody tr:hover,
     .room-table tbody tr:hover,
-    .crud-table tbody tr:hover {
-        background: var(--package-table-hover);
+    .crud-table tbody tr:hover,
+    .package-table tbody tr:focus-within,
+    .kelas-table tbody tr:focus-within,
+    .room-table tbody tr:focus-within,
+    .crud-table tbody tr:focus-within {
+        background: var(--package-row-focus-bg);
         transform: translateY(-1px);
-        box-shadow: inset 4px 0 0 var(--package-table-hover-accent);
+        box-shadow:
+            0 0 0 2px var(--package-row-focus-ring),
+            0 10px 22px var(--package-row-focus-shadow);
+    }
+
+    .package-table tbody tr:hover td,
+    .kelas-table tbody tr:hover td,
+    .room-table tbody tr:hover td,
+    .crud-table tbody tr:hover td,
+    .package-table tbody tr:focus-within td,
+    .kelas-table tbody tr:focus-within td,
+    .room-table tbody tr:focus-within td,
+    .crud-table tbody tr:focus-within td {
+        background: var(--package-row-focus-bg) !important;
+        border-top-color: var(--package-row-focus-ring);
+        border-bottom-color: var(--package-row-focus-ring);
+        color: var(--package-row-focus-text);
+    }
+
+    .package-table tbody tr:hover td:first-child,
+    .kelas-table tbody tr:hover td:first-child,
+    .room-table tbody tr:hover td:first-child,
+    .crud-table tbody tr:hover td:first-child,
+    .package-table tbody tr:focus-within td:first-child,
+    .kelas-table tbody tr:focus-within td:first-child,
+    .room-table tbody tr:focus-within td:first-child,
+    .crud-table tbody tr:focus-within td:first-child {
+        box-shadow: inset 7px 0 0 var(--package-row-focus-ring);
+    }
+
+    .package-table tbody tr:hover td:last-child,
+    .kelas-table tbody tr:hover td:last-child,
+    .room-table tbody tr:hover td:last-child,
+    .crud-table tbody tr:hover td:last-child,
+    .package-table tbody tr:focus-within td:last-child,
+    .kelas-table tbody tr:focus-within td:last-child,
+    .room-table tbody tr:focus-within td:last-child,
+    .crud-table tbody tr:focus-within td:last-child {
+        box-shadow: inset -2px 0 0 var(--package-row-focus-ring);
+    }
+
+    .package-table tbody tr:hover .package-code,
+    .kelas-table tbody tr:hover .kelas-code,
+    .room-table tbody tr:hover .room-code,
+    .crud-table tbody tr:hover .package-code,
+    .package-table tbody tr:focus-within .package-code,
+    .kelas-table tbody tr:focus-within .kelas-code,
+    .room-table tbody tr:focus-within .room-code,
+    .crud-table tbody tr:focus-within .package-code {
+        background: #fff8e7;
+        color: #0f513c;
+        border: 1px solid var(--package-row-focus-ring);
+        box-shadow: 0 4px 10px rgba(6, 46, 35, 0.18);
+    }
+
+    .package-table tbody tr:hover .kind-pill,
+    .crud-table tbody tr:hover .kind-pill,
+    .package-table tbody tr:focus-within .kind-pill,
+    .crud-table tbody tr:focus-within .kind-pill {
+        background: #fff8e7;
+        color: #0f513c;
+        border-color: var(--package-row-focus-ring);
     }
 
     .package-table tbody td,

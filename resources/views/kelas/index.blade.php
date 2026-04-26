@@ -139,10 +139,39 @@
             background: var(--package-table-even);
         }
 
-        .kelas-table tbody tr:hover {
-            background: var(--package-table-hover);
+        .kelas-table tbody tr:hover,
+        .kelas-table tbody tr:focus-within {
+            background: var(--package-row-focus-bg);
             transform: translateY(-1px);
-            box-shadow: inset 4px 0 0 var(--package-table-hover-accent);
+            box-shadow:
+                0 0 0 2px var(--package-row-focus-ring),
+                0 10px 22px var(--package-row-focus-shadow);
+        }
+
+        .kelas-table tbody tr:hover td,
+        .kelas-table tbody tr:focus-within td {
+            background: var(--package-row-focus-bg) !important;
+            border-top-color: var(--package-row-focus-ring);
+            border-bottom-color: var(--package-row-focus-ring);
+            color: var(--package-row-focus-text);
+        }
+
+        .kelas-table tbody tr:hover td:first-child,
+        .kelas-table tbody tr:focus-within td:first-child {
+            box-shadow: inset 7px 0 0 var(--package-row-focus-ring);
+        }
+
+        .kelas-table tbody tr:hover td:last-child,
+        .kelas-table tbody tr:focus-within td:last-child {
+            box-shadow: inset -2px 0 0 var(--package-row-focus-ring);
+        }
+
+        .kelas-table tbody tr:hover .kelas-code,
+        .kelas-table tbody tr:focus-within .kelas-code {
+            background: #fff8e7;
+            color: #0f513c;
+            border: 1px solid var(--package-row-focus-ring);
+            box-shadow: 0 4px 10px rgba(6, 46, 35, 0.18);
         }
 
         .kelas-table tbody td {
