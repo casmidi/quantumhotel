@@ -26,6 +26,8 @@ Thumbs.db
 venv/
 node_modules/
 vendor/
+!/public/vendor/
+!/public/vendor/**
 __pycache__/
 *.pyc
 .env

@@ -262,7 +262,18 @@
                 . '|REGNO2:' . trim((string) ($registration->RegNo2 ?? ''))
                 . '|ROOM:' . trim((string) ($registration->Kode ?? ''));
         }
-        $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=132x132&margin=0&data=' . rawurlencode($qrPayload);
+        $qrCode = new \Endroid\QrCode\Builder\Builder(
+            writer: new \Endroid\QrCode\Writer\SvgWriter(),
+            writerOptions: [],
+            validateResult: false,
+            data: $qrPayload,
+            encoding: new \Endroid\QrCode\Encoding\Encoding('UTF-8'),
+            errorCorrectionLevel: \Endroid\QrCode\ErrorCorrectionLevel::High,
+            size: 132,
+            margin: 0,
+            roundBlockSizeMode: \Endroid\QrCode\RoundBlockSizeMode::Margin,
+        );
+        $qrCodeUrl = $qrCode->build()->getDataUri();
     @endphp
 
     <div class="print-shell">

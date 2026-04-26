@@ -56,6 +56,7 @@ return [
     ],
 
     'openai_ocr' => [
+        'enabled' => env('OPENAI_OCR_ENABLED', false),
         'api_key' => env('OPENAI_API_KEY'),
         'model' => env('OPENAI_OCR_MODEL', 'gpt-5.4'),
         'detail' => env('OPENAI_OCR_DETAIL', 'high'),

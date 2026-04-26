@@ -2498,7 +2498,7 @@
         </tr>
     </template>
 
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="{{ asset('vendor/tesseract/tesseract.min.js') }}"></script>
     <script>
         function normalizeNumber(value) {
             return (value || '').toString().replace(/[^\d]/g, '');
@@ -3129,8 +3129,7 @@
 
             tesseractLoadPromise = (async function() {
                 const sources = [
-                    'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
-                    'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js',
+                    '{{ asset('vendor/tesseract/tesseract.min.js') }}',
                 ];
 
                 for (const source of sources) {
@@ -3970,6 +3969,9 @@
                     : (variant.label === 'enhanced' ? 'enhanced' : 'high contrast');
 
                 const result = await TesseractLib.recognize(variant.source, 'ind+eng', {
+                    workerPath: '{{ asset('vendor/tesseract/worker.min.js') }}',
+                    corePath: '{{ asset('vendor/tesseract/core/tesseract-core-lstm.wasm.js') }}',
+                    langPath: '{{ asset('vendor/tesseract/lang-data') }}',
                     logger(message) {
                         if (typeof onProgress !== 'function') {
                             return;

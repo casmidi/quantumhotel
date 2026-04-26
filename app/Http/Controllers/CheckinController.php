@@ -1380,7 +1380,8 @@ class CheckinController extends Controller
 
     private function openAiKtpCorrectionConfigured(): bool
     {
-        return trim((string) config('services.openai_ocr.api_key', '')) !== '';
+        return (bool) config('services.openai_ocr.enabled', false)
+            && trim((string) config('services.openai_ocr.api_key', '')) !== '';
     }
 
     private function scanKtpRawWithDocumentAi($image): string

@@ -10,8 +10,8 @@
     <title>Quantum Hotel System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/adminlte/css/adminlte.min.css') }}">
 
     <style>
         body {
@@ -564,19 +564,20 @@
                     $canItemPackageMenu = $canSidebarMenu('M01 Item Package For Global');
                     $canPackageTransactionMenu = $canSidebarMenu('M02 Menu Package for transaction');
                     $canUserAuthorizationMenu = $sidebarRole === 'SUPERVISOR';
+                    $canApiSettingsMenu = $sidebarRole === 'SUPERVISOR';
                     $canChangePasswordMenu = $sidebarUser !== '';
 
                     $canTableMenu = $canKelasMenu || $canRoomMenu;
                     $canPackageMenu = $canItemPackageMenu || $canPackageTransactionMenu;
                     $canTransactionMenu = $canCheckinMenu || $canCheckoutMenu || $canNightAuditMenu;
                     $canReportMenu = $canGuestInHouseMenu || $canExpectedDepartureMenu || $canReceptionRecapMenu;
-                    $canSettingMenu = $canHotelBrandingMenu || $canSynchroniseMenu || $canUserAuthorizationMenu || $canChangePasswordMenu;
+                    $canSettingMenu = $canHotelBrandingMenu || $canSynchroniseMenu || $canUserAuthorizationMenu || $canApiSettingsMenu || $canChangePasswordMenu;
 
                     $isTableMenu = ($canKelasMenu && (request()->is('kelas') || request()->is('kelas/*'))) || ($canRoomMenu && (request()->is('room') || request()->is('room/*')));
                     $isPackageMenu = ($canItemPackageMenu && (request()->is('item-package-global') || request()->is('stock-package'))) || ($canPackageTransactionMenu && request()->is('menu-package-transaction*'));
                     $isTransactionMenu = ($canCheckinMenu && (request()->is('checkin') || request()->is('checkin/*'))) || ($canCheckoutMenu && (request()->is('checkout') || request()->is('checkout/*'))) || ($canNightAuditMenu && (request()->is('night-audit') || request()->is('night-audit/*')));
                     $isReportMenu = ($canGuestInHouseMenu && (request()->is('guest-in-house') || request()->is('guest-in-house/*'))) || ($canExpectedDepartureMenu && (request()->is('expected-departure') || request()->is('expected-departure/*'))) || ($canReceptionRecapMenu && (request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*')));
-                    $isSettingMenu = ($canHotelBrandingMenu && request()->is('settings/hotel-branding*')) || ($canUserAuthorizationMenu && request()->is('settings/user-authorization*')) || ($canSynchroniseMenu && request()->is('synchronise')) || ($canChangePasswordMenu && request()->is('settings/change-password'));
+                    $isSettingMenu = ($canHotelBrandingMenu && request()->is('settings/hotel-branding*')) || ($canUserAuthorizationMenu && request()->is('settings/user-authorization*')) || ($canApiSettingsMenu && request()->is('settings/api*')) || ($canSynchroniseMenu && request()->is('synchronise')) || ($canChangePasswordMenu && request()->is('settings/change-password'));
                 @endphp
                 <ul class="nav nav-pills nav-sidebar flex-column quantum-sidebar-menu" data-widget="treeview" role="menu" data-accordion="false">
 
@@ -757,6 +758,14 @@
                                 </a>
                             </li>
                             @endif
+                            @if ($canApiSettingsMenu)
+                            <li class="nav-item">
+                                <a href="/settings/api" class="nav-link {{ request()->is('settings/api') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-plug"></i>
+                                    <p>API Settings</p>
+                                </a>
+                            </li>
+                            @endif
                             @if ($canSynchroniseMenu)
                             <li class="nav-item">
                                 <a href="/synchronise" class="nav-link {{ request()->is('synchronise') ? 'active' : '' }}">
@@ -807,9 +816,9 @@
 </div>
 
 <!-- REQUIRED SCRIPTS -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('vendor/adminlte/js/adminlte.min.js') }}"></script>
 <script>
     (function() {
         function isoToDisplayDate(value) {

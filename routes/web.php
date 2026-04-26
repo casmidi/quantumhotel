@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ApiSettingsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\CheckinController;
@@ -428,6 +429,18 @@ Route::get('/settings/hotel-branding/logo', function () {
     if ($response = ensureSessionAccess()) return $response;
     if ($response = ensureMenuPermission('Q01 Hotel Branding')) return $response;
     return app(HotelSettingsController::class)->logo();
+});
+
+Route::get('/settings/api', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureSupervisorAccess()) return $response;
+    return app(ApiSettingsController::class)->edit(request());
+});
+
+Route::post('/settings/api', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureSupervisorAccess()) return $response;
+    return app(ApiSettingsController::class)->update(request());
 });
 
 Route::get('/settings/user-authorization', function () {
