@@ -564,18 +564,19 @@
                     $canItemPackageMenu = $canSidebarMenu('M01 Item Package For Global');
                     $canPackageTransactionMenu = $canSidebarMenu('M02 Menu Package for transaction');
                     $canUserAuthorizationMenu = $sidebarRole === 'SUPERVISOR';
+                    $canChangePasswordMenu = $sidebarUser !== '';
 
                     $canTableMenu = $canKelasMenu || $canRoomMenu;
                     $canPackageMenu = $canItemPackageMenu || $canPackageTransactionMenu;
                     $canTransactionMenu = $canCheckinMenu || $canCheckoutMenu || $canNightAuditMenu;
                     $canReportMenu = $canGuestInHouseMenu || $canExpectedDepartureMenu || $canReceptionRecapMenu;
-                    $canSettingMenu = $canHotelBrandingMenu || $canSynchroniseMenu || $canUserAuthorizationMenu;
+                    $canSettingMenu = $canHotelBrandingMenu || $canSynchroniseMenu || $canUserAuthorizationMenu || $canChangePasswordMenu;
 
                     $isTableMenu = ($canKelasMenu && (request()->is('kelas') || request()->is('kelas/*'))) || ($canRoomMenu && (request()->is('room') || request()->is('room/*')));
                     $isPackageMenu = ($canItemPackageMenu && (request()->is('item-package-global') || request()->is('stock-package'))) || ($canPackageTransactionMenu && request()->is('menu-package-transaction*'));
                     $isTransactionMenu = ($canCheckinMenu && (request()->is('checkin') || request()->is('checkin/*'))) || ($canCheckoutMenu && (request()->is('checkout') || request()->is('checkout/*'))) || ($canNightAuditMenu && (request()->is('night-audit') || request()->is('night-audit/*')));
                     $isReportMenu = ($canGuestInHouseMenu && (request()->is('guest-in-house') || request()->is('guest-in-house/*'))) || ($canExpectedDepartureMenu && (request()->is('expected-departure') || request()->is('expected-departure/*'))) || ($canReceptionRecapMenu && (request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*')));
-                    $isSettingMenu = ($canHotelBrandingMenu && request()->is('settings/hotel-branding*')) || ($canUserAuthorizationMenu && request()->is('settings/user-authorization*')) || ($canSynchroniseMenu && request()->is('synchronise'));
+                    $isSettingMenu = ($canHotelBrandingMenu && request()->is('settings/hotel-branding*')) || ($canUserAuthorizationMenu && request()->is('settings/user-authorization*')) || ($canSynchroniseMenu && request()->is('synchronise')) || ($canChangePasswordMenu && request()->is('settings/change-password'));
                 @endphp
                 <ul class="nav nav-pills nav-sidebar flex-column quantum-sidebar-menu" data-widget="treeview" role="menu" data-accordion="false">
 
@@ -591,7 +592,7 @@
                         <a href="#" class="nav-link {{ $isTableMenu ? 'active' : '' }}">
                             <i class="nav-icon fas fa-database"></i>
                             <p>
-                                Table
+                                Room Management
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
@@ -600,7 +601,7 @@
                             <li class="nav-item">
                                 <a href="/kelas" class="nav-link {{ request()->is('kelas') || request()->is('kelas/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-layer-group"></i>
-                                    <p>Room Class</p>
+                                    <p>Room Types</p>
                                 </a>
                             </li>
                             @endif
@@ -609,7 +610,7 @@
                             <li class="nav-item">
                                 <a href="/room" class="nav-link {{ request()->is('room') || request()->is('room/*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-bed"></i>
-                                    <p>Room</p>
+                                    <p>Room Master</p>
                                 </a>
                             </li>
                             @endif
@@ -761,6 +762,14 @@
                                 <a href="/synchronise" class="nav-link {{ request()->is('synchronise') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-sync-alt"></i>
                                     <p>Synchronise</p>
+                                </a>
+                            </li>
+                            @endif
+                            @if ($canChangePasswordMenu)
+                            <li class="nav-item">
+                                <a href="/settings/change-password" class="nav-link {{ request()->is('settings/change-password') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-key"></i>
+                                    <p>Change Password</p>
                                 </a>
                             </li>
                             @endif

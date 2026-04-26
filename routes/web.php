@@ -17,6 +17,7 @@ use App\Http\Controllers\StockPackageController;
 use App\Http\Controllers\PackageTransactionController;
 use App\Http\Controllers\SynchroniseController;
 use App\Http\Controllers\UserAuthorizationController;
+use App\Http\Controllers\ChangePasswordController;
 
 if (!function_exists('ensureSessionAccess')) {
     function ensureSessionAccess()
@@ -483,6 +484,16 @@ Route::post('/settings/user-authorization/menus/delete', function () {
     return app(UserAuthorizationController::class)->destroyMenu(request());
 });
 
+Route::get('/settings/change-password', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(ChangePasswordController::class)->edit(request());
+});
+
+Route::post('/settings/change-password', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(ChangePasswordController::class)->update(request());
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -538,5 +549,5 @@ Route::get('/user', function () {
 
 Route::get('/change-password', function () {
     if ($response = ensureSessionAccess()) return $response;
-    return respondPlaceholder('Change Password Page');
+    return redirect('/settings/change-password');
 });

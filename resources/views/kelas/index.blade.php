@@ -3,7 +3,7 @@
 @section('title', '')
 
 @section('topbar_brand')
-    <div class="kelas-topbar-title">Room Class</div>
+    <div class="kelas-topbar-title">Room Types</div>
 @endsection
 
 @section('content')
@@ -145,7 +145,7 @@
             transform: translateY(-1px);
             box-shadow:
                 0 0 0 2px var(--package-row-focus-ring),
-                0 10px 22px var(--package-row-focus-shadow);
+                0 8px 18px var(--package-row-focus-shadow);
         }
 
         .kelas-table tbody tr:hover td,
@@ -168,27 +168,32 @@
 
         .kelas-table tbody tr:hover .kelas-code,
         .kelas-table tbody tr:focus-within .kelas-code {
-            background: #fff8e7;
-            color: #0f513c;
-            border: 1px solid var(--package-row-focus-ring);
-            box-shadow: 0 4px 10px rgba(6, 46, 35, 0.18);
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            color: var(--package-row-focus-text);
+        }
+
+        .kelas-table thead th {
+            padding: 0.72rem 0.95rem;
         }
 
         .kelas-table tbody td {
+            padding: 0.66rem 0.95rem;
             vertical-align: middle;
             color: var(--package-text);
+            line-height: 1.25;
         }
 
         .kelas-code {
-            display: inline-flex;
-            align-items: center;
-            min-width: 68px;
-            justify-content: center;
-            padding: 0.45rem 0.7rem;
-            border-radius: 999px;
-            background: var(--package-badge-bg);
+            display: inline;
+            min-width: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
             color: var(--package-badge-text);
-            font-weight: 700;
+            font-weight: 800;
+            font-size: 0.88rem;
             letter-spacing: 0.06em;
         }
 
@@ -205,14 +210,14 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 38px;
-            height: 38px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: rgba(178, 34, 34, 0.08);
             color: #aa2f2f;
             border: 1px solid rgba(178, 34, 34, 0.12);
             text-decoration: none;
-            font-size: 1rem;
+            font-size: 0.88rem;
             transition: all 0.18s ease;
         }
 
@@ -239,34 +244,18 @@
         @endif
 
         <section class="kelas-shell">
-            <div class="kelas-shell-header">
-                <div>
-                    <h2 class="kelas-shell-title">Input Room Class</h2>
-                    <p class="kelas-shell-subtitle">Press Enter to move through each field, and the last field submits the
-                        form automatically.</p>
-                </div>
-                <span class="kelas-shell-badge">Ready for Fast Entry</span>
-            </div>
-
             <div class="kelas-shell-body">
                 <form method="POST" action="/kelas" id="formKelas">
                     @csrf
 
                     <div class="form-row">
                         <div class="form-group col-lg-2 col-md-3">
-                            <label class="kelas-label" for="RecordId">ID</label>
-                            <input type="text" id="RecordId" class="form-control kelas-input" readonly>
-                        </div>
-
-                        <div class="form-group col-lg-2 col-md-3">
-                            <label class="kelas-label" for="Kode">Kode</label>
+                            <label class="kelas-label" for="Kode">Code</label>
                             <input type="text" name="Kode" id="Kode" class="form-control kelas-input" required>
-                            <small class="text-muted d-block mt-2">If the code already exists, pressing Enter will load that
-                                room class for editing.</small>
                         </div>
 
                         <div class="form-group col-lg-5 col-md-9">
-                            <label class="kelas-label" for="Nama">Nama</label>
+                            <label class="kelas-label" for="Nama">Room Facilities</label>
                             <input type="text" name="Nama" id="Nama" class="form-control kelas-input" required>
                         </div>
 
@@ -284,7 +273,7 @@
                     </div>
 
                     <div class="kelas-actions">
-                        <button class="btn text-white kelas-btn-primary" id="saveButton">Save Room Class</button>
+                        <button class="btn text-white kelas-btn-primary" id="saveButton">Save Room Type</button>
                         <button type="button" class="btn kelas-btn-secondary" onclick="resetForm()" id="resetButton">Reset
                             Form</button>
                     </div>
@@ -292,56 +281,7 @@
             </div>
         </section>
 
-        <section class="kelas-shell">
-            <div class="kelas-shell-header">
-                <div>
-                    <h2 class="kelas-shell-title">Class Directory</h2>
-                    <p class="kelas-shell-subtitle">Click any row to load its data into the form and switch directly into
-                        edit mode.</p>
-                </div>
-            </div>
-
-            <div class="kelas-table-wrap">
-                <div class="table-responsive">
-                    <table class="table kelas-table" id="tableKelas">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Kode</th>
-                                <th>Nama</th>
-                                <th class="text-right">Rate</th>
-                                <th class="text-right">Deposit</th>
-                                <th class="text-center" width="90">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($kelas as $k)
-                                <tr data-id="{{ $k->id }}" data-kode="{{ $k->Kode }}"
-                                    data-nama="{{ $k->Nama }}" data-rate="{{ $k->Rate1 }}"
-                                    data-depo="{{ $k->Depo1 }}">
-                                    <td>{{ $k->id ?? '-' }}</td>
-                                    <td><span class="kelas-code">{{ $k->Kode }}</span></td>
-                                    <td class="kelas-name">{{ $k->Nama }}</td>
-                                    <td class="text-right kelas-money">{{ number_format($k->Rate1 ?? 0, 0, ',', '.') }}
-                                    </td>
-                                    <td class="text-right kelas-money">{{ number_format($k->Depo1 ?? 0, 0, ',', '.') }}
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="/kelas/{{ $k->Kode }}/delete" class="kelas-delete" title="Delete"
-                                            aria-label="Delete">&#128465;</a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="kelas-empty">No room class records yet. Create the first one
-                                        to get started.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+        @include('kelas.partials.directory-section', ['kelas' => $kelas])
     </div>
 
     <script>
@@ -387,14 +327,12 @@
         }
 
         const formKelas = document.getElementById('formKelas');
-        const recordIdField = document.getElementById('RecordId');
         const kodeField = document.getElementById('Kode');
         const namaField = document.getElementById('Nama');
         const rateField = document.getElementById('Rate1');
         const depoField = document.getElementById('Depo1');
         const saveButton = document.getElementById('saveButton');
         const resetButton = document.getElementById('resetButton');
-        const tableRows = Array.from(document.querySelectorAll('#tableKelas tbody tr[data-kode]'));
 
         const fields = [kodeField, namaField, rateField, depoField];
         const numericFields = [rateField, depoField];
@@ -402,11 +340,11 @@
         function findExistingRowByCode(kode) {
             const normalizedCode = normalizeCode(kode);
 
-            return tableRows.find((row) => normalizeCode(row.dataset.kode) === normalizedCode) || null;
+            return Array.from(document.querySelectorAll('#tableKelas tbody tr[data-kode]'))
+                .find((row) => normalizeCode(row.dataset.kode) === normalizedCode) || null;
         }
 
         function loadRowIntoForm(row) {
-            recordIdField.value = row.dataset.id || '';
             kodeField.value = row.dataset.kode;
             namaField.value = row.dataset.nama;
             rateField.value = formatRibuan(row.dataset.rate || '');
@@ -414,7 +352,7 @@
 
             kodeField.readOnly = true;
             formKelas.action = '/kelas/' + row.dataset.kode + '/update';
-            saveButton.textContent = 'Update Room Class';
+            saveButton.textContent = 'Update Room Type';
             resetButton.textContent = 'Cancel Edit';
             namaField.focus();
             namaField.select();
@@ -456,12 +394,83 @@
             });
         });
 
-        document.querySelector('#tableKelas tbody').addEventListener('click', function(event) {
-            if (event.target.closest('a')) {
+        function parseKelasDirectoryShell(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            return doc.getElementById('kelasDirectoryShell');
+        }
+
+        function replaceKelasDirectoryShell(nextShell) {
+            const currentShell = document.getElementById('kelasDirectoryShell');
+
+            if (!currentShell || !nextShell) {
                 return;
             }
 
-            const row = event.target.closest('tr');
+            currentShell.replaceWith(nextShell);
+        }
+
+        async function refreshKelasDirectory(url, options = {}) {
+            const currentShell = document.getElementById('kelasDirectoryShell');
+
+            if (!currentShell) {
+                window.location.href = url;
+                return;
+            }
+
+            const targetUrl = new URL(url, window.location.origin);
+            currentShell.setAttribute('aria-busy', 'true');
+
+            try {
+                const response = await fetch(targetUrl.toString(), {
+                    headers: {
+                        'Accept': 'text/html',
+                        'X-Partial-Component': 'kelas-directory',
+                    },
+                    credentials: 'same-origin',
+                });
+
+                if (!response.ok) {
+                    throw new Error('Room Types directory request failed.');
+                }
+
+                const html = await response.text();
+                const nextShell = parseKelasDirectoryShell(html);
+
+                if (!nextShell) {
+                    throw new Error('Room Types directory markup is missing.');
+                }
+
+                replaceKelasDirectoryShell(nextShell);
+
+                if (options.pushHistory !== false) {
+                    window.history.pushState({
+                        kelasDirectory: true
+                    }, '', targetUrl.pathname + targetUrl.search + targetUrl.hash);
+                }
+            } catch (error) {
+                console.error('Unable to refresh Room Types directory:', error);
+                window.location.href = targetUrl.pathname + targetUrl.search + targetUrl.hash;
+            } finally {
+                document.getElementById('kelasDirectoryShell')?.removeAttribute('aria-busy');
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const paginationLink = event.target.closest('#kelasDirectoryShell .kelas-pagination-wrap a[href]');
+
+            if (paginationLink) {
+                event.preventDefault();
+                refreshKelasDirectory(paginationLink.href);
+                return;
+            }
+
+            const tableLink = event.target.closest('#tableKelas a');
+
+            if (tableLink) {
+                return;
+            }
+
+            const row = event.target.closest('#tableKelas tbody tr');
 
             if (!row || !row.dataset.kode) {
                 return;
@@ -470,12 +479,17 @@
             loadRowIntoForm(row);
         });
 
+        window.addEventListener('popstate', function() {
+            refreshKelasDirectory(window.location.href, {
+                pushHistory: false,
+            });
+        });
+
         function resetForm() {
-            recordIdField.value = '';
             formKelas.reset();
             kodeField.readOnly = false;
             formKelas.action = '/kelas';
-            saveButton.textContent = 'Save Room Class';
+            saveButton.textContent = 'Save Room Type';
             resetButton.textContent = 'Reset Form';
             kodeField.focus();
         }

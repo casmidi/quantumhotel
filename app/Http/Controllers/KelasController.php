@@ -25,6 +25,12 @@ class KelasController extends Controller
         $kelasCollection = $query->orderBy('Kode')->get();
         $kelas = $this->paginateCollection($kelasCollection, 10, $request);
 
+        if ($request->header('X-Partial-Component') === 'kelas-directory') {
+            return view('kelas.partials.directory-section', [
+                'kelas' => $kelas,
+            ]);
+        }
+
         return $this->respond($request, 'kelas.index', [
             'kelas' => $kelas,
         ], $kelas);
