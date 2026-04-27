@@ -18,15 +18,18 @@ class BookingReportController extends Controller
         $search = strtoupper(trim((string) $request->query('search', '')));
         $viewMode = $this->resolveViewMode($request);
 
-        if ($viewMode === 'calendar') {
+        if (in_array($viewMode, ['calendar', 'availability', 'reservation'], true)) {
             [$dateFrom, $dateTo] = $this->dateRangeForMonth($month);
         }
 
-        $detailRows = $this->loadBookingRows($dateFrom, $dateTo, $resNo, $search);
-        $summaryRows = $this->buildBookingSummaryRows($detailRows);
-        $calendarRows = $this->loadCalendarBookingRows($month, $resNo, $search);
-        $rows = $viewMode === 'calendar' ? $calendarRows : $detailRows;
-        $calendar = $this->buildMonthlyCalendar($calendarRows, $month);
+        [$rows, $summaryRows, $calendar, $availabilityChart] = $this->buildReportPayload(
+            $viewMode,
+            $dateFrom,
+            $dateTo,
+            $month,
+            $resNo,
+            $search
+        );
         $summary = $this->buildSummary($rows, $dateFrom, $dateTo);
 
         return $this->respond($request, 'reports.booking.index', [
@@ -40,6 +43,7 @@ class BookingReportController extends Controller
             'rows' => $rows,
             'summaryRows' => $summaryRows,
             'calendar' => $calendar,
+            'availabilityChart' => $availabilityChart,
             'summary' => $summary,
             'printUrl' => $this->printUrl($dateFrom, $dateTo, $month, $resNo, $search, $viewMode),
         ], [
@@ -51,6 +55,7 @@ class BookingReportController extends Controller
             'rows' => $rows,
             'summary_rows' => $summaryRows,
             'calendar' => $calendar,
+            'availability_chart' => $availabilityChart,
         ]);
     }
 
@@ -62,15 +67,18 @@ class BookingReportController extends Controller
         $search = strtoupper(trim((string) $request->query('search', '')));
         $viewMode = $this->resolveViewMode($request);
 
-        if ($viewMode === 'calendar') {
+        if (in_array($viewMode, ['calendar', 'availability', 'reservation'], true)) {
             [$dateFrom, $dateTo] = $this->dateRangeForMonth($month);
         }
 
-        $detailRows = $this->loadBookingRows($dateFrom, $dateTo, $resNo, $search);
-        $summaryRows = $this->buildBookingSummaryRows($detailRows);
-        $calendarRows = $this->loadCalendarBookingRows($month, $resNo, $search);
-        $rows = $viewMode === 'calendar' ? $calendarRows : $detailRows;
-        $calendar = $this->buildMonthlyCalendar($calendarRows, $month);
+        [$rows, $summaryRows, $calendar, $availabilityChart] = $this->buildReportPayload(
+            $viewMode,
+            $dateFrom,
+            $dateTo,
+            $month,
+            $resNo,
+            $search
+        );
         $summary = $this->buildSummary($rows, $dateFrom, $dateTo);
 
         return $this->respond($request, 'reports.booking.print', [
@@ -84,6 +92,7 @@ class BookingReportController extends Controller
             'rows' => $rows,
             'summaryRows' => $summaryRows,
             'calendar' => $calendar,
+            'availabilityChart' => $availabilityChart,
             'summary' => $summary,
         ], [
             'date_from' => $dateFrom,
@@ -94,12 +103,36 @@ class BookingReportController extends Controller
             'rows' => $rows,
             'summary_rows' => $summaryRows,
             'calendar' => $calendar,
+            'availability_chart' => $availabilityChart,
         ]);
     }
 
     private function loadBookingRows(string $dateFrom, string $dateTo, string $resNo = '', string $search = ''): Collection
     {
         return $this->loadBookingRowsForPeriod($dateFrom, $dateTo, $resNo, $search, false);
+    }
+
+    private function buildReportPayload(string $viewMode, string $dateFrom, string $dateTo, string $month, string $resNo, string $search): array
+    {
+        $rows = collect();
+        $summaryRows = collect();
+        $calendar = $this->emptyMonthlyCalendar($month);
+        $availabilityChart = $this->emptyAvailabilityChart($month);
+
+        if ($viewMode === 'summary') {
+            $rows = $this->loadBookingRows($dateFrom, $dateTo, $resNo, $search);
+            $summaryRows = $this->buildBookingSummaryRows($rows);
+        } elseif ($viewMode === 'detail') {
+            $rows = $this->loadBookingRows($dateFrom, $dateTo, $resNo, $search);
+        } elseif ($viewMode === 'calendar') {
+            $rows = $this->loadCalendarBookingRows($month, $resNo, $search);
+            $calendar = $this->buildMonthlyCalendar($rows, $month);
+        } else {
+            $rows = $this->loadCalendarBookingRows($month, $resNo, $search);
+            $availabilityChart = $this->buildAvailabilityChart($rows, $month);
+        }
+
+        return [$rows, $summaryRows, $calendar, $availabilityChart];
     }
 
     private function loadCalendarBookingRows(string $month, string $resNo = '', string $search = ''): Collection
@@ -241,6 +274,236 @@ class BookingReportController extends Controller
         ];
     }
 
+    private function emptyMonthlyCalendar(string $month): array
+    {
+        return [
+            'month_label' => Carbon::parse($month . '-01')->format('F Y'),
+            'days' => [],
+        ];
+    }
+
+    private function emptyAvailabilityChart(string $month): array
+    {
+        return [
+            'month_label' => Carbon::parse($month . '-01')->format('F Y'),
+            'day_count' => 0,
+            'total_rooms' => 0,
+            'days' => [],
+            'groups' => [],
+        ];
+    }
+
+    private function buildAvailabilityChart(Collection $rows, string $month): array
+    {
+        $start = Carbon::parse($month . '-01')->startOfMonth();
+        $end = $start->copy()->endOfMonth();
+        $startKey = $start->format('Y-m-d');
+        $endKey = $end->format('Y-m-d');
+        $days = [];
+        $dayIndex = [];
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            $dateKey = $cursor->format('Y-m-d');
+            $dayIndex[$dateKey] = count($days) + 1;
+            $days[] = [
+                'date' => $dateKey,
+                'day' => $cursor->format('d'),
+                'weekday' => $cursor->format('D'),
+                'month' => $cursor->format('M'),
+                'is_today' => $cursor->isSameDay(Carbon::today()),
+                'booked_count' => 0,
+                'available_count' => 0,
+                'availability_percent' => 0,
+            ];
+
+            $cursor->addDay();
+        }
+
+        $roomMap = [];
+        $this->loadAvailabilityRooms()->each(function (array $room) use (&$roomMap) {
+            $roomMap[$room['code']] = $room;
+        });
+
+        foreach ($rows as $row) {
+            $code = strtoupper(trim((string) ($row->Kode ?? '')));
+
+            if ($code === '' || isset($roomMap[$code])) {
+                continue;
+            }
+
+            $roomMap[$code] = [
+                'code' => $code,
+                'class' => trim((string) ($row->Kelas ?? '')) ?: 'Unassigned',
+                'rate' => (float) ($row->Rate ?? 0),
+            ];
+        }
+
+        uasort($roomMap, function (array $left, array $right) {
+            $classCompare = strnatcasecmp($left['class'], $right['class']);
+
+            return $classCompare !== 0 ? $classCompare : strnatcasecmp($left['code'], $right['code']);
+        });
+
+        $bookingRows = $rows
+            ->filter(fn ($row) => trim((string) ($row->Kode ?? '')) !== '' && ($row->TglInKey ?? '') !== '')
+            ->sortBy(fn ($row) => ($row->TglInKey ?? '') . '|' . trim((string) ($row->Kode ?? '')))
+            ->values();
+
+        $tapesByRoom = [];
+
+        foreach ($bookingRows as $row) {
+            $code = strtoupper(trim((string) ($row->Kode ?? '')));
+            $checkInKey = (string) ($row->TglInKey ?? '');
+            $checkOutKey = (string) (($row->TglOutKey ?? '') ?: $checkInKey);
+
+            if ($code === '' || $checkInKey === '') {
+                continue;
+            }
+
+            $clampedStart = $checkInKey < $startKey ? $startKey : $checkInKey;
+            $clampedEnd = $checkOutKey > $endKey ? $endKey : $checkOutKey;
+
+            if ($clampedStart > $endKey || $clampedEnd < $startKey || $clampedStart > $clampedEnd) {
+                continue;
+            }
+
+            $startColumn = $dayIndex[$clampedStart] ?? 1;
+            $endColumn = $dayIndex[$clampedEnd] ?? count($days);
+            $guest = trim((string) (($row->Guest ?? '') ?: ($row->BookingGuest ?? '') ?: ($row->ResNo ?? 'Booked')));
+            $colorIndex = abs((int) crc32(($row->ResNo ?? '') . '|' . $code)) % 6;
+
+            $tapesByRoom[$code] ??= [];
+            $tapesByRoom[$code][] = [
+                'res_no' => trim((string) ($row->ResNo ?? '')),
+                'guest' => $guest,
+                'label' => strlen($guest) > 26 ? substr($guest, 0, 24) . '..' : $guest,
+                'room' => $code,
+                'start_column' => $startColumn,
+                'end_column' => $endColumn,
+                'span' => max(1, $endColumn - $startColumn + 1),
+                'lane' => 1,
+                'class' => 'tape-' . $colorIndex,
+                'date_range' => $this->formatDate($checkInKey) . ' - ' . $this->formatDate($checkOutKey),
+            ];
+        }
+
+        $laneCounts = [];
+
+        foreach ($tapesByRoom as $code => $tapes) {
+            usort($tapes, fn (array $left, array $right) => [$left['start_column'], $left['end_column']] <=> [$right['start_column'], $right['end_column']]);
+
+            $laneEnds = [];
+
+            foreach ($tapes as $index => $tape) {
+                $lane = 0;
+
+                while (isset($laneEnds[$lane]) && $laneEnds[$lane] >= $tape['start_column']) {
+                    $lane++;
+                }
+
+                $laneEnds[$lane] = $tape['end_column'];
+                $tapes[$index]['lane'] = $lane + 1;
+            }
+
+            $tapesByRoom[$code] = $tapes;
+            $laneCounts[$code] = max(1, count($laneEnds));
+        }
+
+        $totalRooms = count($roomMap);
+        $bookedRoomCodesByDate = [];
+
+        foreach ($bookingRows as $row) {
+            $code = strtoupper(trim((string) ($row->Kode ?? '')));
+            $checkInKey = (string) ($row->TglInKey ?? '');
+            $checkOutKey = (string) (($row->TglOutKey ?? '') ?: $checkInKey);
+
+            if ($code === '' || $checkInKey === '') {
+                continue;
+            }
+
+            $clampedStart = $checkInKey < $startKey ? $startKey : $checkInKey;
+            $clampedEnd = $checkOutKey > $endKey ? $endKey : $checkOutKey;
+
+            if ($clampedStart > $endKey || $clampedEnd < $startKey || $clampedStart > $clampedEnd) {
+                continue;
+            }
+
+            $cursor = Carbon::parse($clampedStart);
+            $bookingEnd = Carbon::parse($clampedEnd);
+
+            while ($cursor->lte($bookingEnd)) {
+                $dateKey = $cursor->format('Y-m-d');
+                $bookedRoomCodesByDate[$dateKey] ??= [];
+                $bookedRoomCodesByDate[$dateKey][$code] = true;
+                $cursor->addDay();
+            }
+        }
+
+        foreach ($days as $index => $day) {
+            $dateKey = $day['date'];
+            $bookedCount = isset($bookedRoomCodesByDate[$dateKey]) ? count($bookedRoomCodesByDate[$dateKey]) : 0;
+            $availableCount = max(0, $totalRooms - $bookedCount);
+
+            $days[$index]['booked_count'] = $bookedCount;
+            $days[$index]['available_count'] = $availableCount;
+            $days[$index]['availability_percent'] = $totalRooms > 0 ? round(($availableCount / $totalRooms) * 100) : 0;
+        }
+
+        $groups = collect($roomMap)
+            ->groupBy('class')
+            ->map(function (Collection $rooms, string $class) use ($tapesByRoom, $laneCounts) {
+                $items = $rooms
+                    ->map(function (array $room) use ($tapesByRoom, $laneCounts) {
+                        $laneCount = $laneCounts[$room['code']] ?? 1;
+
+                        return [
+                            'code' => $room['code'],
+                            'class' => $room['class'],
+                            'rate' => $room['rate'],
+                            'lane_count' => $laneCount,
+                            'row_height' => 44 + (($laneCount - 1) * 26),
+                            'tapes' => $tapesByRoom[$room['code']] ?? [],
+                        ];
+                    })
+                    ->values()
+                    ->all();
+
+                return [
+                    'class' => $class ?: 'Unassigned',
+                    'room_count' => count($items),
+                    'rooms' => $items,
+                ];
+            })
+            ->values()
+            ->all();
+
+        return [
+            'month_label' => $start->format('F Y'),
+            'day_count' => count($days),
+            'total_rooms' => $totalRooms,
+            'days' => $days,
+            'groups' => $groups,
+        ];
+    }
+
+    private function loadAvailabilityRooms(): Collection
+    {
+        return DB::table('ROOM')
+            ->selectRaw('RTRIM(Kode) as Kode, RTRIM(Nama) as Kelas, Rate1')
+            ->whereRaw("RTRIM(Kode) <> '999'")
+            ->orderByRaw('RTRIM(Nama)')
+            ->orderByRaw('RTRIM(Kode)')
+            ->get()
+            ->map(fn ($room) => [
+                'code' => strtoupper(trim((string) ($room->Kode ?? ''))),
+                'class' => trim((string) ($room->Kelas ?? '')) ?: 'Unassigned',
+                'rate' => (float) ($room->Rate1 ?? 0),
+            ])
+            ->filter(fn (array $room) => $room['code'] !== '')
+            ->values();
+    }
+
     private function buildBookingSummaryRows(Collection $rows): Collection
     {
         return $rows
@@ -324,7 +587,7 @@ class BookingReportController extends Controller
     {
         $viewMode = strtolower(trim((string) $request->query('view', 'summary')));
 
-        return in_array($viewMode, ['summary', 'calendar', 'detail'], true) ? $viewMode : 'summary';
+        return in_array($viewMode, ['summary', 'calendar', 'detail', 'availability', 'reservation'], true) ? $viewMode : 'summary';
     }
 
     private function printUrl(string $dateFrom, string $dateTo, string $month, string $resNo, string $search, string $viewMode): string

@@ -108,6 +108,41 @@
             white-space: nowrap;
         }
 
+        .timeline-table {
+            table-layout: fixed;
+            font-size: 9px;
+        }
+
+        .timeline-table th,
+        .timeline-table td {
+            padding: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .timeline-room {
+            width: 86px;
+            text-align: left;
+        }
+
+        .timeline-group td {
+            background: #f2e8ea;
+            color: #7c5158;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .timeline-booked {
+            background: #eedada;
+            color: #8d1e26;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .timeline-today {
+            background: #fff4bc;
+        }
+
         @media print {
             body {
                 margin: 10mm;
@@ -120,11 +155,15 @@
         <div>
             <h1>
                 @if ($viewMode === 'detail')
-                    Breakdown / Details Booking Report
+                    Booking Detail Ledger
                 @elseif ($viewMode === 'calendar')
-                    Calendar Booking Report
+                    Monthly Booking Calendar
+                @elseif ($viewMode === 'availability')
+                    Room Availability Chart
+                @elseif ($viewMode === 'reservation')
+                    Reservation Calendar Board
                 @else
-                    Summary Booking Report
+                    Executive Booking Summary
                 @endif
             </h1>
             <div class="muted">{{ $profile['address'] ?? '' }}</div>
@@ -132,7 +171,7 @@
         </div>
         <div>
             <strong>{{ \Carbon\Carbon::parse($dateFrom)->format('d-m-Y') }} - {{ \Carbon\Carbon::parse($dateTo)->format('d-m-Y') }}</strong><br>
-            @if ($viewMode === 'calendar')
+            @if (in_array($viewMode, ['calendar', 'availability', 'reservation'], true))
                 <span class="muted">Calendar: {{ $calendar['month_label'] }}</span><br>
             @endif
             <span class="muted">Generated: {{ $summary['generated_at'] }}</span>
@@ -149,7 +188,6 @@
                     <th>Guest</th>
                     <th>Rooms</th>
                     <th>Room List</th>
-                    <th>Class</th>
                     <th>Remark</th>
                     <th class="text-right">Rate</th>
                 </tr>
@@ -163,12 +201,11 @@
                         <td>{{ $row->Guest }}</td>
                         <td>{{ $row->RoomCount }} {{ $row->RoomCount === 1 ? 'room' : 'rooms' }}</td>
                         <td class="text-left room-list">{{ $row->RoomList }}</td>
-                        <td>{{ $row->ClassList }}</td>
                         <td>{{ $row->Remark }}</td>
                         <td class="text-right">{{ number_format($row->Rate, 0, ',', '.') }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" style="text-align:center;">No booking data.</td></tr>
+                    <tr><td colspan="8" style="text-align:center;">No booking data.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -205,6 +242,39 @@
                 @empty
                     <tr><td colspan="10" style="text-align:center;">No booking data.</td></tr>
                 @endforelse
+            </tbody>
+        </table>
+    @elseif (in_array($viewMode, ['availability', 'reservation'], true))
+        <table class="timeline-table">
+            <thead>
+                <tr>
+                    <th class="timeline-room">Room / Date</th>
+                    @foreach ($availabilityChart['days'] as $day)
+                        <th>{{ $day['weekday'] }}<br>{{ $day['day'] }} {{ $day['month'] }}</th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($availabilityChart['groups'] as $group)
+                    <tr class="timeline-group">
+                        <td colspan="{{ $availabilityChart['day_count'] + 1 }}">{{ $group['class'] }} - {{ $group['room_count'] }} rooms</td>
+                    </tr>
+                    @foreach ($group['rooms'] as $room)
+                        <tr>
+                            <td class="timeline-room">
+                                <strong>{{ $room['code'] }}</strong><br>
+                                <span class="muted">{{ $room['class'] }}</span>
+                            </td>
+                            @foreach ($availabilityChart['days'] as $day)
+                                @php($dayColumn = $loop->iteration)
+                                @php($cellTape = collect($room['tapes'])->first(fn ($tape) => $tape['start_column'] <= $dayColumn && $tape['end_column'] >= $dayColumn))
+                                <td class="{{ $cellTape ? 'timeline-booked' : '' }} {{ $day['is_today'] ? 'timeline-today' : '' }}">
+                                    {{ $cellTape['label'] ?? '' }}
+                                </td>
+                            @endforeach
+                        </tr>
+                    @endforeach
+                @endforeach
             </tbody>
         </table>
     @else
