@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ApiSettingsController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\BookingReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\CheckinController;
@@ -316,6 +318,30 @@ Route::get('/menu-package-transaction/{nofak}/delete', function ($nofak) {
 | TRANSACTION
 |--------------------------------------------------------------------------
 */
+Route::get('/booking', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('400 Transaksi Check In')) return $response;
+    return app(BookingController::class)->index(request());
+});
+
+Route::post('/booking', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('400 Transaksi Check In')) return $response;
+    return app(BookingController::class)->store(request());
+});
+
+Route::post('/booking/{resno2}/update', function ($resno2) {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('400 Transaksi Check In')) return $response;
+    return app(BookingController::class)->update(request(), $resno2);
+});
+
+Route::get('/booking/{resno2}/delete', function ($resno2) {
+    if ($response = ensureSessionAccess()) return $response;
+    if ($response = ensureMenuPermission('400 Transaksi Check In')) return $response;
+    return app(BookingController::class)->destroy(request(), $resno2);
+});
+
 Route::get('/checkin', function () {
     if ($response = ensureSessionAccess()) return $response;
     if ($response = ensureMenuPermission('400 Transaksi Check In')) return $response;
@@ -546,6 +572,16 @@ Route::get('/expected-departure/print', function () {
     if ($response = ensureSessionAccess()) return $response;
     if ($response = ensureMenuPermission('918 Laporan Expected Departure')) return $response;
     return app(ExpectedDepartureController::class)->print(request());
+});
+
+Route::get('/booking-report', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(BookingReportController::class)->index(request());
+});
+
+Route::get('/booking-report/print', function () {
+    if ($response = ensureSessionAccess()) return $response;
+    return app(BookingReportController::class)->print(request());
 });
 
 Route::get('/reception-customer-recaptulation', function () {

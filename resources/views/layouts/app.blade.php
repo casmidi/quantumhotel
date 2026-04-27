@@ -553,12 +553,14 @@
 
                     $canKelasMenu = $canSidebarMenu('130 Master Kelas');
                     $canRoomMenu = $canSidebarMenu('102 Master Room');
+                    $canBookingMenu = $canSidebarMenu('400 Transaksi Check In');
                     $canCheckinMenu = $canSidebarMenu('400 Transaksi Check In');
                     $canCheckoutMenu = $canSidebarMenu('410 Transaksi Check Out');
                     $canNightAuditMenu = $canSidebarMenu('M31 Night Audit Report');
                     $canGuestInHouseMenu = $canSidebarMenu('902 Laporan Guest In House');
                     $canExpectedDepartureMenu = $canSidebarMenu('918 Laporan Expected Departure');
                     $canReceptionRecapMenu = $canSidebarMenu('925 Laporan Room Recapitulation');
+                    $canBookingReportMenu = $canBookingMenu || $sidebarUser === 'S';
                     $canHotelBrandingMenu = $canSidebarMenu('Q01 Hotel Branding');
                     $canSynchroniseMenu = $canSidebarMenu('Q02 Synchronise');
                     $canItemPackageMenu = $canSidebarMenu('M01 Item Package For Global');
@@ -570,14 +572,14 @@
 
                     $canTableMenu = $canKelasMenu || $canRoomMenu;
                     $canPackageMenu = $canItemPackageMenu || $canPackageTransactionMenu;
-                    $canTransactionMenu = $canCheckinMenu || $canCheckoutMenu || $canNightAuditMenu;
-                    $canReportMenu = $canGuestInHouseMenu || $canExpectedDepartureMenu || $canReceptionRecapMenu;
+                    $canTransactionMenu = $canBookingMenu || $canCheckinMenu || $canCheckoutMenu || $canNightAuditMenu;
+                    $canReportMenu = $canGuestInHouseMenu || $canExpectedDepartureMenu || $canReceptionRecapMenu || $canBookingReportMenu;
                     $canSettingMenu = $canHotelBrandingMenu || $canSynchroniseMenu || $canUserAuthorizationMenu || $canApiSettingsMenu || $canChangePasswordMenu;
 
                     $isTableMenu = ($canKelasMenu && (request()->is('kelas') || request()->is('kelas/*'))) || ($canRoomMenu && (request()->is('room') || request()->is('room/*')));
                     $isPackageMenu = ($canItemPackageMenu && (request()->is('item-package-global') || request()->is('stock-package'))) || ($canPackageTransactionMenu && request()->is('menu-package-transaction*'));
-                    $isTransactionMenu = ($canCheckinMenu && (request()->is('checkin') || request()->is('checkin/*'))) || ($canCheckoutMenu && (request()->is('checkout') || request()->is('checkout/*'))) || ($canNightAuditMenu && (request()->is('night-audit') || request()->is('night-audit/*')));
-                    $isReportMenu = ($canGuestInHouseMenu && (request()->is('guest-in-house') || request()->is('guest-in-house/*'))) || ($canExpectedDepartureMenu && (request()->is('expected-departure') || request()->is('expected-departure/*'))) || ($canReceptionRecapMenu && (request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*')));
+                    $isTransactionMenu = ($canBookingMenu && (request()->is('booking') || request()->is('booking/*'))) || ($canCheckinMenu && (request()->is('checkin') || request()->is('checkin/*'))) || ($canCheckoutMenu && (request()->is('checkout') || request()->is('checkout/*'))) || ($canNightAuditMenu && (request()->is('night-audit') || request()->is('night-audit/*')));
+                    $isReportMenu = ($canGuestInHouseMenu && (request()->is('guest-in-house') || request()->is('guest-in-house/*'))) || ($canExpectedDepartureMenu && (request()->is('expected-departure') || request()->is('expected-departure/*'))) || ($canReceptionRecapMenu && (request()->is('reception-customer-recaptulation') || request()->is('reception-customer-recaptulation/*'))) || ($canBookingReportMenu && (request()->is('booking-report') || request()->is('booking-report/*')));
                     $isSettingMenu = ($canHotelBrandingMenu && request()->is('settings/hotel-branding*')) || ($canUserAuthorizationMenu && request()->is('settings/user-authorization*')) || ($canApiSettingsMenu && request()->is('settings/api*')) || ($canSynchroniseMenu && request()->is('synchronise')) || ($canChangePasswordMenu && request()->is('settings/change-password'));
                     $isToolsMenu = $canToolsMenu && request()->is('tools/class-test*');
                 @endphp
@@ -664,6 +666,15 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @if ($canBookingMenu)
+                            <li class="nav-item">
+                                <a href="/booking" class="nav-link {{ request()->is('booking') || request()->is('booking/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-calendar-plus"></i>
+                                    <p>Room Booking</p>
+                                </a>
+                            </li>
+                            @endif
+
                             @if ($canCheckinMenu)
                             <li class="nav-item">
                                 <a href="/checkin" class="nav-link {{ request()->is('checkin') || request()->is('checkin/*') ? 'active' : '' }}">
@@ -704,6 +715,15 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @if ($canBookingReportMenu)
+                            <li class="nav-item">
+                                <a href="/booking-report" class="nav-link {{ request()->is('booking-report') || request()->is('booking-report/*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-calendar-alt"></i>
+                                    <p>Booking Report</p>
+                                </a>
+                            </li>
+                            @endif
+
                             @if ($canGuestInHouseMenu)
                             <li class="nav-item">
                                 <a href="/guest-in-house" class="nav-link {{ request()->is('guest-in-house') || request()->is('guest-in-house/*') ? 'active' : '' }}">
